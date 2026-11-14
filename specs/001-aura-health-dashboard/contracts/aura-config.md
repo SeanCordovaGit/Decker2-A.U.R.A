@@ -1,4 +1,4 @@
-# Contract: `src/config/aura.ts`
+# Contract: `config/aura.ts`
 
 The single source of truth (Constitution IV). UI and logic import only from here for thresholds,
 colors, actions, escalation and citations.

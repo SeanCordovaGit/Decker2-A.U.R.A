@@ -2,16 +2,16 @@
 
 ## Prerequisites
 
-- Node.js 20+ and npm
+- Node.js 20+ and pnpm
 - Optional: NASA API key from api.nasa.gov in `.env.local` as `NASA_API_KEY=...`
 
 ## Setup
 
 ```bash
-npm install
-npm run fetch:donki   # refresh the bundled NASA cache (needs network + personal NASA_API_KEY)
-npm test              # unit tests: thresholds, severity, MHI, discrepancy, sentiment
-npm run dev           # http://localhost:3000
+pnpm install
+pnpm fetch:donki   # refresh the bundled NASA cache (needs network + personal NASA_API_KEY)
+pnpm test              # unit tests: thresholds, severity, MHI, discrepancy, sentiment
+pnpm dev           # http://localhost:3000
 ```
 
 ## Validation scenarios
@@ -36,5 +36,5 @@ npm run dev           # http://localhost:3000
 ## Build check
 
 ```bash
-npm run build
+pnpm build
 ```

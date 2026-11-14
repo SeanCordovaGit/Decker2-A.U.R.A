@@ -56,7 +56,7 @@ checked. The DONKI API facts in R5 were confirmed against the live API on 2026-1
 - **Decision**: route handler `GET /api/donki/sep` calls
   `https://api.nasa.gov/DONKI/SEP?startDate=…&endDate=…&api_key=…` for the last 60 days with a
   5 s timeout, key from `NASA_API_KEY` (fallback `DEMO_KEY`). On any failure or empty result,
-  returns bundled `src/data/donki-sep-cache.json` with `source: "nasaCached"`.
+  returns bundled `data/donki-sep-cache.json` with `source: "nasaCached"`.
 - **Confirmed API constraints (2026-11-14)**:
   - A request range longer than 60 days is rejected with HTTP 400
     ("Date range cannot exceed 60 days").
@@ -64,7 +64,7 @@ checked. The DONKI API facts in R5 were confirmed against the live API on 2026-1
     key from api.nasa.gov is required for the cache refresh and the live demo.
   - A range with no events can return an empty body rather than `[]`.
 - **Cache content**: MUST contain real DONKI records. It is populated by
-  `npm run fetch:donki`, which fetches 60-day chunks going back about 2 years, merges by `sepID`,
+  `pnpm fetch:donki`, which fetches 60-day chunks going back about 2 years, merges by `sepID`,
   and on HTTP 429 saves the events fetched so far. The cache MUST NOT be hand-written or
   fabricated; if it cannot be populated, the cache is an empty list and the UI states that no
   cached events are available.

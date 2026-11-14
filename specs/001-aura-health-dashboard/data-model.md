@@ -1,6 +1,6 @@
 # Data Model: A.U.R.A.
 
-All entities are in-memory TypeScript types defined in `src/lib/types.ts`.
+All entities are in-memory TypeScript types defined in `lib/types.ts`.
 
 ## Enumerations
 
