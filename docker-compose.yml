@@ -1,0 +1,10 @@
+services:
+  aura:
+    build: .
+    ports:
+      - "3000:3000"
+    # NASA_API_KEY is read at request time; without it the app uses DEMO_KEY and the bundled cache
+    env_file:
+      - path: .env.local
+        required: false
+    restart: unless-stopped

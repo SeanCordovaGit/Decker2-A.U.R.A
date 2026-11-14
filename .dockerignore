@@ -1,0 +1,21 @@
+**/node_modules
+**/.next
+**/out
+**/coverage
+**/*.tsbuildinfo
+**/next-env.d.ts
+
+# Never bake secrets into the image; compose passes .env.local at runtime
+**/.env*
+
+.git
+.gitignore
+.vercel
+.claude
+.specify
+specs
+Dockerfile
+docker-compose.yml
+.dockerignore
+backend/smoke-test.sh
+*.md
