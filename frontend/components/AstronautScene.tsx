@@ -77,8 +77,8 @@ const fragment = /* glsl */ `
   varying vec3 vNormal;
   varying vec3 vView;
   void main() {
-    float rim = pow(1.0 - abs(dot(vNormal, vView)), 1.8);
-    gl_FragColor = vec4(uColor, (rim * 0.9 + 0.08) * uOpacity);
+    float rim = pow(1.0 - abs(dot(vNormal, vView)), 2.4);
+    gl_FragColor = vec4(uColor, rim * uOpacity);
   }
 `;
 
@@ -253,7 +253,7 @@ function Astronaut() {
     <group ref={group}>
       <primitive object={model} />
       {SHELL_ORDER.map((c, i) => (
-        <Shell key={c} category={c} geometries={geometries} thickness={0.03 + i * 0.015} />
+        <Shell key={c} category={c} geometries={geometries} thickness={0.02 + i * 0.008} />
       ))}
       <Glow position={anchor([0, 0.88, 0])} color={CATEGORY_META.mental.color} sev={categories.find((c) => c.category === "mental")!.severity} size={1.4} />
       {(Object.keys(REGION_ANCHOR) as BodyRegion[]).map((r) => (
