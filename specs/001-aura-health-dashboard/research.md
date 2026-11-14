@@ -1,9 +1,9 @@
 # Research: A.U.R.A. Astronaut Health Aura Dashboard
 
-Network access to NASA hosts was blocked in the environment where this plan was written, so
-numeric values below come from the team's research document and recalled NASA references. Every
-value marked **VERIFY** must be checked against the cited document before the pitch, and the
-config's `verified` flag set to `true` once checked.
+Threshold values below come from the team's research document and recalled NASA references; they
+were not checked against the source documents. Every value marked **VERIFY** must be checked
+against the cited document before the pitch, and the config's `verified` flag set to `true` once
+checked. The DONKI API facts in R5 were confirmed against the live API on 2026-11-14.
 
 ## R1. Radiation thresholds
 
@@ -54,15 +54,23 @@ config's `verified` flag set to `true` once checked.
 ## R5. NASA DONKI integration
 
 - **Decision**: route handler `GET /api/donki/sep` calls
-  `https://api.nasa.gov/DONKI/SEP?startDate=…&endDate=…&api_key=…` with a 5 s timeout, key from
-  `NASA_API_KEY` (fallback `DEMO_KEY`). On any failure or empty result, returns bundled
-  `src/data/donki-sep-cache.json` with `source: "cached"`.
+  `https://api.nasa.gov/DONKI/SEP?startDate=…&endDate=…&api_key=…` for the last 60 days with a
+  5 s timeout, key from `NASA_API_KEY` (fallback `DEMO_KEY`). On any failure or empty result,
+  returns bundled `src/data/donki-sep-cache.json` with `source: "nasaCached"`.
+- **Confirmed API constraints (2026-11-14)**:
+  - A request range longer than 60 days is rejected with HTTP 400
+    ("Date range cannot exceed 60 days").
+  - `DEMO_KEY` is rate-limited (HTTP 429 after a handful of requests from a shared IP). A personal
+    key from api.nasa.gov is required for the cache refresh and the live demo.
+  - A range with no events can return an empty body rather than `[]`.
 - **Cache content**: MUST contain real DONKI records. It is populated by
-  `npm run fetch:donki` (script writes the API response to the cache file). The cache MUST NOT be
-  hand-written or fabricated; if it cannot be populated, the cache is an empty list and the UI
-  states that no cached events are available.
-- **Fields used**: `sepID`, `eventTime`, `instruments[].displayName`, `link`. Parser tolerates
-  missing fields. **VERIFY** field names against a live response.
+  `npm run fetch:donki`, which fetches 60-day chunks going back about 2 years, merges by `sepID`,
+  and on HTTP 429 saves the events fetched so far. The cache MUST NOT be hand-written or
+  fabricated; if it cannot be populated, the cache is an empty list and the UI states that no
+  cached events are available.
+- **Fields used** (confirmed in a live response): `sepID`, `eventTime`,
+  `instruments[].displayName`, `link`. Other fields present: `linkedEvents`, `submissionTime`,
+  `versionId`, `sentNotifications`. Parser tolerates missing fields.
 - **Alternatives**: client-side fetch directly from api.nasa.gov — rejected (exposes key, no
   single fallback point).
 

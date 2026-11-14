@@ -9,7 +9,7 @@
 
 ```bash
 npm install
-npm run fetch:donki   # refresh the bundled NASA cache (needs network)
+npm run fetch:donki   # refresh the bundled NASA cache (needs network + personal NASA_API_KEY)
 npm test              # unit tests: thresholds, severity, MHI, discrepancy, sentiment
 npm run dev           # http://localhost:3000
 ```

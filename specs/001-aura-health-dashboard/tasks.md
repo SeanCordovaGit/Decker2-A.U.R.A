@@ -79,8 +79,8 @@ severity, MHI, discrepancy and sentiment only.
 
 **Independent Test**: online shows "Live NASA data"; offline shows "Cached NASA data"; replay raises radiation.
 
-- [ ] T019 [US4] Create `scripts/fetch-donki.mjs` that fetches DONKI SEP for the last 3 years (`NASA_API_KEY` or `DEMO_KEY`) and writes `{ fetchedAt, raw }` to `src/data/donki-sep-cache.json`; never fabricates data; seed file `{ "fetchedAt": null, "raw": [] }`
-- [ ] T020 [US4] Implement route `src/app/api/donki/sep/route.ts` per contracts/donki-sep-route.md (5 s timeout, `days` clamp 1–1095, fallback to cache on any failure or empty list, newest first, max 20, never error status) with parser `src/lib/donki.ts` tolerant of missing fields
+- [ ] T019 [US4] Create `scripts/fetch-donki.mjs` that fetches DONKI SEP in 60-day chunks for about 2 years (`NASA_API_KEY` or `DEMO_KEY`; DONKI rejects ranges over 60 days), merges by `sepID`, saves partial results on HTTP 429, and writes `{ fetchedAt, raw }` to `src/data/donki-sep-cache.json`; never fabricates data; seed file `{ "fetchedAt": null, "raw": [] }`
+- [ ] T020 [US4] Implement route `src/app/api/donki/sep/route.ts` per contracts/donki-sep-route.md (5 s timeout, `days` default 60 and clamp 1–60, fallback to cache on any failure or empty list, newest first, max 20, never error status) with parser `src/lib/donki.ts` tolerant of missing fields
 - [ ] T021 [US4] Build `src/components/SpaceWeatherPanel.tsx`: fetch on mount, list events (date, instruments, link), source label "Live NASA data" / "Cached NASA data", empty-state text, "Replay" button calling `replaySep`
 
 ---
