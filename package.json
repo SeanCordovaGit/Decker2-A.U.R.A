@@ -5,7 +5,8 @@
     "dev": "pnpm --filter frontend dev",
     "build": "pnpm --filter frontend build",
     "start": "pnpm --filter frontend start",
-    "lint": "pnpm --filter frontend lint"
+    "lint": "pnpm --filter frontend lint",
+    "test": "pnpm --filter @aura/core test"
   },
   "packageManager": "pnpm@11.24.0"
 }

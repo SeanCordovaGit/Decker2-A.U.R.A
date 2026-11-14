@@ -2,9 +2,15 @@
   "name": "@aura/core",
   "version": "0.1.0",
   "private": true,
+  "scripts": {
+    "test": "vitest run"
+  },
   "exports": {
     "./config/*": "./config/*.ts",
     "./lib/*": "./lib/*.ts",
     "./data/*": "./data/*"
+  },
+  "devDependencies": {
+    "vitest": "5.1.0"
   }
 }
