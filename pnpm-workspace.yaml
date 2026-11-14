@@ -1,3 +1,11 @@
+packages:
+  - frontend
+  - backend
+
 allowBuilds:
   sharp: false
   unrs-resolver: false
+
+# Warn (not auto-install) when node_modules is out of sync, so `pnpm docker:*` never
+# rewrites the lockfile on the host before Docker installs the locked versions.
+verifyDepsBeforeRun: warn
