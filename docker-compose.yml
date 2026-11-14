@@ -2,7 +2,8 @@ services:
   aura:
     build: .
     ports:
-      - "3000:3000"
+      # host 3001 so it runs alongside `pnpm dev` (next dev on 3000)
+      - "3001:3000"
     # NASA_API_KEY is read at request time; without it the app uses DEMO_KEY and the bundled cache
     env_file:
       - path: .env.local
