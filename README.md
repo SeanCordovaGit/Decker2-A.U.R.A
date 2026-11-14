@@ -101,13 +101,17 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ### Run with Docker
 
-Uses the same root `.env.local` (optional). Then:
+The easiest way to run the app without worrying about your local Node or package versions. The image installs exactly what `pnpm-lock.yaml` pins, and rebuilds that step whenever `package.json` or the lockfile changes. It uses the same root `.env.local` (optional).
 
 ```bash
-docker compose up --build
+pnpm docker:up     # build and start in the background
+pnpm docker:logs   # follow the app's logs (Ctrl+C to stop following)
+pnpm docker:down   # stop and remove the container
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000). Without Node or pnpm installed, run the same commands with `docker compose` directly: `docker compose up --build -d`, `docker compose logs -f aura`, `docker compose down`.
+
+If the build fails with `ERR_PNPM_OUTDATED_LOCKFILE`, someone changed a `package.json` without updating the lockfile. Run `pnpm install` and commit `pnpm-lock.yaml`.
 
 ### Commands
 
@@ -118,6 +122,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | `pnpm start` | Serve the production build |
 | `pnpm lint` | Lint the frontend |
 | `pnpm test` | Run the unit tests |
+| `pnpm docker:up` / `docker:logs` / `docker:down` | Build and run the app in Docker, follow its logs, stop it |
 | `bash backend/smoke-test.sh [url]` | Check the running app's API against its contract |
 
 ## Project Structure

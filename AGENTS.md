@@ -170,6 +170,7 @@ All from the repo root:
 - Dev: `pnpm dev` (http://localhost:3000) — runs `next dev` (frontend) and `vitest watch` (backend) in parallel
 - Build: `pnpm build` — must pass before submission
 - Lint: `pnpm lint`
+- Docker: `pnpm docker:up` (build + start detached, locked deps), `pnpm docker:logs`, `pnpm docker:down`. `pnpm-workspace.yaml` sets `verifyDepsBeforeRun: warn` so `pnpm run` never auto-installs and rewrites the lockfile
 - Add a dependency: `pnpm --filter frontend add <pkg>` or `pnpm --filter @aura/core add <pkg>`
 - Test: `pnpm test` — **not set up yet** (task T002 adds Vitest in `backend`)
 - NASA cache refresh: `pnpm fetch:donki` — **not set up yet**; needs network + `NASA_API_KEY` in the root `.env.local` (shared by frontend and backend; `frontend/next.config.ts` loads it)

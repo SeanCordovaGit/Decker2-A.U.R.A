@@ -6,7 +6,10 @@
     "build": "pnpm --filter frontend build",
     "start": "pnpm --filter frontend start",
     "lint": "pnpm --filter frontend lint",
-    "test": "pnpm --filter @aura/core test"
+    "test": "pnpm --filter @aura/core test",
+    "docker:up": "docker compose up --build -d",
+    "docker:logs": "docker compose logs -f aura",
+    "docker:down": "docker compose down"
   },
   "packageManager": "pnpm@11.24.0"
 }
