@@ -222,5 +222,12 @@ When the user corrects your approach, append a one-line rule here before ending 
 - Never add `Co-Authored-By: Claude` or "Generated with Claude Code" lines to commits or PRs in this repo.
 - When adapting this file, keep sections 0–9 as they are; only rewrite project-specific sections (10, 11). The Next.js block lives in `frontend/AGENTS.md` and is managed by `next dev`.
 - `origin/main` gets work pushed from other machines and PR merges; `git fetch` and merge before pushing, never force-push `main`.
+- Use `astronaut_by_jungle_jim.glb` as the dashboard's 3D astronaut model.
+- Style the mission viewer with neutral black frosted glass surfaces; avoid navy UI backgrounds.
+- Keep the viewer dark-only, allow drag rotation and zoom, expand Environment in place, and open alert details on the left.
+- Use the San Francisco system font stack throughout the dashboard and plain text scenario controls.
+- Show the active alert as one line above the bottom dock; size navigation bars to their content instead of stretching across empty space.
+- Expand Crew status in place instead of opening a dialog; retain the suit outline when adding smoke to the aura.
+- Anchor the dashboard panel menu directly above its dock button.
 
 ---
