@@ -97,7 +97,7 @@ pnpm install
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+`pnpm dev` first builds and starts the Docker container (needs Docker Desktop running), then the dev server. Open [http://localhost:3000](http://localhost:3000) for the dev server with hot reload; the container's production build is at [http://localhost:3001](http://localhost:3001). Run `pnpm docker:down` to stop the container when you're done.
 
 ### Run with Docker
 
@@ -109,7 +109,7 @@ pnpm docker:logs   # follow the app's logs (Ctrl+C to stop following)
 pnpm docker:down   # stop and remove the container
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Without Node or pnpm installed, run the same commands with `docker compose` directly: `docker compose up --build -d`, `docker compose logs -f aura`, `docker compose down`.
+Open [http://localhost:3001](http://localhost:3001) (port 3001, so it can run next to the dev server on 3000). Without Node or pnpm installed, run the same commands with `docker compose` directly: `docker compose up --build -d`, `docker compose logs -f aura`, `docker compose down`.
 
 If the build fails with `ERR_PNPM_OUTDATED_LOCKFILE`, someone changed a `package.json` without updating the lockfile. Run `pnpm install` and commit `pnpm-lock.yaml`.
 
@@ -117,12 +117,12 @@ If the build fails with `ERR_PNPM_OUTDATED_LOCKFILE`, someone changed a `package
 
 | Command | What it does |
 |---|---|
-| `pnpm dev` | Start the Next.js dev server and the backend unit tests in watch mode, side by side |
+| `pnpm dev` | Build and start the Docker container (port 3001), then the Next.js dev server (port 3000) and the backend unit tests in watch mode |
 | `pnpm build` | Production build |
 | `pnpm start` | Serve the production build |
 | `pnpm lint` | Lint the frontend |
 | `pnpm test` | Run the unit tests |
-| `pnpm docker:up` / `docker:logs` / `docker:down` | Build and run the app in Docker, follow its logs, stop it |
+| `pnpm docker:up` / `docker:logs` / `docker:down` | Build and run the app in Docker on port 3001, follow its logs, stop it |
 | `bash backend/smoke-test.sh [url]` | Check the running app's API against its contract |
 
 ## Project Structure

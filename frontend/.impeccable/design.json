@@ -1,0 +1,755 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-14T10:17:02.777Z",
+  "title": "Design System: Decker2 A.U.R.A.",
+  "extensions": {
+    "colorMeta": {
+      "ink-ground": {
+        "role": "neutral",
+        "displayName": "Ink Ground",
+        "canonical": "#0b0e14",
+        "tonalRamp": [
+          "#1b2331",
+          "#2f3c56",
+          "#43557a",
+          "#576f9e",
+          "#788cb5",
+          "#9cabc9",
+          "#c4cdde",
+          "#eff1f6"
+        ]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Panel",
+        "canonical": "#11161f",
+        "tonalRamp": [
+          "#1b2331",
+          "#2f3d56",
+          "#43567a",
+          "#57709e",
+          "#788eb5",
+          "#9cacc9",
+          "#c4cdde",
+          "#eff1f6"
+        ]
+      },
+      "panel-raised": {
+        "role": "neutral",
+        "displayName": "Panel Raised",
+        "canonical": "#171e2a",
+        "tonalRamp": [
+          "#1b2331",
+          "#2f3d56",
+          "#43577a",
+          "#57719e",
+          "#788eb5",
+          "#9cadc9",
+          "#c4cedf",
+          "#eff1f6"
+        ]
+      },
+      "panel-high": {
+        "role": "neutral",
+        "displayName": "Panel High",
+        "canonical": "#1e2736",
+        "tonalRamp": [
+          "#1b2431",
+          "#2f3e55",
+          "#435879",
+          "#57729d",
+          "#798fb4",
+          "#9dadc8",
+          "#c4cede",
+          "#eff1f6"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#222b3a",
+        "tonalRamp": [
+          "#1c2430",
+          "#313e54",
+          "#465877",
+          "#5a729a",
+          "#7b90b2",
+          "#9faec6",
+          "#c5cedd",
+          "#eff1f6"
+        ]
+      },
+      "hairline-strong": {
+        "role": "neutral",
+        "displayName": "Hairline Strong",
+        "canonical": "#314058",
+        "tonalRamp": [
+          "#1b2431",
+          "#2f3e55",
+          "#435879",
+          "#58729d",
+          "#7990b4",
+          "#9dadc8",
+          "#c4cede",
+          "#eff1f6"
+        ]
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Text",
+        "canonical": "#e6edf7",
+        "tonalRamp": [
+          "#13233a",
+          "#203c64",
+          "#2e568f",
+          "#3b6fb9",
+          "#618dcc",
+          "#8bacda",
+          "#b9cde9",
+          "#ecf1f9"
+        ]
+      },
+      "text-2": {
+        "role": "neutral",
+        "displayName": "Text 2",
+        "canonical": "#a9b4c7",
+        "tonalRamp": [
+          "#1e242e",
+          "#343f50",
+          "#4a5972",
+          "#617494",
+          "#8091ad",
+          "#a2aec3",
+          "#c7cfdb",
+          "#f0f2f5"
+        ]
+      },
+      "text-3": {
+        "role": "neutral",
+        "displayName": "Text 3",
+        "canonical": "#8591a6",
+        "tonalRamp": [
+          "#20252c",
+          "#383f4d",
+          "#505a6d",
+          "#67758e",
+          "#8692a7",
+          "#a7afbe",
+          "#cacfd8",
+          "#f0f2f4"
+        ]
+      },
+      "signal-cyan": {
+        "role": "primary",
+        "displayName": "Signal Cyan",
+        "canonical": "#00e5ff",
+        "tonalRamp": [
+          "#00454d",
+          "#007785",
+          "#00a9bd",
+          "#00dcf5",
+          "#2eeaff",
+          "#66efff",
+          "#a3f6ff",
+          "#e5fcff"
+        ]
+      },
+      "signal-cyan-ink": {
+        "role": "primary",
+        "displayName": "Signal Cyan Ink",
+        "canonical": "#00161a",
+        "tonalRamp": [
+          "#00414d",
+          "#007085",
+          "#00a0bd",
+          "#00cff5",
+          "#2edfff",
+          "#66e7ff",
+          "#a3f1ff",
+          "#e5fbff"
+        ]
+      },
+      "signal-cyan-soft": {
+        "role": "primary",
+        "displayName": "Signal Cyan Soft",
+        "canonical": "rgb(0 229 255 / 0.12)",
+        "tonalRamp": [
+          "#00454d",
+          "#007785",
+          "#00a9bd",
+          "#00dcf5",
+          "#2eeaff",
+          "#66efff",
+          "#a3f6ff",
+          "#e5fcff"
+        ]
+      },
+      "caution-amber": {
+        "role": "secondary",
+        "displayName": "Caution Amber",
+        "canonical": "#ffb020",
+        "tonalRamp": [
+          "#4d3100",
+          "#855600",
+          "#bd7a00",
+          "#f59e00",
+          "#ffb52e",
+          "#ffc966",
+          "#ffdea3",
+          "#fff6e5"
+        ]
+      },
+      "caution-amber-soft": {
+        "role": "secondary",
+        "displayName": "Caution Amber Soft",
+        "canonical": "rgb(255 176 32 / 0.14)",
+        "tonalRamp": [
+          "#4d3100",
+          "#855600",
+          "#bd7a00",
+          "#f59e00",
+          "#ffb52e",
+          "#ffc966",
+          "#ffdea3",
+          "#fff6e5"
+        ]
+      },
+      "caution-on-observation": {
+        "role": "secondary",
+        "displayName": "Caution on Observation",
+        "canonical": "#ffc861",
+        "tonalRamp": [
+          "#4d3200",
+          "#855600",
+          "#bd7b00",
+          "#f5a000",
+          "#ffb62e",
+          "#ffca66",
+          "#ffdfa3",
+          "#fff6e5"
+        ]
+      },
+      "uplink-ok": {
+        "role": "neutral",
+        "displayName": "Uplink OK",
+        "canonical": "#8ce3b4",
+        "tonalRamp": [
+          "#0f3e24",
+          "#1a6b3f",
+          "#25985a",
+          "#30c574",
+          "#57d691",
+          "#84e1af",
+          "#b5edcf",
+          "#eafaf2"
+        ]
+      },
+      "observation-void": {
+        "role": "neutral",
+        "displayName": "Observation Void",
+        "canonical": "#05070c",
+        "tonalRamp": [
+          "#161f36",
+          "#27375e",
+          "#384e85",
+          "#4865ad",
+          "#6b84c2",
+          "#93a5d2",
+          "#bec9e4",
+          "#edf0f8"
+        ]
+      },
+      "observation-glass": {
+        "role": "neutral",
+        "displayName": "Observation Glass",
+        "canonical": "rgb(8 11 17 / 0.8)",
+        "tonalRamp": [
+          "#182234",
+          "#2a3a5a",
+          "#3c5380",
+          "#4e6ca6",
+          "#718abc",
+          "#97a9ce",
+          "#c1cce2",
+          "#eef1f7"
+        ]
+      },
+      "porcelain-ground": {
+        "role": "neutral",
+        "displayName": "Porcelain Ground",
+        "canonical": "#e9eef4",
+        "tonalRamp": [
+          "#192533",
+          "#2c4058",
+          "#3f5b7e",
+          "#5277a3",
+          "#7493b9",
+          "#99b0cc",
+          "#c2d0e0",
+          "#eef2f7"
+        ]
+      },
+      "porcelain-panel": {
+        "role": "neutral",
+        "displayName": "Porcelain Panel",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#262626",
+          "#424242",
+          "#5e5e5e",
+          "#7a7a7a",
+          "#969696",
+          "#b3b3b3",
+          "#d1d1d1",
+          "#f2f2f2"
+        ]
+      },
+      "porcelain-panel-raised": {
+        "role": "neutral",
+        "displayName": "Porcelain Panel Raised",
+        "canonical": "#f4f7fa",
+        "tonalRamp": [
+          "#182635",
+          "#29425b",
+          "#3b5e82",
+          "#4d7aa8",
+          "#6f96be",
+          "#96b3cf",
+          "#c0d1e2",
+          "#edf2f7"
+        ]
+      },
+      "porcelain-panel-high": {
+        "role": "neutral",
+        "displayName": "Porcelain Panel High",
+        "canonical": "#e8edf3",
+        "tonalRamp": [
+          "#1a2532",
+          "#2d4057",
+          "#415c7c",
+          "#5477a1",
+          "#7693b7",
+          "#9ab0cb",
+          "#c3d0e0",
+          "#eef2f6"
+        ]
+      },
+      "porcelain-hairline": {
+        "role": "neutral",
+        "displayName": "Porcelain Hairline",
+        "canonical": "#d6dee8",
+        "tonalRamp": [
+          "#1b2531",
+          "#304055",
+          "#445b79",
+          "#58779d",
+          "#7993b4",
+          "#9db0c8",
+          "#c4d0de",
+          "#eff2f6"
+        ]
+      },
+      "porcelain-hairline-strong": {
+        "role": "neutral",
+        "displayName": "Porcelain Hairline Strong",
+        "canonical": "#b8c4d3",
+        "tonalRamp": [
+          "#1d252f",
+          "#334152",
+          "#485c75",
+          "#5e7797",
+          "#7e94af",
+          "#a1b1c4",
+          "#c6d0dc",
+          "#eff2f5"
+        ]
+      },
+      "porcelain-text": {
+        "role": "neutral",
+        "displayName": "Porcelain Text",
+        "canonical": "#0b0e14",
+        "tonalRamp": [
+          "#1b2331",
+          "#2f3c56",
+          "#43557a",
+          "#576f9e",
+          "#788cb5",
+          "#9cabc9",
+          "#c4cdde",
+          "#eff1f6"
+        ]
+      },
+      "porcelain-text-2": {
+        "role": "neutral",
+        "displayName": "Porcelain Text 2",
+        "canonical": "#3b4658",
+        "tonalRamp": [
+          "#1f242e",
+          "#353f4f",
+          "#4c5a71",
+          "#627593",
+          "#8291ab",
+          "#a3afc2",
+          "#c8cfda",
+          "#f0f2f5"
+        ]
+      },
+      "porcelain-text-3": {
+        "role": "neutral",
+        "displayName": "Porcelain Text 3",
+        "canonical": "#556175",
+        "tonalRamp": [
+          "#20252c",
+          "#38404d",
+          "#4f5b6d",
+          "#67768e",
+          "#8692a7",
+          "#a6afbf",
+          "#cacfd8",
+          "#f0f2f4"
+        ]
+      },
+      "signal-cyan-text-light": {
+        "role": "primary",
+        "displayName": "Signal Cyan Text (light)",
+        "canonical": "#00727f",
+        "tonalRamp": [
+          "#00454d",
+          "#007785",
+          "#00a9bd",
+          "#00dcf5",
+          "#2eeaff",
+          "#66efff",
+          "#a3f6ff",
+          "#e5fcff"
+        ]
+      },
+      "signal-cyan-soft-light": {
+        "role": "primary",
+        "displayName": "Signal Cyan Soft (light)",
+        "canonical": "rgb(0 170 190 / 0.1)",
+        "tonalRamp": [
+          "#00444d",
+          "#007785",
+          "#00a9bd",
+          "#00dbf5",
+          "#2ee9ff",
+          "#66efff",
+          "#a3f5ff",
+          "#e5fcff"
+        ]
+      },
+      "caution-amber-light": {
+        "role": "secondary",
+        "displayName": "Caution Amber (light)",
+        "canonical": "#a35f00",
+        "tonalRamp": [
+          "#4d2d00",
+          "#854d00",
+          "#bd6e00",
+          "#f58f00",
+          "#ffa82e",
+          "#ffbf66",
+          "#ffd9a3",
+          "#fff4e5"
+        ]
+      },
+      "caution-amber-soft-light": {
+        "role": "secondary",
+        "displayName": "Caution Amber Soft (light)",
+        "canonical": "rgb(255 176 32 / 0.18)",
+        "tonalRamp": [
+          "#4d3100",
+          "#855600",
+          "#bd7a00",
+          "#f59e00",
+          "#ffb52e",
+          "#ffc966",
+          "#ffdea3",
+          "#fff6e5"
+        ]
+      },
+      "uplink-ok-light": {
+        "role": "neutral",
+        "displayName": "Uplink OK (light)",
+        "canonical": "#1d7a4a",
+        "tonalRamp": [
+          "#0f3e25",
+          "#196b41",
+          "#24985c",
+          "#2fc678",
+          "#56d794",
+          "#83e2b1",
+          "#b5edd0",
+          "#eafaf2"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Mental Health Index score; the single large number on screen."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Crew-status summary sentence."
+      },
+      "brand": {
+        "displayName": "Brand",
+        "purpose": "Product name in the top bar."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Panel titles, sentence case."
+      },
+      "readout": {
+        "displayName": "Readout",
+        "purpose": "Telemetry values; 700 weight at critical, never animated."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Rows, alert titles, buttons, inputs."
+      },
+      "body-small": {
+        "displayName": "Body small",
+        "purpose": "Alert detail grids, helper text, scenario buttons."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Severity badges, viewport chips, callouts, log lines."
+      },
+      "tag": {
+        "displayName": "Tag",
+        "purpose": "Uppercase provenance tags only."
+      }
+    },
+    "categoryColorSource": {
+      "file": "backend/config/aura.ts",
+      "symbol": "CATEGORY_META[*].color",
+      "note": "Hazard category colours live only there; read them in code, never copy them into the frontend."
+    },
+    "shadows": [
+      {
+        "name": "panel-ambient-dark",
+        "value": "0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -12px rgb(0 0 0 / 0.6)",
+        "purpose": "Every panel in the dark theme."
+      },
+      {
+        "name": "panel-ambient-light",
+        "value": "0 1px 2px rgb(15 30 50 / 0.06), 0 8px 24px -14px rgb(15 30 50 / 0.18)",
+        "purpose": "Every panel in the light theme."
+      },
+      {
+        "name": "category-glow-swatch",
+        "value": "0 0 10px 1px <category colour>",
+        "purpose": "Active hazard swatch."
+      },
+      {
+        "name": "category-glow-marker",
+        "value": "0 0 8px 1px <category colour>",
+        "purpose": "Body callout marker dot."
+      }
+    ],
+    "focus": {
+      "value": "outline: 2px solid var(--accent-text); outline-offset: 2px",
+      "purpose": "Global focus-visible ring."
+    },
+    "brackets": {
+      "value": "14px arms, 1px, var(--accent) at 0.55 opacity, inset 10px",
+      "purpose": "Viewport frame only."
+    },
+    "motion": [
+      {
+        "name": "pulse-soft",
+        "value": "opacity 1 -> 0.45 -> 1, 1.4s cubic-bezier(0.16, 1, 0.3, 1) infinite",
+        "purpose": "Critical badge dots and callout markers; disabled under reduced motion."
+      },
+      {
+        "name": "aura-ease",
+        "value": "opacity eases to target at rate dt*3; caution target 0.38 with slow 1.4 rad/s shimmer; critical target 1 with 4.5 rad/s pulse",
+        "purpose": "3D aura intensity by severity."
+      },
+      {
+        "name": "control-transition",
+        "value": "150ms on background-color, border-color, filter",
+        "purpose": "Buttons, tabs, theme toggle."
+      },
+      {
+        "name": "meter-transition",
+        "value": "width 500ms ease-out",
+        "purpose": "MHI component bars."
+      },
+      {
+        "name": "stage-ring",
+        "value": "rotation 0.08 rad/s",
+        "purpose": "Cyan stage ring under the model."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one committing action in a panel (journal Log).",
+      "html": "<div class=\"ds-root\"><button class=\"ds-btn ds-btn-primary\">Log</button></div>",
+      "css": ".ds-root{--bg:#0b0e14;--panel:#11161f;--panel-2:#171e2a;--panel-3:#1e2736;--line:#222b3a;--line-strong:#314058;--text:#e6edf7;--text-2:#a9b4c7;--text-3:#8591a6;--accent:#00e5ff;--accent-text:#00e5ff;--accent-ink:#00161a;--accent-soft:rgb(0 229 255 / 0.12);--caution:#ffb020;--caution-soft:rgb(255 176 32 / 0.14);font-family:\"Space Grotesk\",ui-sans-serif,system-ui,sans-serif;background:var(--bg);padding:16px}.ds-btn{display:inline-flex;align-items:center;gap:8px;border:1px solid transparent;border-radius:5px;padding:6px 12px;font:inherit;font-size:13px;font-weight:500;cursor:pointer;transition:background-color .15s,border-color .15s,filter .15s}.ds-btn-primary{background:var(--accent);color:var(--accent-ink)}.ds-btn-primary:hover{filter:brightness(1.1)}.ds-btn-primary:active{filter:brightness(.95)}.ds-btn:focus-visible{outline:2px solid var(--accent-text);outline-offset:2px}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Scenario triggers and general actions; pressed state marks the running scenario in cyan.",
+      "html": "<div class=\"ds-root\"><button class=\"ds-btn ds-btn-secondary\">Cabin cold</button> <button class=\"ds-btn ds-btn-secondary\" aria-pressed=\"true\">EVA hand injury</button></div>",
+      "css": ".ds-root{--bg:#0b0e14;--panel:#11161f;--panel-2:#171e2a;--panel-3:#1e2736;--line:#222b3a;--line-strong:#314058;--text:#e6edf7;--text-2:#a9b4c7;--text-3:#8591a6;--accent:#00e5ff;--accent-text:#00e5ff;--accent-ink:#00161a;--accent-soft:rgb(0 229 255 / 0.12);--caution:#ffb020;--caution-soft:rgb(255 176 32 / 0.14);font-family:\"Space Grotesk\",ui-sans-serif,system-ui,sans-serif;background:var(--panel);padding:16px}.ds-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid;border-radius:5px;padding:6px 12px;font:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:background-color .15s,border-color .15s}.ds-btn-secondary{border-color:var(--line-strong);background:var(--panel-2);color:var(--text)}.ds-btn-secondary:hover{border-color:rgb(0 229 255 / .6);background:var(--panel-3)}.ds-btn-secondary[aria-pressed=true]{border-color:rgb(0 229 255 / .7);background:var(--accent-soft)}.ds-btn:focus-visible{outline:2px solid var(--accent-text);outline-offset:2px}"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Low-emphasis panel-header actions such as Reset.",
+      "html": "<div class=\"ds-root\"><button class=\"ds-btn\">Reset</button></div>",
+      "css": ".ds-root{--bg:#0b0e14;--panel:#11161f;--panel-2:#171e2a;--panel-3:#1e2736;--line:#222b3a;--line-strong:#314058;--text:#e6edf7;--text-2:#a9b4c7;--text-3:#8591a6;--accent:#00e5ff;--accent-text:#00e5ff;--accent-ink:#00161a;--accent-soft:rgb(0 229 255 / 0.12);--caution:#ffb020;--caution-soft:rgb(255 176 32 / 0.14);font-family:\"Space Grotesk\",ui-sans-serif,system-ui,sans-serif;background:var(--panel);padding:16px}.ds-btn{border:1px solid transparent;border-radius:5px;padding:4px 8px;font:inherit;font-size:12px;font-weight:500;cursor:pointer;background:transparent;color:var(--text-2);transition:background-color .15s}.ds-btn:hover{background:var(--panel-2);color:var(--text)}.ds-btn:focus-visible{outline:2px solid var(--accent-text);outline-offset:2px}"
+    },
+    {
+      "name": "Journal Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Single-line text field on the raised panel tone with a cyan caret and focus border.",
+      "html": "<div class=\"ds-root\"><input class=\"ds-input\" placeholder=\"How are you feeling today?\"></div>",
+      "css": ".ds-root{--bg:#0b0e14;--panel:#11161f;--panel-2:#171e2a;--panel-3:#1e2736;--line:#222b3a;--line-strong:#314058;--text:#e6edf7;--text-2:#a9b4c7;--text-3:#8591a6;--accent:#00e5ff;--accent-text:#00e5ff;--accent-ink:#00161a;--accent-soft:rgb(0 229 255 / 0.12);--caution:#ffb020;--caution-soft:rgb(255 176 32 / 0.14);font-family:\"Space Grotesk\",ui-sans-serif,system-ui,sans-serif;background:var(--panel);padding:16px}.ds-input{width:260px;border:1px solid var(--line-strong);border-radius:5px;background:var(--panel-2);color:var(--text);padding:6px 12px;font:inherit;font-size:13px;caret-color:var(--accent-text)}.ds-input::placeholder{color:var(--text-3)}.ds-input:focus{outline:none;border-color:rgb(0 229 255 / .7)}"
+    },
+    {
+      "name": "Severity Badges",
+      "kind": "chip",
+      "refersTo": "badge-critical",
+      "description": "Nominal outline, caution amber, critical inverted ink with a pulsing dot. Never red.",
+      "html": "<div class=\"ds-root\"><span class=\"ds-badge ds-nominal\"><i></i>Nominal</span><span class=\"ds-badge ds-caution\"><i></i>Caution</span><span class=\"ds-badge ds-critical\"><i class=\"ds-pulse\"></i>Critical</span></div>",
+      "css": ".ds-root{--bg:#0b0e14;--panel:#11161f;--panel-2:#171e2a;--panel-3:#1e2736;--line:#222b3a;--line-strong:#314058;--text:#e6edf7;--text-2:#a9b4c7;--text-3:#8591a6;--accent:#00e5ff;--accent-text:#00e5ff;--accent-ink:#00161a;--accent-soft:rgb(0 229 255 / 0.12);--caution:#ffb020;--caution-soft:rgb(255 176 32 / 0.14);background:var(--panel);padding:16px;display:flex;gap:8px}.ds-badge{display:inline-flex;align-items:center;gap:6px;border:1px solid;border-radius:4px;padding:2px 6px;font-family:\"JetBrains Mono\",ui-monospace,monospace;font-size:11px;font-weight:500;line-height:1}.ds-badge i{width:6px;height:6px;border-radius:9999px;background:currentColor}.ds-nominal{border-color:var(--line-strong);color:var(--text-3)}.ds-nominal i{opacity:.6}.ds-caution{border-color:rgb(255 176 32 / .5);background:var(--caution-soft);color:var(--caution)}.ds-critical{border-color:var(--text);background:var(--text);color:var(--bg);font-weight:600}.ds-pulse{animation:ds-p 1.4s cubic-bezier(.16,1,.3,1) infinite}@keyframes ds-p{0%,100%{opacity:1}50%{opacity:.45}}@media (prefers-reduced-motion:reduce){.ds-pulse{animation:none}}"
+    },
+    {
+      "name": "Provenance Tags",
+      "kind": "chip",
+      "refersTo": "tag-neutral",
+      "description": "10px uppercase mono tags for data provenance; the only uppercase in the system.",
+      "html": "<div class=\"ds-root\"><span class=\"ds-tag\">Simulated</span><span class=\"ds-tag\">Team-defined</span><span class=\"ds-tag ds-tag-caution\">Verify</span></div>",
+      "css": ".ds-root{--bg:#0b0e14;--panel:#11161f;--panel-2:#171e2a;--panel-3:#1e2736;--line:#222b3a;--line-strong:#314058;--text:#e6edf7;--text-2:#a9b4c7;--text-3:#8591a6;--accent:#00e5ff;--accent-text:#00e5ff;--accent-ink:#00161a;--accent-soft:rgb(0 229 255 / 0.12);--caution:#ffb020;--caution-soft:rgb(255 176 32 / 0.14);background:var(--panel);padding:16px;display:flex;gap:6px}.ds-tag{display:inline-flex;border:1px solid var(--line-strong);border-radius:4px;padding:2px 6px;font-family:\"JetBrains Mono\",ui-monospace,monospace;font-size:10px;font-weight:500;line-height:1;letter-spacing:.04em;text-transform:uppercase;color:var(--text-2)}.ds-tag-caution{border-color:rgb(255 176 32 / .4);background:var(--caution-soft);color:var(--caution)}"
+    },
+    {
+      "name": "Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Hairline panel with a 44px title header; status rows pair a category swatch with a label.",
+      "html": "<section class=\"ds-panel\"><header><h2>Crew status</h2><span class=\"ds-tag\">Simulated</span></header><div class=\"ds-body\"><div class=\"ds-row\"><span class=\"ds-sw\" style=\"background:#00FF90\"></span>Radiation<span class=\"ds-muted\">Nominal</span></div><div class=\"ds-row\"><span class=\"ds-sw\" style=\"background:#4D7CFF;box-shadow:0 0 10px 1px #4D7CFF\"></span><b>Cabin cold</b><span class=\"ds-amber\">Caution</span></div></div></section>",
+      "css": ".ds-panel{--bg:#0b0e14;--panel:#11161f;--panel-2:#171e2a;--panel-3:#1e2736;--line:#222b3a;--line-strong:#314058;--text:#e6edf7;--text-2:#a9b4c7;--text-3:#8591a6;--accent:#00e5ff;--accent-text:#00e5ff;--accent-ink:#00161a;--accent-soft:rgb(0 229 255 / 0.12);--caution:#ffb020;--caution-soft:rgb(255 176 32 / 0.14);font-family:\"Space Grotesk\",ui-sans-serif,system-ui,sans-serif;width:300px;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:6px;box-shadow:0 1px 2px rgb(0 0 0 / .4),0 8px 24px -12px rgb(0 0 0 / .6)}.ds-panel header{display:flex;align-items:center;justify-content:space-between;min-height:44px;padding:8px 16px;border-bottom:1px solid var(--line);box-sizing:border-box}.ds-panel h2{margin:0;font-size:14px;font-weight:600;letter-spacing:-.01em}.ds-tag{border:1px solid var(--line-strong);border-radius:4px;padding:2px 6px;font-family:\"JetBrains Mono\",ui-monospace,monospace;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-2)}.ds-body{padding:16px}.ds-row{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13px;border-top:1px solid var(--line)}.ds-row:first-child{border-top:0}.ds-sw{width:10px;height:10px;border-radius:9999px}.ds-muted,.ds-amber{margin-left:auto;font-family:\"JetBrains Mono\",ui-monospace,monospace;font-size:11px}.ds-muted{color:var(--text-3)}.ds-amber{color:var(--caution)}"
+    },
+    {
+      "name": "Segmented Tabs",
+      "kind": "nav",
+      "refersTo": "segmented-tab-active",
+      "description": "Panel-level view switch on a raised track.",
+      "html": "<div class=\"ds-root\"><div class=\"ds-seg\" role=\"tablist\"><button role=\"tab\" aria-selected=\"true\">Active · 1</button><button role=\"tab\" aria-selected=\"false\">Log</button></div></div>",
+      "css": ".ds-root{--bg:#0b0e14;--panel:#11161f;--panel-2:#171e2a;--panel-3:#1e2736;--line:#222b3a;--line-strong:#314058;--text:#e6edf7;--text-2:#a9b4c7;--text-3:#8591a6;--accent:#00e5ff;--accent-text:#00e5ff;--accent-ink:#00161a;--accent-soft:rgb(0 229 255 / 0.12);--caution:#ffb020;--caution-soft:rgb(255 176 32 / 0.14);font-family:\"Space Grotesk\",ui-sans-serif,system-ui,sans-serif;background:var(--panel);padding:16px}.ds-seg{display:inline-flex;gap:2px;padding:2px;border-radius:5px;background:var(--panel-2)}.ds-seg button{border:0;border-radius:4px;padding:2px 8px;font:inherit;font-size:12px;background:transparent;color:var(--text-3);cursor:pointer;transition:color .15s}.ds-seg button:hover{color:var(--text)}.ds-seg button[aria-selected=true]{background:var(--panel-3);color:var(--text)}.ds-seg button:focus-visible{outline:2px solid var(--accent-text);outline-offset:2px}"
+    },
+    {
+      "name": "Body Callout",
+      "kind": "custom",
+      "refersTo": "body-callout",
+      "description": "Signature: marker on the model, leader line, glass label; tracks the body as it rotates.",
+      "html": "<div class=\"ds-void\"><div class=\"ds-callout ds-up\"><span class=\"ds-label\">Right hand <b>· critical</b></span><span class=\"ds-line\"></span><span class=\"ds-dot ds-pulse\"></span></div><div class=\"ds-callout ds-side\" style=\"--c:#4D7CFF\"><span class=\"ds-dot\"></span><span class=\"ds-line\"></span><span class=\"ds-label\">Cabin cold <em>· caution</em></span></div></div>",
+      "css": ".ds-void{--c:#FF3366;background:#05070c;padding:32px;display:flex;gap:48px;align-items:center;border-radius:6px}.ds-callout{display:flex;align-items:center}.ds-up{flex-direction:column}.ds-up .ds-line{width:1px;height:40px}.ds-side .ds-line{width:40px;height:1px}.ds-dot{width:8px;height:8px;border-radius:9999px;background:var(--c);box-shadow:0 0 8px 1px var(--c)}.ds-line{background:var(--c);opacity:.8}.ds-label{white-space:nowrap;border:1px solid color-mix(in srgb,var(--c) 60%,transparent);border-radius:4px;background:rgb(8 11 17 / .86);padding:4px 8px;font-family:\"JetBrains Mono\",ui-monospace,monospace;font-size:11px;line-height:1;color:#e6edf7}.ds-label b{color:#fff;font-weight:600}.ds-label em{font-style:normal;color:#ffc861}.ds-pulse{animation:ds-p 1.4s cubic-bezier(.16,1,.3,1) infinite}@keyframes ds-p{0%,100%{opacity:1}50%{opacity:.45}}@media (prefers-reduced-motion:reduce){.ds-pulse{animation:none}}"
+    },
+    {
+      "name": "Telemetry Readout",
+      "kind": "custom",
+      "refersTo": "telemetry-readout",
+      "description": "Label, mono value with unit, 60 s trace and dashed caution threshold.",
+      "html": "<div class=\"ds-root\"><div class=\"ds-cell\"><p class=\"ds-l\">CO₂</p><p class=\"ds-v\">2.2 <span>mmHg</span></p><svg viewBox=\"0 0 120 32\" preserveAspectRatio=\"none\"><line x1=\"0\" x2=\"120\" y1=\"10\" y2=\"10\" stroke=\"#ffb020\" stroke-dasharray=\"3 3\" opacity=\".7\" vector-effect=\"non-scaling-stroke\"/><path d=\"M0,24L20,23L40,25L60,22L80,24L100,21L120,22\" fill=\"none\" stroke=\"#a9b4c7\" stroke-width=\"1.5\" vector-effect=\"non-scaling-stroke\"/></svg></div></div>",
+      "css": ".ds-root{--bg:#0b0e14;--panel:#11161f;--panel-2:#171e2a;--panel-3:#1e2736;--line:#222b3a;--line-strong:#314058;--text:#e6edf7;--text-2:#a9b4c7;--text-3:#8591a6;--accent:#00e5ff;--accent-text:#00e5ff;--accent-ink:#00161a;--accent-soft:rgb(0 229 255 / 0.12);--caution:#ffb020;--caution-soft:rgb(255 176 32 / 0.14);font-family:\"Space Grotesk\",ui-sans-serif,system-ui,sans-serif;background:var(--panel);padding:16px}.ds-cell{width:120px;padding:10px 12px}.ds-l{margin:0;font-size:11px;color:var(--text-3)}.ds-v{margin:2px 0 0;font-family:\"JetBrains Mono\",ui-monospace,monospace;font-size:18px;font-weight:500;line-height:1;font-variant-numeric:tabular-nums;color:var(--text)}.ds-v span{font-size:11px;font-weight:400;color:var(--text-3)}.ds-cell svg{display:block;margin-top:6px;width:100%;height:32px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Body Is the Display",
+    "overview": "A.U.R.A. is a telemetry HUD built around one object: NASA's astronaut model standing in a dark observation window, wearing its hazards as coloured auras. Everything else is instrumentation that explains what the body shows. The surrounding panels are quiet, tonal and hairline-ruled so the only saturated colour on a calm screen comes from a hazard, and on a nominal screen there is almost none.\n\nThe world descends from the user-pinned Google Stitch telemetry mocks: an ink ground with stepped panel tones, 1px hairlines, tight 6px corners, Space Grotesk for words and JetBrains Mono for anything measured. It is dense in the way an operations console is dense: three columns, small type, every number tabular, nothing decorative that does not carry state. A light theme swaps the ground for cool porcelain, but the 3D viewport stays a dark observation window in both, because an aura needs a dark ground to read.\n\nRejected by the direction contract: a grid of KPI tiles with a 3D toy in a corner. The model is the centre of the layout, not an accessory to it.",
+    "keyCharacteristics": [
+      "Colour means hazard category; severity is carried by intensity and label, never by hue.",
+      "Cyan is the hand of the operator: interaction, focus, selection, and the viewport's instrument framing.",
+      "Flat tonal panels with a soft ambient shadow; depth comes from the observation window, not from cards.",
+      "Mono for readouts, units, badges and labels; grotesk for titles and prose.",
+      "Body-anchored callouts with leader lines are the signature move."
+    ],
+    "rules": [
+      {
+        "name": "The Category-Only Colour Rule",
+        "body": "A saturated hue on screen means a hazard category, read from `CATEGORY_META`. If a colour is not a category and not cyan or amber, it is a neutral.",
+        "section": "colors"
+      },
+      {
+        "name": "The Red Is Injury Rule",
+        "body": "Red never encodes severity, because red means injury. Critical is shown by pulsing aura plus an inverted ink badge (ink fill, ground-colour text), never by turning things red.",
+        "section": "colors"
+      },
+      {
+        "name": "The Cyan Is the Operator Rule",
+        "body": "Signal Cyan marks what the user can touch, what has focus and what is selected. A cyan number or chart is a bug.",
+        "section": "colors"
+      },
+      {
+        "name": "The Measured-Is-Mono Rule",
+        "body": "Values, units, clocks, thresholds, badges and log lines use JetBrains Mono with tabular numerals; titles and prose never do.",
+        "section": "typography"
+      },
+      {
+        "name": "The Uppercase-Is-Provenance Rule",
+        "body": "Uppercase is reserved for the 10px provenance tag. Panel titles and labels stay sentence case; there are no eyebrows or kickers above titles.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Window Rule",
+        "body": "Volume, glow and darkness belong to the observation window. Panels stay flat and tonal in both themes.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Brackets Are the Window Rule",
+        "body": "Corner brackets mark the observation window only; no panel, card or button gets them.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Even Border Rule",
+        "body": "Borders are uniform 1px on all sides. No coloured side stripes on cards, alerts or rows; category identity comes from the swatch beside the label.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "**Do** read every category colour from `CATEGORY_META` in `backend/config/aura.ts`; that file is the only place they live.",
+      "**Do** carry severity by intensity and words: no aura or outline badge at nominal, steady amber at caution, pulsing aura plus inverted ink badge at critical.",
+      "**Do** keep the 3D viewport on observation-void (#05070c via the token) in both themes, framed by corner brackets.",
+      "**Do** pair every colour swatch with a text label; colour is never the only signal.",
+      "**Do** set every measured value in JetBrains Mono with tabular numerals.",
+      "**Do** honour reduced motion: auto-rotation and pulses stop."
+    ],
+    "donts": [
+      "**Don't** use red, or any colour, to mean severity; red means injury.",
+      "**Don't** use Signal Cyan for data, charts or readings.",
+      "**Don't** hard-code a category hex in frontend code or add a new hue outside the category set.",
+      "**Don't** put corner brackets on anything but the viewport frame.",
+      "**Don't** use coloured side borders on cards, alerts or rows.",
+      "**Don't** put eyebrows or kickers above panel titles.",
+      "**Don't** pulse telemetry numbers; the pulse belongs to auras, callout markers and critical badge dots."
+    ]
+  }
+}

@@ -13,6 +13,7 @@
 .vercel
 .claude
 .specify
+**/.impeccable
 specs
 Dockerfile
 docker-compose.yml

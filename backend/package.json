@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "vitest watch --passWithNoTests",
-    "test": "vitest run"
+    "test": "vitest run",
+    "fetch:donki": "node --env-file-if-exists=../.env.local scripts/fetch-donki.mjs"
   },
   "exports": {
     "./config/*": "./config/*.ts",
