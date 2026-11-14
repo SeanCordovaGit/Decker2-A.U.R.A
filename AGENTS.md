@@ -167,7 +167,7 @@ Read before building: [`.specify/memory/constitution.md`](./.specify/memory/cons
 All from the repo root:
 
 - Install: `pnpm install`
-- Dev: `pnpm dev` (http://localhost:3000)
+- Dev: `pnpm dev` (http://localhost:3000) — runs `next dev` (frontend) and `vitest watch` (backend) in parallel
 - Build: `pnpm build` — must pass before submission
 - Lint: `pnpm lint`
 - Add a dependency: `pnpm --filter frontend add <pkg>` or `pnpm --filter @aura/core add <pkg>`

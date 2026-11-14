@@ -2,7 +2,7 @@
   "name": "decker2-aura",
   "private": true,
   "scripts": {
-    "dev": "pnpm --filter frontend dev",
+    "dev": "pnpm --parallel -r dev",
     "build": "pnpm --filter frontend build",
     "start": "pnpm --filter frontend start",
     "lint": "pnpm --filter frontend lint",

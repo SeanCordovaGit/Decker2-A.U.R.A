@@ -113,7 +113,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 | Command | What it does |
 |---|---|
-| `pnpm dev` | Start the development server |
+| `pnpm dev` | Start the Next.js dev server and the backend unit tests in watch mode, side by side |
 | `pnpm build` | Production build |
 | `pnpm start` | Serve the production build |
 | `pnpm lint` | Lint the frontend |
