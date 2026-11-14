@@ -1,0 +1,10 @@
+{
+  "name": "@aura/core",
+  "version": "0.1.0",
+  "private": true,
+  "exports": {
+    "./config/*": "./config/*.ts",
+    "./lib/*": "./lib/*.ts",
+    "./data/*": "./data/*"
+  }
+}
