@@ -31,7 +31,7 @@ One glance at one body: hazard category is encoded as aura color and severity as
 - Mental Health Index (0–100) from biometrics, affect/voice, journal sentiment and PVT reaction time; a discrepancy alert goes to the astronaut only.
 - Escalation: caution → crew self-manage; critical or persistent caution → flight surgeon.
 - Stack: pnpm workspace; `frontend` (Next.js 16, React 19, Tailwind 4, three.js via React Three Fiber) and `backend` (`@aura/core`, pure TypeScript logic, Vitest). No database, no separate server.
-- 3D model: NASA 3D Resources "Astronaut" GLB (DigitalSpace), a single mesh in a T-pose with no skeleton; injuries render as glows anchored at body-region positions.
+- 3D model: NASA 3D Resources "Z2 Spacesuit" GLB (NASA's exploration suit prototype), a single Draco-compressed mesh with no skeleton; injuries render as glows anchored at body-region positions. The Draco decoder is served locally from `frontend/public/draco/` so the app stays offline-capable.
 - Dark and light themes with a toggle.
 - Specs: `specs/001-aura-health-dashboard/`; rules: `.specify/memory/constitution.md`.
 
@@ -44,7 +44,7 @@ One glance at one body: hazard category is encoded as aura color and severity as
 ## Evidence on Hand
 
 - Real NASA DONKI solar energetic particle events: `backend/data/donki-sep-cache.json` (fetched 2026-11-14).
-- NASA "Astronaut" GLB from github.com/nasa/NASA-3D-Resources.
+- NASA "Z2 Spacesuit" GLB from github.com/nasa/NASA-3D-Resources (JPEG fallback textures stripped, 2 MB).
 - Thresholds and citations: `specs/001-aura-health-dashboard/research.md`; values marked VERIFY are not yet checked against NASA documents.
 - Crew biometrics are simulated and must be labeled "Simulated". No real astronaut data, testimonials or endorsements exist; do not invent them.
 

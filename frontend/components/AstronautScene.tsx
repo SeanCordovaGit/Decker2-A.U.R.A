@@ -9,28 +9,30 @@ import { CATEGORY_META, SEVERITY_META } from "@aura/core/config/aura";
 import type { BodyRegion, HazardCategory, Severity } from "@aura/core/lib/types";
 import { useAuraStore } from "@/store/useAuraStore";
 
-const MODEL_URL = "/models/astronaut.glb";
+// NASA Z2 exploration suit (Draco mesh); the decoder is served locally so the app stays offline-capable.
+const MODEL_URL = "/models/z2-spacesuit.glb";
+const DRACO_PATH = "/draco/";
 const HEIGHT = 1.9;
 
 /** Body anchors as fractions of the model's bounds: x of half-width (astronaut's right = −x, facing +z), y of height, z of half-depth. */
 const REGION_ANCHOR: Record<BodyRegion, [number, number, number]> = {
   head: [0, 0.88, 0.35],
-  chest: [0, 0.66, 0.65],
-  back: [0, 0.66, -0.95],
-  rightArm: [-0.52, 0.7, 0],
-  leftArm: [0.52, 0.7, 0],
-  rightHand: [-0.96, 0.655, 0.15],
-  leftHand: [0.96, 0.655, 0.15],
-  rightLeg: [-0.2, 0.24, 0.15],
-  leftLeg: [0.2, 0.24, 0.15],
+  chest: [0, 0.68, 0.45],
+  back: [0, 0.68, -0.9],
+  rightArm: [-0.84, 0.73, 0.1],
+  leftArm: [0.84, 0.73, 0.1],
+  rightHand: [-0.78, 0.575, 0.5],
+  leftHand: [0.78, 0.575, 0.5],
+  rightLeg: [-0.33, 0.27, 0.15],
+  leftLeg: [0.33, 0.27, 0.15],
 };
 
 /** Where each whole-body hazard pins its callout. */
 const CATEGORY_ANCHOR: Partial<Record<HazardCategory, [number, number, number]>> = {
-  radiation: [-0.42, 0.98, 0],
+  radiation: [-0.9, 0.95, 0],
   air: [0.34, 0.9, 0.3],
-  cabinHot: [0.46, 0.44, 0],
-  cabinCold: [-0.46, 0.38, 0],
+  cabinHot: [0.88, 0.45, 0],
+  cabinCold: [-0.88, 0.35, 0],
   mental: [0.12, 1.02, 0],
 };
 
@@ -196,7 +198,7 @@ function Callout({ position, side, color, label, sev }: { position: THREE.Vector
 }
 
 function Astronaut() {
-  const { scene } = useGLTF(MODEL_URL);
+  const { scene } = useGLTF(MODEL_URL, DRACO_PATH);
   const categories = useAuraStore((s) => s.categories);
 
   const { model, geometries, anchor } = useMemo(() => {
@@ -209,11 +211,14 @@ function Astronaut() {
     model.position.set(-center.x * scale, -box.min.y * scale, -center.z * scale);
     model.updateMatrixWorld(true);
 
-    // The visor is the small second primitive; give it a reflective gold EVA finish.
-    const visor = new THREE.MeshStandardMaterial({ color: "#c99a3b", metalness: 1, roughness: 0.12, envMapIntensity: 1.4 });
+    // The suit's specular-colour texture tints highlights blue under the cyan lights; keep highlights neutral.
     model.traverse((o) => {
-      const mesh = o as THREE.Mesh;
-      if (mesh.isMesh && mesh.geometry.getAttribute("position").count < 1000) mesh.material = visor;
+      const mat = (o as THREE.Mesh).material as THREE.MeshPhysicalMaterial | undefined;
+      if (!mat || !("specularColorMap" in mat)) return;
+      mat.specularColorMap = null;
+      mat.specularColor.set("#ffffff");
+      mat.specularIntensity = 0.35;
+      mat.needsUpdate = true;
     });
 
     // Shell geometries in world space so shells and model share one frame.
@@ -250,7 +255,7 @@ function Astronaut() {
       {SHELL_ORDER.map((c, i) => (
         <Shell key={c} category={c} geometries={geometries} thickness={0.03 + i * 0.015} />
       ))}
-      <Glow position={anchor([0, 0.88, 0])} color={CATEGORY_META.mental.color} sev={categories.find((c) => c.category === "mental")!.severity} size={1.1} />
+      <Glow position={anchor([0, 0.88, 0])} color={CATEGORY_META.mental.color} sev={categories.find((c) => c.category === "mental")!.severity} size={1.4} />
       {(Object.keys(REGION_ANCHOR) as BodyRegion[]).map((r) => (
         <Glow key={r} position={anchor(REGION_ANCHOR[r])} color={CATEGORY_META.injury.color} sev={injury.regions[r] ?? "nominal"} size={r === "head" || r === "chest" ? 0.7 : 0.5} />
       ))}
@@ -326,19 +331,19 @@ export default function AstronautScene({ autoRotate }: { autoRotate: boolean }) 
   const { active, progress } = useProgress();
   return (
     <>
-    <Canvas dpr={[1, 2]} camera={{ position: [0, 1.15, 4.8], fov: 36 }} gl={{ antialias: true }}>
+    <Canvas dpr={[1, 2]} camera={{ position: [0, 1.1, 4.2], fov: 36 }} gl={{ antialias: true }}>
       <color attach="background" args={["#05070c"]} />
       <Stars radius={60} depth={40} count={2200} factor={3} fade speed={0.4} />
       <hemisphereLight args={["#dbe8ff", "#0b0e14", 0.9]} />
       <directionalLight position={[3, 5, 4]} intensity={2.2} />
-      <directionalLight position={[-4, 2, -3]} intensity={0.8} color="#7ddcff" />
+      <directionalLight position={[-4, 2, -3]} intensity={0.8} color="#e8eef6" />
       {/* rim light from behind separates the suit from the starfield */}
-      <directionalLight position={[0, 3, -5]} intensity={2.4} color="#bfefff" />
-      {/* local reflection environment for the visor: no network fetch, works offline */}
+      <directionalLight position={[0, 3, -5]} intensity={2.4} color="#f1f5fa" />
+      {/* local reflection environment for the suit and visor: no network fetch, works offline */}
       <Environment resolution={128}>
         <Lightformer form="rect" intensity={2.5} position={[0, 4, 3]} scale={[6, 2, 1]} color="#ffffff" />
-        <Lightformer form="rect" intensity={1.2} position={[-4, 1, 0]} scale={[2, 4, 1]} color="#7ddcff" />
-        <Lightformer form="ring" intensity={0.8} position={[3, 1, -3]} scale={2} color="#00e5ff" />
+        <Lightformer form="rect" intensity={1.2} position={[-4, 1, 0]} scale={[2, 4, 1]} color="#eef3f8" />
+        <Lightformer form="ring" intensity={0.8} position={[3, 1, -3]} scale={2} color="#ffffff" />
       </Environment>
       <Stage />
       {/* no fallback inside the canvas: drei <Html> as a Suspense fallback unmounts its own React root mid-render */}
@@ -357,4 +362,4 @@ export default function AstronautScene({ autoRotate }: { autoRotate: boolean }) 
   );
 }
 
-useGLTF.preload(MODEL_URL);
+useGLTF.preload(MODEL_URL, DRACO_PATH);
