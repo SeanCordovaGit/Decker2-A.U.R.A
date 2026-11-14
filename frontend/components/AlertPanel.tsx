@@ -17,7 +17,7 @@ export default function AlertPanel() {
   const sorted = [...alerts].sort((a, b) => SEVERITY_META[b.severity].rank - SEVERITY_META[a.severity].rank);
 
   return (
-    <Tabs defaultValue="active" className="min-h-0 flex-1 gap-0">
+    <Tabs defaultValue="active" className="h-full min-h-0 gap-0">
     <Card className="flex-1" aria-label="Alerts">
       <CardHeader>
         <CardTitle>Alerts</CardTitle>
@@ -31,10 +31,9 @@ export default function AlertPanel() {
       <CardContent>
       <TabsContent value="active">
         {sorted.length === 0 ? (
-          <div className="flex flex-col items-center gap-2 py-6 text-center">
-            <ShieldCheck size={22} className="text-ink-3" aria-hidden />
-            <p className="text-[13px] text-ink-2">No active alerts.</p>
-            <p className="max-w-[24ch] text-[12px] text-ink-3">Trigger a demo scenario to see how an alert explains itself.</p>
+          <div className="flex flex-col items-start gap-3 py-6">
+            <ShieldCheck size={20} strokeWidth={1.5} className="text-ink-3" aria-hidden />
+            <p className="text-[14px] text-ink">No active alerts</p>
           </div>
         ) : (
           <ul className="space-y-2.5">
@@ -60,7 +59,7 @@ export default function AlertPanel() {
           ))}
         </ol>
       </TabsContent>
-      <p className="mt-3 text-[11px] text-ink-3">{ESCALATION.demoTimeNote}</p>
+      {alerts.length > 0 && <p className="mt-3 text-[11px] text-ink-3">{ESCALATION.demoTimeNote}</p>}
       </CardContent>
     </Card>
     </Tabs>

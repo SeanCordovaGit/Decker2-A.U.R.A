@@ -16,7 +16,7 @@ export default function SpaceWeatherPanel() {
   const replayId = useAuraStore((s) => (s.scenarioId === "sep" ? s.replayEvent?.id : null));
 
   return (
-    <Card className="shrink-0" aria-label="NASA space weather">
+    <Card className="h-full" aria-label="NASA space weather">
       <CardHeader>
         <CardTitle>NASA space weather</CardTitle>
         {data && (

@@ -1,13 +1,12 @@
 import * as React from "react"
 import { cn } from "cn"
 
-// Restyled to the A.U.R.A. panel: 6px corners, 1px hairline, soft ambient shadow, header bar.
 function Card({ className, ...props }: React.ComponentProps<"section">) {
   return (
     <section
       data-slot="card"
       className={cn(
-        "flex min-h-0 flex-col overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-(--shadow)",
+        "flex min-h-0 flex-col overflow-hidden rounded-xl border border-border bg-card text-card-foreground shadow-(--shadow)",
         className
       )}
       {...props}
@@ -20,7 +19,7 @@ function CardHeader({ className, ...props }: React.ComponentProps<"header">) {
     <header
       data-slot="card-header"
       className={cn(
-        "flex min-h-11 flex-wrap items-center justify-between gap-x-3 gap-y-1.5 border-b border-border px-4 py-2",
+        "flex min-h-12 flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-border px-5 py-3",
         className
       )}
       {...props}
@@ -32,7 +31,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<"h2">) {
   return (
     <h2
       data-slot="card-title"
-      className={cn("font-heading text-[14px] font-semibold tracking-[-0.01em] text-card-foreground", className)}
+      className={cn("font-heading text-[14px] font-medium text-card-foreground", className)}
       {...props}
     />
   )
@@ -47,7 +46,7 @@ function CardAction({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 function CardContent({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="card-content" className={cn("min-h-0 flex-1 overflow-auto p-4", className)} {...props} />
+  return <div data-slot="card-content" className={cn("min-h-0 flex-1 overflow-auto p-5", className)} {...props} />
 }
 
 function CardFooter({ className, ...props }: React.ComponentProps<"div">) {

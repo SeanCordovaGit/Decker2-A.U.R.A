@@ -3,9 +3,8 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "cn"
 import { Slot } from "radix-ui"
 
-// Restyled to A.U.R.A. chips: 4px corners, mono, tight. Severity and provenance variants added.
 const badgeVariants = cva(
-  "group/badge inline-flex w-fit shrink-0 items-center gap-1.5 overflow-hidden rounded-sm border px-1.5 py-0.5 font-mono text-[11px] leading-none font-medium whitespace-nowrap transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 [&>svg]:pointer-events-none [&>svg]:size-3",
+  "group/badge inline-flex w-fit shrink-0 items-center gap-1.5 overflow-hidden rounded-md border px-2 py-1 font-mono text-[11px] leading-none font-normal whitespace-nowrap transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 [&>svg]:pointer-events-none [&>svg]:size-3",
   {
     variants: {
       variant: {
@@ -16,11 +15,10 @@ const badgeVariants = cva(
         // severity: colour never encodes critical (red means injury); critical is inverted ink
         nominal: "border-input text-muted-foreground",
         caution: "border-caution/50 bg-caution-soft text-caution",
-        critical: "border-foreground bg-foreground font-semibold text-background",
-        // provenance tags: uppercase marks where data comes from
-        tag: "border-input text-[10px] tracking-[0.04em] text-ink-2 uppercase",
-        "tag-signal": "border-signal-text/40 bg-signal-soft text-[10px] tracking-[0.04em] text-signal-text uppercase",
-        "tag-caution": "border-caution/40 bg-caution-soft text-[10px] tracking-[0.04em] text-caution uppercase",
+        critical: "border-foreground bg-foreground font-medium text-background",
+        tag: "border-input text-[11px] text-ink-3",
+        "tag-signal": "border-input bg-panel-2 text-[11px] text-ink-2",
+        "tag-caution": "border-input bg-panel-2 text-[11px] text-ink-2",
       },
     },
     defaultVariants: {

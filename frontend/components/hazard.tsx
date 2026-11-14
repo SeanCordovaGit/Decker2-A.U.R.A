@@ -31,7 +31,7 @@ export function Swatch({ category, active = false }: { category: HazardCategory;
     <span
       aria-hidden
       className="inline-block h-2.5 w-2.5 shrink-0 rounded-full ring-1 ring-black/20"
-      style={{ background: color, boxShadow: active ? `0 0 10px 1px ${color}` : "none" }}
+      style={{ background: color, opacity: active ? 1 : 0.7 }}
     />
   );
 }

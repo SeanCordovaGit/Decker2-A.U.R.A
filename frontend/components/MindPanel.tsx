@@ -25,7 +25,7 @@ export default function MindPanel() {
   };
 
   return (
-    <Card className="shrink-0" aria-label="Mental Health Index">
+    <Card className="mind-panel h-full" aria-label="Mental Health Index">
       <CardHeader>
         <CardTitle>Mental Health Index</CardTitle>
         <CardAction>
@@ -33,35 +33,27 @@ export default function MindPanel() {
         </CardAction>
       </CardHeader>
       <CardContent>
-      <div className="grid grid-cols-[92px_1fr] gap-3">
-        <div>
-          <p className="font-mono text-[40px] font-semibold leading-none tracking-[-0.03em] tnum text-ink">{Math.round(mhi.index)}</p>
-          <p className="mt-1.5 whitespace-nowrap font-mono text-[11px] leading-snug text-ink-3">
-            of 100
-            <br />
-            caution &lt;{MHI_CONFIG.caution}
-            <br />
-            critical &lt;{MHI_CONFIG.critical}
-          </p>
-        </div>
-      <ul className="space-y-1.5">
+      <div className="mhi-summary flex items-end gap-3 border-b border-line pb-2">
+        <p className="font-mono text-[40px] font-medium leading-none tnum text-ink">{Math.round(mhi.index)}</p>
+        <p className="pb-1 font-mono text-[11px] leading-snug text-ink-3">of 100 · caution &lt;{MHI_CONFIG.caution} · critical &lt;{MHI_CONFIG.critical}</p>
+      </div>
+      <ul className="mhi-scores mt-3 grid grid-cols-2 gap-x-3 gap-y-2">
         {mhi.components.map((c) => (
           <li key={c.source}>
-            <div className="flex items-baseline justify-between text-[12px]">
-              <span className="text-ink-2">
+            <div className="text-[12px]">
+              <span className="block truncate text-ink-2">
                 {SOURCE_LABEL[c.source]}
               </span>
               <span className="font-mono tnum text-ink-3">
                 {c.score === null ? "no entry" : <span className="text-ink">{Math.round(c.score)}</span>} · w {c.weight.toFixed(2)}
               </span>
             </div>
-            <div className="mt-1 h-1 overflow-hidden rounded-full bg-panel-3">
-              <div className="h-full rounded-full transition-[width] duration-500 ease-out" style={{ width: `${c.score ?? 0}%`, background: color }} />
+            <div className="mhi-bar mt-1 h-1 overflow-hidden rounded-full bg-panel-3">
+              <div className="h-full rounded-full" style={{ width: `${c.score ?? 0}%`, background: color }} />
             </div>
           </li>
         ))}
       </ul>
-      </div>
 
       {mhi.discrepancy.active && mhi.discrepancy.pair && (
         <div className="mt-3 rounded-[5px] border border-line-strong bg-panel-2 p-2.5 text-[12px] text-ink" role="status">
@@ -72,7 +64,7 @@ export default function MindPanel() {
         </div>
       )}
 
-      <form onSubmit={onSubmit} className="mt-3">
+      <form onSubmit={onSubmit} className="mt-2">
         <label htmlFor="journal" className="sr-only">
           Private journal entry
         </label>
@@ -89,7 +81,7 @@ export default function MindPanel() {
             Log
           </Button>
         </div>
-        <p className="mt-1.5 text-[11px] text-ink-3">
+        <p className="mhi-feedback mt-1.5 text-[11px] text-ink-3">
           {latest ? (latest.score === null ? "Too short to score: write at least 3 words." : `Last entry sentiment ${latest.score}/100.`) : "Private journal, scored on-device. Nothing leaves the station."}
         </p>
       </form>
