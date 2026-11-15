@@ -1,7 +1,7 @@
 "use client";
 
-import { CATEGORY_META, PROFILE, getIndicatorColor } from "@aura/core/config/aura";
-import { useAuraStore } from "@/store/useAuraStore";
+import { CATEGORY_META, PROFILE, SEVERITY_META, getIndicatorColor } from "@aura/core/config/aura";
+import { isSnapshot, useAuraStore } from "@/store/useAuraStore";
 import { crewProfile } from "@aura/core/lib/research-data";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +10,7 @@ import { SeverityBadge, Swatch } from "./hazard";
 export default function StatusPanel() {
   const categories = useAuraStore((s) => s.categories);
   const readings = useAuraStore((s) => s.readings);
-  const snapshot = useAuraStore((s) => !s.scenarioId && crewProfile(s.selectedCrewId));
+  const snapshot = useAuraStore((s) => isSnapshot(s) ? crewProfile(s.selectedCrewId) : undefined);
   const metrics = useAuraStore((s) => s.metrics);
   const alertCount = useAuraStore((s) => s.alerts.length);
   const surgeon = useAuraStore((s) => s.alerts.some((a) => a.escalation === "flightSurgeon"));
@@ -58,6 +58,12 @@ export default function StatusPanel() {
           );
         })}
       </ul>
+      <div className="severity-legend" aria-label="Badge color key">
+        {(["nominal", "caution", "critical"] as const).map((severity) => (
+          <span key={severity}><span className="severity-legend-dot" style={{ background: SEVERITY_META[severity].badgeColor }} aria-hidden />{SEVERITY_META[severity].label}</span>
+        ))}
+        <p>Badge color shows severity; the dot beside each row shows the hazard type.</p>
+      </div>
 
       <div className="status-dose mt-2 border-t border-line pt-3">
         <div className="flex flex-wrap items-baseline justify-between gap-x-2 text-[12px]">
