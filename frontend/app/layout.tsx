@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Decker2 A.U.R.A.",
+  title: "A²U.R.A. (A.I. Astro-Unified Response Algorithm)",
   description: "Astronaut health and environment monitoring: a 3D astronaut whose aura shows what is wrong at a glance.",
 };
 

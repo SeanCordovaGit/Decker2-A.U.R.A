@@ -64,7 +64,8 @@ export const SCENARIOS: Scenario[] = [
     id: "imFine",
     label: "\"I'm fine\" mismatch",
     description: "Journal says fine, but biometrics and affect show strain.",
-    targets: () => ({ sleepHours: 4, hrv: 26, restingHeartRate: 78, affectScore: 40, pvtReactionMs: 380, pvtLapses: 3 }),
+    // Caution-level strain only: enough to disagree with "I'm fine" by more than the discrepancy gap, never critical.
+    targets: () => ({ sleepHours: 5, hrv: 40, restingHeartRate: 72, affectScore: 50, pvtReactionMs: 300, pvtLapses: 3 }),
     journalText: "I'm fine, everything is good. Feeling great and really productive today.",
   },
 ];

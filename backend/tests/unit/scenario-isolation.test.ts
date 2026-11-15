@@ -45,6 +45,16 @@ describe("scenario isolation", () => {
     expect(s.alerts.some((item) => item.metric === "co")).toBe(false);
   });
 
+  it("keeps Mental Distress (I'm fine) at caution while it shows the discrepancy, even after readings settle", () => {
+    run("imFine", 30);
+    const s = store();
+    expect(s.mhi.discrepancy.active).toBe(true);
+    expect(s.alerts.some((alert) => alert.key === "discrepancy")).toBe(true);
+    expect(s.alerts.filter((alert) => alert.severity === "critical")).toEqual([]);
+    expect(s.categories.every((category) => category.severity !== "critical")).toBe(true);
+    expect(s.categories.find((category) => category.category === "mental")!.severity).toBe("caution");
+  });
+
   it("does not carry the I'm fine journal entry into the next scenario", () => {
     run("imFine", 5);
     store().triggerScenario("fever");

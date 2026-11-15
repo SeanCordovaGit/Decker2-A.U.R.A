@@ -1,3 +1,5 @@
+import type { WorkflowKind } from "../config/workflows";
+
 export type Severity = "nominal" | "caution" | "critical";
 
 export type HazardCategory =
@@ -41,7 +43,7 @@ export interface Readings {
   pvtLapses: number; // count per 300-second PVT+ test
   absorbedDoseGy: number; // independent acute absorbed dose, never derived from mSv
   injuries: Partial<Record<BodyRegion, Severity>>;
-  reportedConcerns?: Partial<Record<"hand" | "cold", boolean>>;
+  reportedConcerns?: Partial<Record<WorkflowKind, boolean>>;
   sepActive: boolean;
   sepEvent?: SpaceWeatherEvent;
 }

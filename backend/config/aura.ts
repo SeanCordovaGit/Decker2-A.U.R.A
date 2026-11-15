@@ -18,6 +18,7 @@ import type {
 export const CITATIONS: Record<string, Citation> = {
   donkiSep: { id: "donkiSep", text: "NASA CCMC DONKI recorded SEP event. A replay activates a project-defined space-weather precaution only; it is not current telemetry or a crew-dose measurement.", url: "https://ccmc.gsfc.nasa.gov/tools/DONKI/", verified: true, teamDefined: true },
   handUrgentReference: { id: "handUrgentReference", text: "Public hand/finger-injury urgent-assessment reference (healthdirect). Mission adaptation and medical review pending; not an onboard treatment protocol.", url: "https://www.healthdirect.gov.au/accidents-and-injuries/hand-and-finger-fractures", verified: false, teamDefined: true },
+  teamSymptomReport: { id: "teamSymptomReport", text: "Team-supplied clarifying questions and next steps. A Yes to a symptom question escalates by project rule; it is not a sensor reading, diagnosis or mission-approved protocol.", verified: true, teamDefined: true },
   coldUrgentReference: { id: "coldUrgentReference", text: "NHS hypothermia emergency-recognition reference. Mission adaptation and medical review pending; cabin temperature alone is not a hypothermia diagnosis.", url: "https://www.nhs.uk/conditions/hypothermia/", verified: false, teamDefined: true },
   std3001Radiation: {
     id: "std3001Radiation",

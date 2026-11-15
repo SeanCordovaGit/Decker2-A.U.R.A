@@ -5,6 +5,7 @@ import { ESCALATION } from "@aura/core/config/aura";
 import { buildAlerts, evaluateCategories, evaluateMetrics } from "@aura/core/lib/evaluate";
 import { biometricScore, computeMhi } from "@aura/core/lib/mhi";
 import { crewProfile } from "@aura/core/lib/research-data";
+import type { WorkflowKind } from "@aura/core/config/workflows";
 import { scenarioById } from "@aura/core/lib/scenarios";
 import { scoreSentiment } from "@aura/core/lib/sentiment";
 import { NOMINAL_READINGS, clampReadings, tickReadings } from "@aura/core/lib/simulation";
@@ -56,9 +57,9 @@ interface AuraState extends Derived {
   replaySep: (event: SpaceWeatherEvent) => void;
   clearSepReplay: () => void;
   submitJournal: (text: string) => void;
-  incidentReports: Partial<Record<"hand" | "cold", IncidentReport>>;
-  setIncidentReport: (kind: "hand" | "cold", report: string, answers: IncidentReport["answers"]) => void;
-  reportUrgentConcern: (kind: "hand" | "cold") => void;
+  incidentReports: Partial<Record<WorkflowKind, IncidentReport>>;
+  setIncidentReport: (kind: WorkflowKind, report: string, answers: IncidentReport["answers"]) => void;
+  reportUrgentConcern: (kind: WorkflowKind) => void;
   manual: Partial<Record<ManualVital, number>>;
   setManualVital: (key: ManualVital, value: number) => void;
   reset: () => void;
@@ -124,7 +125,7 @@ function initial(selectedCrewId: string | null = null) {
     scenarioStart: 0,
     replayEvent: null as SpaceWeatherEvent | null,
     journal: [] as JournalEntry[],
-    incidentReports: {} as Partial<Record<"hand" | "cold", IncidentReport>>,
+    incidentReports: {} as Partial<Record<WorkflowKind, IncidentReport>>,
     manual: {} as Partial<Record<ManualVital, number>>,
     alerts: [] as Alert[],
     openedAt: {} as Record<string, number>,

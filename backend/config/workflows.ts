@@ -1,9 +1,34 @@
-import type { HazardCategory } from "../lib/types";
+import type { BodyRegion, HazardCategory } from "../lib/types";
+import { ruleFor } from "./aura";
 
-export type WorkflowKind = "hand" | "cold";
-export const WORKFLOWS = {
+export type WorkflowKind = "hand" | "cold" | "sep" | "acuteDose" | "co" | "co2" | "overheat" | "fever" | "sleep";
+export interface WorkflowStep { id: string; text: string; treatment: false }
+export interface WorkflowQuestion { id: string; text: string; urgent: boolean }
+export interface WorkflowConfig {
+  title: string;
+  scenarioId: string;
+  category: HazardCategory;
+  /** Citation for report-based escalation and the no-threshold finding. */
+  sourceId: string;
+  sourceUrl?: string;
+  questions: readonly WorkflowQuestion[];
+  /** Steps shown below critical (or always, when criticalSteps is absent). */
+  steps: readonly WorkflowStep[];
+  criticalSteps?: readonly WorkflowStep[];
+  /** Live alerts that feed "Why this was flagged": alert metric names, "sep" or "mhi". */
+  alertKeys?: readonly string[];
+  status?: { caution: string; critical: string };
+  placeholder?: string;
+  /** Body regions marked critical when the crew reports an urgent symptom. */
+  regions?: readonly BodyRegion[];
+}
+
+const step = (id: string, text: string): WorkflowStep => ({ id, text, treatment: false });
+const CRITICAL_STATUS = "Flight surgeon / crew medical officer assessment indicated.";
+
+export const WORKFLOWS: Record<WorkflowKind, WorkflowConfig> = {
   hand: {
-    title: "Right-hand injury", scenarioId: "evaHandInjury", category: "injury" as HazardCategory,
+    title: "Right-hand injury", scenarioId: "evaHandInjury", category: "injury", regions: ["rightHand"],
     sourceId: "handUrgentReference", sourceUrl: "https://www.healthdirect.gov.au/accidents-and-injuries/hand-and-finger-fractures",
     questions: [
       { id: "hand-bleeding", text: "Is there heavy bleeding?", urgent: true },
@@ -11,12 +36,12 @@ export const WORKFLOWS = {
       { id: "hand-grip", text: "Does trying to grip something increase the pain?", urgent: false },
     ],
     steps: [
-      { id: "hand-report", text: "Report what happened, the affected hand and any change in grip or sensation to the crew medical officer.", treatment: false },
-      { id: "hand-protocol", text: "Request assessment using the mission-approved injury procedure. This prototype does not contain an approved treatment protocol.", treatment: false },
+      step("hand-report", "Report what happened, the affected hand and any change in grip or sensation to the crew medical officer."),
+      step("hand-protocol", "Request assessment using the mission-approved injury procedure. This prototype does not contain an approved treatment protocol."),
     ],
   },
   cold: {
-    title: "Cabin cold", scenarioId: "cabinCold", category: "cabinCold" as HazardCategory,
+    title: "Cabin cold", scenarioId: "cabinCold", category: "cabinCold", alertKeys: ["cabinTemp", "coreTemp"],
     sourceId: "coldUrgentReference", sourceUrl: "https://www.nhs.uk/conditions/hypothermia/",
     questions: [
       { id: "cold-alertness", text: "Is anyone confused, unusually difficult to wake, or speaking unclearly?", urgent: true },
@@ -24,10 +49,154 @@ export const WORKFLOWS = {
       { id: "cold-location", text: "Does the cold affect more than one cabin area?", urgent: false },
     ],
     steps: [
-      { id: "cold-report", text: "Report cabin location, temperature readings and any crew symptoms to mission control or the crew medical officer.", treatment: false },
-      { id: "cold-protocol", text: "Use the mission-approved thermal-control and medical procedures. A low cabin reading alone does not diagnose hypothermia.", treatment: false },
+      step("cold-report", "Report cabin location, temperature readings and any crew symptoms to mission control or the crew medical officer."),
+      step("cold-protocol", "Use the mission-approved thermal-control and medical procedures. A low cabin reading alone does not diagnose hypothermia."),
     ],
   },
-} as const;
+  sep: {
+    title: "Solar radiation", scenarioId: "sep", category: "radiation", alertKeys: ["sep", "cumulativeDose"], sourceId: "teamSymptomReport",
+    status: { caution: "Elevated solar particle flux; monitor cumulative dose.", critical: CRITICAL_STATUS },
+    placeholder: "Describe the module location, shielding status, and how the crew feels.",
+    questions: [
+      { id: "sep-symptoms", text: "Is anyone experiencing sudden nausea, vomiting, or unusual fatigue?", urgent: true },
+      { id: "sep-exposure", text: "Were any crew members outside shielded modules or near viewports during the alert?", urgent: false },
+      { id: "sep-dosimeters", text: "Are multiple cabin dosimeters showing elevated readings simultaneously?", urgent: false },
+    ],
+    steps: [
+      step("sep-c1", "Log current module location and verify personal dosimeter readings."),
+      step("sep-c2", "Minimize time near unshielded viewports and prepare to pause non-essential tasks."),
+      step("sep-c3", "Follow mission-approved space weather monitoring protocols until proton flux subsides."),
+    ],
+    criticalSteps: [
+      step("sep-r1", "Report module location, cumulative dosimeter readings, and any crew symptoms to mission control or the crew medical officer."),
+      step("sep-r2", "Relocate immediately to the mission-designated radiation storm shelter (water- or polyethylene-shielded area)."),
+      step("sep-r3", "Request prompt flight-surgeon assessment and follow mission-approved radiation emergency procedures."),
+    ],
+  },
+  acuteDose: {
+    title: "Acute dose", scenarioId: "acuteDose", category: "injury", alertKeys: ["absorbedDoseGy"], regions: ["abdomen"], sourceId: "teamSymptomReport",
+    status: { caution: "Elevated localized particle flux detected; verify dosimeter metrics.", critical: CRITICAL_STATUS },
+    placeholder: "Describe the module location, radiation spike readings, and physical symptoms.",
+    questions: [
+      { id: "acute-gi", text: "Are any crew members suffering from sudden abdominal pain, nausea, or cramping?", urgent: true },
+      { id: "acute-shielded", text: "Have personnel moved into shielded spaces away from unshielded sources?", urgent: false },
+      { id: "acute-dosimeters", text: "Do crew dosimeters validate the environmental telemetry alerts?", urgent: false },
+    ],
+    steps: [
+      step("acute-c1", "Vacate the designated radiation hotspot and log personal dosimeter totals."),
+      step("acute-c2", "Perform a baseline status assessment to report any early gastrointestinal discomfort."),
+      step("acute-c3", "Follow mission-approved radiation exposure logging until evaluated by the flight surgeon."),
+    ],
+    criticalSteps: [
+      step("acute-r1", "Transmit accumulated exposure dose, anatomical indicator status (lower abdomen/GI), and symptoms to mission control or the crew medical officer."),
+      step("acute-r2", "Relocate immediately to heavy shielding structures and halt activities near the affected zone."),
+      step("acute-r3", "Request immediate flight-surgeon evaluation and execute mission-approved acute radiation protocols."),
+    ],
+  },
+  co: {
+    title: "Carbon monoxide leak", scenarioId: "coLeak", category: "air", alertKeys: ["co"], sourceId: "teamSymptomReport",
+    status: { caution: "Elevated cabin CO levels; air scrubbing & monitoring advised.", critical: CRITICAL_STATUS },
+    placeholder: "Describe the affected module, hardware combustion status, and crew vitals.",
+    questions: [
+      { id: "co-symptoms", text: "Is anyone reporting headaches, dizziness, confusion, or elevated heart rates?", urgent: true },
+      { id: "co-hardware", text: "Are there signs of hardware overheating, electrical burning, or smoke?", urgent: true },
+      { id: "co-spread", text: "Are secondary cabin sensors detecting widespread gas accumulation?", urgent: false },
+    ],
+    steps: [
+      step("co-c1", "Log ambient CO levels and report the impacted module location to ground control."),
+      step("co-c2", "Inspect atmospheric scrubbing systems and verify telemetry across neighboring modules."),
+      step("co-c3", "Track heart rate shifts and cognitive symptoms using established air-quality standards."),
+    ],
+    criticalSteps: [
+      step("co-r1", "Report module location, carbon monoxide concentration, and any physiological symptoms to flight surgeons."),
+      step("co-r2", "Execute toxic atmosphere protocols immediately; cross-validate sensor spikes with crew vital shifts."),
+      step("co-r3", "Request prompt flight-surgeon assessment and follow mission-approved environmental emergency procedures."),
+    ],
+  },
+  co2: {
+    title: "Carbon dioxide buildup", scenarioId: "co2Buildup", category: "air", alertKeys: ["co2"], sourceId: "teamSymptomReport",
+    status: { caution: "Elevated cabin CO₂; ventilation & workload adjustment advised.", critical: CRITICAL_STATUS },
+    placeholder: "Describe local ventilation performance, crew activity, and physical symptoms.",
+    questions: [
+      { id: "co2-symptoms", text: "Are crew members experiencing dyspnea, throbbing headaches, or lethargy?", urgent: true },
+      { id: "co2-ventilation", text: "Are cabin ventilation fans and local scrubbers functioning nominally?", urgent: false },
+      { id: "co2-stagnation", text: "Is there localized air stagnation from multiple crew members in unventilated areas?", urgent: false },
+    ],
+    steps: [
+      step("co2-c1", "Log cabin CO₂ partial pressure and confirm CDRA airflow performance."),
+      step("co2-c2", "Suspend strenuous physical tasks in the affected sector until scrubbers stabilize."),
+      step("co2-c3", "Execute environmental control procedures while monitoring for hypercapnia symptoms."),
+    ],
+    criticalSteps: [
+      step("co2-r1", "Report module location, hypercapnia metrics, and crew vital trends to flight surgeons."),
+      step("co2-r2", "Activate emergency CDRA scrubber backup loops immediately to restore baseline air quality."),
+      step("co2-r3", "Request immediate flight-surgeon assessment and follow mission-approved hypercapnia protocols."),
+    ],
+  },
+  overheat: {
+    title: "Thermal overheat", scenarioId: "cabinOverheat", category: "cabinHot", alertKeys: ["cabinTemp", "coreTemp"], sourceId: "teamSymptomReport",
+    status: { caution: "Elevated cabin ambient temperature; thermal regulation advised.", critical: CRITICAL_STATUS },
+    placeholder: "Describe module thermal status, cooling loop hardware, and crew vitals.",
+    questions: [
+      { id: "heat-symptoms", text: "Is anyone displaying profuse sweating, dizziness, nausea, or altered mental status?", urgent: true },
+      { id: "heat-core", text: `Is astronaut core temperature rising above the ${ruleFor("coreTemp")?.cautionHigh} °C threshold?`, urgent: false },
+      { id: "heat-spread", text: "Are active thermal alerts expanding across adjacent module sectors?", urgent: false },
+    ],
+    steps: [
+      step("heat-c1", "Record ambient module temperatures and inspect ECLSS cooling loop performance."),
+      step("heat-c2", "Limit exertion protocol demands and enforce crew hydration schedules."),
+      step("heat-c3", "Follow thermal-control procedures; environmental spikes require correlation with physiological vitals."),
+    ],
+    criticalSteps: [
+      step("heat-r1", "Report module location, ambient thermal data, and physiological vitals to flight surgeons."),
+      step("heat-r2", "Deploy emergency active-cooling protocols; isolate ambient heat spikes from core body temperature shifts."),
+      step("heat-r3", "Request immediate flight-surgeon consultation and proceed with hyperthermia emergency steps."),
+    ],
+  },
+  fever: {
+    title: "Fever", scenarioId: "fever", category: "injury", alertKeys: ["coreTemp"], regions: ["chest"], sourceId: "teamSymptomReport",
+    status: { caution: "Mild core temperature elevation; rest & symptom tracking advised.", critical: CRITICAL_STATUS },
+    placeholder: "Describe how long the fever has lasted and any other physical symptoms.",
+    questions: [
+      { id: "fever-symptoms", text: "Is the astronaut experiencing chills, body aches, sore throat, or respiratory symptoms?", urgent: false },
+      { id: "fever-others", text: "Is anyone else on the crew reporting similar symptoms or elevated temperatures?", urgent: false },
+      { id: "fever-alertness", text: "Is the astronaut confused, severely lethargic, or struggling to stay hydrated?", urgent: true },
+    ],
+    steps: [
+      step("fever-c1", "Log core temperature reading, heart rate variability (HRV), and any accompanying symptoms."),
+      step("fever-c2", "Rest from non-essential tasks, maintain hydration, and recheck core temperature per schedule."),
+      step("fever-c3", "Follow mission-approved health monitoring procedures; a single elevated reading requires trend verification."),
+    ],
+    criticalSteps: [
+      step("fever-r1", "Report core temperature readings, duration, and any crew symptoms to mission control or the crew medical officer."),
+      step("fever-r2", "Follow mission-approved crew isolation and medical monitoring procedures while awaiting ground guidance."),
+      step("fever-r3", "Request prompt flight-surgeon assessment and follow mission-approved emergency medical procedures."),
+    ],
+  },
+  sleep: {
+    title: "Sleep loss", scenarioId: "sleepDeprivation", category: "mental", alertKeys: ["pvtReactionMs", "pvtLapses", "hrv", "mhi"], sourceId: "teamSymptomReport",
+    status: { caution: "Moderate cognitive fatigue; schedule & recovery adjustment advised.", critical: CRITICAL_STATUS },
+    placeholder: "Describe recent sleep interruptions, workload strain, and current alertness.",
+    questions: [
+      { id: "sleep-deficit", text: "Has the astronaut had less uninterrupted sleep than scheduled in the last 24–48 hours?", urgent: false },
+      { id: "sleep-operations", text: "Is the astronaut scheduled for high-risk or safety-critical operations today?", urgent: false },
+      { id: "sleep-signs", text: "Is anyone noticing slowed reaction times, irritability, or difficulty concentrating?", urgent: false },
+    ],
+    steps: [
+      step("sleep-c1", "Review recent sleep architecture, HRV trends, and PVT+ reaction-time results."),
+      step("sleep-c2", "Defer non-urgent, high-precision tasks and schedule a protected rest block per mission guidelines."),
+      step("sleep-c3", "Follow mission-approved fatigue management procedures and log subjective alertness."),
+    ],
+    criticalSteps: [
+      step("sleep-r1", "Report PVT+ test lapses, MHI score, and sleep deficit history to mission control or the crew medical officer."),
+      step("sleep-r2", "Stand down from high-risk operations (EVA, robotics, docking) per mission-approved fatigue rules."),
+      step("sleep-r3", "Request prompt flight-surgeon assessment to restructure work-rest cycles."),
+    ],
+  },
+};
 
 export const URGENT_REPORT_ACTION = "Request prompt flight-surgeon or crew-medical-officer assessment and follow the mission-approved emergency procedure. Treatment instructions are withheld in this research prototype.";
+
+export function workflowForScenario(scenarioId: string | null): WorkflowKind | null {
+  return (Object.keys(WORKFLOWS) as WorkflowKind[]).find((kind) => WORKFLOWS[kind].scenarioId === scenarioId) ?? null;
+}

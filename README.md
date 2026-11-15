@@ -1,6 +1,6 @@
 <div align="center">
 
-# Decker2 A.U.R.A.
+# A²U.R.A. (A.I. Astro-Unified Response Algorithm)
 
 **Astro-Unified Response Algorithm: an immersive 3D research dashboard for astronaut health and environmental awareness.**
 
@@ -33,7 +33,7 @@ Alerts show their readings or reported symptoms, configured thresholds, source c
 - **Responder recommendations:** rule-based alerts identify crew review or flight-surgeon assessment, including configured persistence escalation. These are demonstration recommendations, not delivered notifications.
 - **Real NASA data:** recorded solar energetic particle events from NASA DONKI add a space-weather precaution and radiation aura. Replays show event ID/time and never infer a personal crew dose.
 - **Private check-ins:** journal sentiment is processed locally and contributes to a project-defined MHI with simulated biometric/affect scores. Discrepancies appear privately in the UI. No microphone or voice analysis is implemented; entries live in browser memory and are lost on reload.
-- **Conditions bar:** one click triggers simulated solar particles, acute absorbed dose, CO leak, CO2 buildup, cabin overheat or cold, fever, sleep deprivation, right-hand injury or the **How I feel** ("I'm fine") discrepancy. Each condition starts from the clean crew baseline, so hazards from the previous one never carry over, and opens **Next steps** with the active alerts' actions in priority order. Real DONKI record replay is a separate control.
+- **Conditions bar:** one click triggers simulated solar particles, acute absorbed dose, CO leak, CO2 buildup, cabin overheat or cold, fever, sleep deprivation, right-hand injury or the **Mental Distress** ("I'm fine") discrepancy. Each condition starts from the clean crew baseline, so hazards from the previous one never carry over, and opens **Next steps** with the active alerts' actions in priority order. Real DONKI record replay is a separate control.
 - **Adjust vitals:** click any vitals card to open Telemetry and drag Heart rate, Core temp or PVT reaction. Core temp and PVT move the aura, alerts and Next steps immediately; heart rate has no research threshold and is display only.
 - **Offline fallback:** the locally served dashboard, deterministic rules, local journal scoring and bundled NASA catalog work without external APIs. Gemini explanations require a network connection and fall back to rule-based guidance.
 - **Measurements reference:** what is measured, with which onboard device, and why it matters in space.

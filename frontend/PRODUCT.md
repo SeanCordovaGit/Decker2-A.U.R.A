@@ -37,7 +37,7 @@ One glance at one body: hazard category is encoded as aura color and severity as
 
 ## Brand Commitments
 
-- Name: "Decker2 A.U.R.A.", Astro-Unified Response Algorithm.
+- Name: "A²U.R.A.", A.I. Astro-Unified Response Algorithm.
 - Visual reference supplied by the user: Google Stitch mocks "Astronaut Biometric Telemetry & 3D Aura HUD" (palette primary #00E5FF, secondary #00FF90, tertiary #FF3366, neutral #0B0E14; Space Grotesk for headlines and body, JetBrains Mono for labels; telemetry-HUD panels). Used as the basis, enhanced for hierarchy; content follows the spec, not the mocks.
 - Wording: "designed to integrate with" NASA systems, never "integrated with".
 
