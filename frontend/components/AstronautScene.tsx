@@ -2,13 +2,14 @@
 
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, Html, Lightformer, OrbitControls, Stars, useGLTF, useProgress } from "@react-three/drei";
-import { Suspense, useMemo, useRef } from "react";
+import { Suspense, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import SmokeAura from "./SmokeAura";
 import AuraOutline from "./AuraOutline";
 import InjuryEffect from "./InjuryEffect";
 import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils.js";
-import { CATEGORY_META, SEVERITY_META } from "@aura/core/config/aura";
+import { getIndicatorColor, SEVERITY_META } from "@aura/core/config/aura";
+import { bodyRegionLabel } from "@aura/core/lib/evaluate";
 import type { BodyRegion, HazardCategory, Severity } from "@aura/core/lib/types";
 import { useAuraStore } from "@/store/useAuraStore";
 
@@ -19,6 +20,7 @@ const HEIGHT = 1.9;
 
 /** Body anchors as fractions of the model's bounds: x of half-width (astronaut's right = −x, facing +z), y of height, z of half-depth. */
 const REGION_ANCHOR: Record<BodyRegion, [number, number, number]> = {
+  abdomen: [0, 0.54, 0.55],
   head: [0, 0.88, 0.35],
   chest: [0, 0.68, 0.45],
   back: [0, 0.68, -0.9],
@@ -32,6 +34,7 @@ const REGION_ANCHOR: Record<BodyRegion, [number, number, number]> = {
 
 // Ellipsoid radii in the normalized 1.9 m suit frame, fitted to the model's regions.
 const REGION_RADII: Record<BodyRegion, [number, number, number]> = {
+  abdomen: [0.23, 0.2, 0.18],
   head: [0.23, 0.25, 0.24], chest: [0.28, 0.25, 0.2], back: [0.28, 0.28, 0.18],
   rightArm: [0.19, 0.24, 0.18], leftArm: [0.19, 0.24, 0.18],
   rightHand: [0.125, 0.17, 0.15], leftHand: [0.125, 0.17, 0.15],
@@ -45,18 +48,6 @@ const CATEGORY_ANCHOR: Partial<Record<HazardCategory, [number, number, number]>>
   cabinHot: [0.88, 0.45, 0],
   cabinCold: [-0.88, 0.35, 0],
   mental: [0.12, 1.02, 0],
-};
-
-const REGION_LABEL: Record<BodyRegion, string> = {
-  head: "Head",
-  chest: "Chest",
-  back: "Back",
-  leftArm: "Left arm",
-  rightArm: "Right arm",
-  leftHand: "Left hand",
-  rightHand: "Right hand",
-  leftLeg: "Left leg",
-  rightLeg: "Right leg",
 };
 
 const CALLOUT_LABEL: Record<Exclude<HazardCategory, "injury">, string> = {
@@ -134,7 +125,7 @@ function Callout({ position, side, color, label, sev }: { position: THREE.Vector
             className="whitespace-nowrap rounded-[4px] border bg-[rgb(8_11_17/0.86)] px-2 py-1 font-mono text-[11px] leading-none text-[#e6edf7]"
             style={{ borderColor: `${color}99` }}
           >
-            {label} <span className={sev === "critical" ? "font-semibold" : ""} style={{ color: sev === "critical" ? "#ffffff" : "#ffc861" }}>· {SEVERITY_META[sev].label.toLowerCase()}</span>
+            {label} <span className={sev === "critical" ? "font-semibold" : ""} style={{ color: SEVERITY_META[sev].badgeColor }}>· {SEVERITY_META[sev].label.toLowerCase()}</span>
           </span>
         </div>
       </div>
@@ -142,10 +133,14 @@ function Callout({ position, side, color, label, sev }: { position: THREE.Vector
   );
 }
 
-function Astronaut() {
+function Astronaut({ onReady }: { onReady?: () => void }) {
   const { scene } = useGLTF(MODEL_URL, DRACO_PATH);
+  useEffect(() => { onReady?.(); }, [onReady]);
   const categories = useAuraStore((s) => s.categories);
   const reportedInjuries = useAuraStore((s) => s.readings.injuries);
+  const readings = useAuraStore((s) => s.readings);
+  const metrics = useAuraStore((s) => s.metrics);
+  const coreTemperature = metrics.find((metric) => metric.metric === "coreTemp");
 
   const { model, geometries, anchor } = useMemo(() => {
     const model = scene.clone(true);
@@ -198,9 +193,9 @@ function Astronaut() {
           <SmokeAura category={c} geometries={geometries} severity={categories.find((status) => status.category === c)!.severity} />
         </group>
       ))}
-      <Glow position={anchor([0, 0.88, 0])} color={CATEGORY_META.mental.color} sev={categories.find((c) => c.category === "mental")!.severity} size={1.4} />
+      <Glow position={anchor([0, 0.88, 0])} color={getIndicatorColor("mental", categories.find((c) => c.category === "mental")!.severity)} sev={categories.find((c) => c.category === "mental")!.severity} size={1.4} />
       {injuryVolumes.map(({ region, center, radii }) => (
-        <InjuryEffect key={region} geometries={geometries} center={center} radii={radii} severity={injury.regions[region] ?? "nominal"} />
+        <InjuryEffect key={region} geometries={geometries} center={center} radii={radii} severity={injury.regions[region] ?? "nominal"} context={region === "chest" && (reportedInjuries[region] ?? "nominal") === "nominal" ? coreTemperature : undefined} />
       ))}
 
       {categories
@@ -208,15 +203,15 @@ function Astronaut() {
         .map((c) => {
           const a = CATEGORY_ANCHOR[c.category]!;
           return (
-            <Callout key={c.category} position={anchor(a)} side={sideFor(null, a[0])} color={CATEGORY_META[c.category].color} label={CALLOUT_LABEL[c.category as Exclude<HazardCategory, "injury">]} sev={c.severity} />
+            <Callout key={c.category} position={anchor(a)} side={sideFor(null, a[0])} color={getIndicatorColor(c.category, c.severity)} label={CALLOUT_LABEL[c.category as Exclude<HazardCategory, "injury">]} sev={c.severity} />
           );
         })}
       {(Object.entries(injury.regions) as [BodyRegion, Severity][])
         .filter(([, sev]) => sev !== "nominal")
         .map(([r, sev]) => {
           const a = REGION_ANCHOR[r];
-          const label = reportedInjuries[r] && reportedInjuries[r] !== "nominal" ? `${REGION_LABEL[r]} injury` : REGION_LABEL[r];
-          return <Callout key={r} position={anchor(a)} side={sideFor(r, a[0])} color={CATEGORY_META.injury.color} label={label} sev={sev} />;
+          const label = bodyRegionLabel(r, readings, metrics);
+          return <Callout key={r} position={anchor(a)} side={sideFor(r, a[0])} color={getIndicatorColor("injury", sev, r === "chest" && (reportedInjuries[r] ?? "nominal") === "nominal" ? coreTemperature : undefined)} label={label} sev={sev} />;
         })}
     </group>
   );
@@ -253,7 +248,7 @@ function Stage() {
   );
 }
 
-export default function AstronautScene({ autoRotate, onInteract }: { autoRotate: boolean; onInteract: () => void }) {
+export default function AstronautScene({ autoRotate, onInteract, onReady }: { autoRotate: boolean; onInteract: () => void; onReady?: () => void }) {
   const { active, progress } = useProgress();
   return (
     <>
@@ -274,7 +269,7 @@ export default function AstronautScene({ autoRotate, onInteract }: { autoRotate:
       <Stage />
       {/* no fallback inside the canvas: drei <Html> as a Suspense fallback unmounts its own React root mid-render */}
       <Suspense fallback={null}>
-        <Astronaut />
+        <Astronaut onReady={onReady} />
       </Suspense>
       <OrbitControls target={[0, 0.95, 0]} enablePan={false} enableDamping={false} minDistance={2.6} maxDistance={7} autoRotate={autoRotate} autoRotateSpeed={0.6} onStart={onInteract} />
     </Canvas>

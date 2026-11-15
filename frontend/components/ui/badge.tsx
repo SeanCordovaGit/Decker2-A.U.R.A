@@ -12,7 +12,6 @@ const badgeVariants = cva(
         secondary: "border-transparent bg-secondary text-secondary-foreground",
         destructive: "border-transparent bg-destructive text-white",
         outline: "border-input text-muted-foreground",
-        // severity: colour never encodes critical (red means injury); critical is inverted ink
         nominal: "border-input text-muted-foreground",
         caution: "border-caution/50 bg-caution-soft text-caution",
         critical: "border-foreground bg-foreground font-medium text-background",

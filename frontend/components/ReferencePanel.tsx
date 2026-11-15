@@ -1,11 +1,10 @@
 "use client";
 
-import { CATEGORY_META, CHALLENGE_OBJECTIVES, MEASUREMENTS } from "@aura/core/config/aura";
-import type { HazardCategory } from "@aura/core/lib/types";
+import { INDICATOR_LEGEND, CHALLENGE_OBJECTIVES, MEASUREMENTS } from "@aura/core/config/aura";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CATEGORY_ICON, Swatch } from "./hazard";
+import ResearchReference from "./ResearchReference";
 
 export default function ReferencePanel() {
   return (
@@ -14,10 +13,11 @@ export default function ReferencePanel() {
         <CardHeader>
           <CardTitle>Reference</CardTitle>
           <CardAction>
-            <TabsList aria-label="Reference" className="h-7">
+            <TabsList aria-label="Reference" className="h-auto flex-wrap">
               <TabsTrigger value="measurements" className="px-2 text-[12px]">What we measure</TabsTrigger>
               <TabsTrigger value="objectives" className="px-2 text-[12px]">Challenge objectives</TabsTrigger>
               <TabsTrigger value="legend" className="px-2 text-[12px]">Reading the aura</TabsTrigger>
+              <TabsTrigger value="research" className="px-2 text-[12px]">Research data</TabsTrigger>
             </TabsList>
           </CardAction>
         </CardHeader>
@@ -68,16 +68,12 @@ export default function ReferencePanel() {
           <TabsContent value="legend">
             <div className="grid gap-4 md:grid-cols-[1fr_1fr]">
               <ul className="grid grid-cols-2 gap-x-4 gap-y-2">
-                {(Object.keys(CATEGORY_META) as HazardCategory[]).map((c) => {
-                  const Icon = CATEGORY_ICON[c];
-                  return (
-                    <li key={c} className="flex items-center gap-2 text-[13px] text-ink">
-                      <Swatch category={c} active />
-                      <Icon size={14} className="text-ink-3" aria-hidden />
-                      {CATEGORY_META[c].label}
-                    </li>
-                  );
-                })}
+                {INDICATOR_LEGEND.map((indicator) => (
+                  <li key={indicator.label} className="flex items-start gap-2 text-[13px] text-ink">
+                    <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: indicator.color }} />
+                    <span><strong>{indicator.label}</strong><span className="block text-ink-2">{indicator.meaning}</span></span>
+                  </li>
+                ))}
               </ul>
               <dl className="grid grid-cols-[88px_1fr] gap-y-1.5 text-[13px]">
                 <dt className="text-ink-3">No aura</dt>
@@ -85,12 +81,13 @@ export default function ReferencePanel() {
                 <dt className="text-ink-3">Steady glow</dt>
                 <dd className="text-ink-2">Caution: the crew self-manages.</dd>
                 <dt className="text-ink-3">Pulsing glow</dt>
-                <dd className="text-ink-2">Critical: the flight surgeon is notified.</dd>
+                <dd className="text-ink-2">Red for critical tiers; the alert distinguishes urgent symptoms, project warnings and career-dose review.</dd>
                 <dt className="text-ink-3">Body glow</dt>
                 <dd className="text-ink-2">Injury or fever, only on the affected body part.</dd>
               </dl>
             </div>
           </TabsContent>
+          <TabsContent value="research"><ResearchReference /></TabsContent>
         </CardContent>
       </Card>
     </Tabs>

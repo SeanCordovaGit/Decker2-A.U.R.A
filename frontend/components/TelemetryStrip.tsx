@@ -18,7 +18,7 @@ const READOUTS: { key: HistoryKey; label: string; unit: string; digits: number }
 
 const W = 120;
 const H = 32;
-const TONE: Record<Severity, string> = { nominal: "var(--text)", caution: "var(--caution)", critical: "var(--text)" };
+const TONE: Record<Severity, string> = { nominal: "var(--text)", caution: "var(--caution)", critical: "var(--critical)" };
 
 function Trace({ values, caution, severity }: { values: number[]; caution?: number; severity: Severity }) {
   const all = caution !== undefined ? [...values, caution] : values;

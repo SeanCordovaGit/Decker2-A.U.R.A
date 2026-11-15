@@ -9,6 +9,7 @@ export type HazardCategory =
   | "injury";
 
 export type BodyRegion =
+  | "abdomen"
   | "head"
   | "chest"
   | "back"
@@ -37,12 +38,16 @@ export interface Readings {
   activityLevel: number; // 0–1
   affectScore: number; // 0–100
   pvtReactionMs: number; // mean PVT reaction time, ms
+  pvtLapses: number; // count per 300-second PVT+ test
+  absorbedDoseGy: number; // independent acute absorbed dose, never derived from mSv
   injuries: Partial<Record<BodyRegion, Severity>>;
+  reportedConcerns?: Partial<Record<"hand" | "cold", boolean>>;
   sepActive: boolean;
+  sepEvent?: SpaceWeatherEvent;
 }
 
 export type NumericMetric = {
-  [K in keyof Readings]: Readings[K] extends number ? K : never;
+  [K in keyof Readings]-?: Readings[K] extends number ? K : never;
 }[keyof Readings];
 
 export interface Citation {
@@ -67,6 +72,14 @@ export interface ThresholdRule {
   criticalHigh?: number;
   cautionLow?: number;
   criticalLow?: number;
+  cautionHighExclusive?: boolean;
+  cautionLowExclusive?: boolean;
+  criticalHighExclusive?: boolean;
+  criticalLowExclusive?: boolean;
+  escalateHigh?: number;
+  earlyWarningBelow?: number;
+  earlyCitationId?: string;
+  context?: string;
   citationId: string;
   actions: { caution: string; critical: string };
   regions?: BodyRegion[];
@@ -89,6 +102,8 @@ export interface CategoryStatus {
 }
 
 export interface Alert {
+  metric?: NumericMetric;
+  direction?: "high" | "low" | null;
   key: string;
   category: HazardCategory;
   title: string;
@@ -104,6 +119,8 @@ export interface Alert {
 }
 
 export interface AlertLogEntry {
+  metric?: NumericMetric;
+  direction?: "high" | "low" | null;
   id: number;
   time: number;
   key: string;
@@ -114,7 +131,7 @@ export interface AlertLogEntry {
   event: "opened" | "escalated" | "changed" | "cleared";
 }
 
-export type MhiSource = "biometrics" | "affect" | "journal" | "pvt";
+export type MhiSource = "biometrics" | "affect" | "journal";
 
 export interface MhiComponent {
   source: MhiSource;
@@ -123,6 +140,7 @@ export interface MhiComponent {
 }
 
 export interface MhiResult {
+  source: "provided" | "computed";
   index: number;
   severity: Severity;
   components: MhiComponent[];
@@ -141,6 +159,8 @@ export interface SpaceWeatherEvent {
   eventTime: string;
   instruments: string[];
   link?: string;
+  catalogSource?: "nasaLive" | "nasaCached";
+  fetchedAt?: string | null;
 }
 
 export interface SpaceWeatherResponse {

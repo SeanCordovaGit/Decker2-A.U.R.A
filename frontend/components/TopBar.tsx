@@ -3,6 +3,7 @@
 import { BookOpen } from "lucide-react";
 import { useEffect, useState } from "react";
 import { PROFILE } from "@aura/core/config/aura";
+import { useAuraStore } from "@/store/useAuraStore";
 import { Button } from "@/components/ui/button";
 
 function useMissionClock() {
@@ -30,6 +31,7 @@ function AuraMark() {
 
 export default function TopBar({ onOpenReference }: { onOpenReference: () => void }) {
   const clock = useMissionClock();
+  const selectedCrewId = useAuraStore((state) => state.selectedCrewId);
 
   return (
     <header className="hud-glass mission-header">
@@ -43,7 +45,7 @@ export default function TopBar({ onOpenReference }: { onOpenReference: () => voi
       <dl className="mission-header-data">
         <div>
           <dt>Crew</dt>
-          <dd>{PROFILE.callsign}</dd>
+          <dd>{selectedCrewId ?? PROFILE.callsign}</dd>
         </div>
         <div>
           <dt>Mission clock</dt>

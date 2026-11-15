@@ -3,7 +3,7 @@
 import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { CATEGORY_META } from "@aura/core/config/aura";
+import { getIndicatorColor } from "@aura/core/config/aura";
 import type { HazardCategory, Severity } from "@aura/core/lib/types";
 
 const vertex = `
@@ -35,14 +35,14 @@ export default function AuraOutline({ category, severity, geometries, thickness 
     vertexShader: vertex,
     fragmentShader: fragment,
     uniforms: {
-      uColor: { value: new THREE.Color(CATEGORY_META[category].color) },
+      uColor: { value: new THREE.Color(getIndicatorColor(category, severity)) },
       uOpacity: { value: 0 },
       uThickness: { value: thickness },
     },
     transparent: true,
     depthWrite: false,
     blending: THREE.AdditiveBlending,
-  }), [category, thickness]);
+  }), [category, severity, thickness]);
   useFrame(({ clock }, dt) => {
     if (!group.current?.children.length) return;
     const shader = (group.current.children[0] as THREE.Mesh).material as THREE.ShaderMaterial;

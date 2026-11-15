@@ -6,6 +6,7 @@ import {
   SEVERITY_META,
   THRESHOLD_RULES,
 } from "../config/aura";
+import { URGENT_REPORT_ACTION, WORKFLOWS, type WorkflowKind } from "../config/workflows";
 import type {
   Alert,
   BodyRegion,
@@ -13,6 +14,7 @@ import type {
   HazardCategory,
   MetricStatus,
   MhiResult,
+  NumericMetric,
   Readings,
   Severity,
   ThresholdRule,
@@ -31,18 +33,18 @@ export function maxSeverity(a: Severity, b: Severity): Severity {
   return SEVERITY_META[a].rank >= SEVERITY_META[b].rank ? a : b;
 }
 
-/** Inclusive threshold evaluation (FR-010). */
+/** Each bound follows the inclusive or strict comparison declared in configuration. */
 export function severityFor(
   rule: ThresholdRule,
   value: number,
 ): { severity: Severity; direction: "high" | "low" | null; threshold: number | null } {
-  if (rule.criticalHigh !== undefined && value >= rule.criticalHigh)
+  if (rule.criticalHigh !== undefined && (rule.criticalHighExclusive ? value > rule.criticalHigh : value >= rule.criticalHigh))
     return { severity: "critical", direction: "high", threshold: rule.criticalHigh };
-  if (rule.criticalLow !== undefined && value <= rule.criticalLow)
+  if (rule.criticalLow !== undefined && (rule.criticalLowExclusive ? value < rule.criticalLow : value <= rule.criticalLow))
     return { severity: "critical", direction: "low", threshold: rule.criticalLow };
-  if (rule.cautionHigh !== undefined && value >= rule.cautionHigh)
+  if (rule.cautionHigh !== undefined && (rule.cautionHighExclusive ? value > rule.cautionHigh : value >= rule.cautionHigh))
     return { severity: "caution", direction: "high", threshold: rule.cautionHigh };
-  if (rule.cautionLow !== undefined && value <= rule.cautionLow)
+  if (rule.cautionLow !== undefined && (rule.cautionLowExclusive ? value < rule.cautionLow : value <= rule.cautionLow))
     return { severity: "caution", direction: "low", threshold: rule.cautionLow };
   return { severity: "nominal", direction: null, threshold: null };
 }
@@ -82,11 +84,11 @@ export function evaluateCategories(
     if (m.category === "injury") {
       for (const r of m.rule.regions ?? []) markRegion(s, r, m.severity);
     }
-    // Critical CO → brain and heart highlighted red (CNS + arrhythmia risk)
-    if (m.metric === "co" && m.severity === "critical") {
+    // Compare concentration with the duration-based reference; no exposure duration is inferred.
+    if (m.metric === "co" && m.value >= (m.rule.earlyWarningBelow ?? Infinity)) {
       const inj = statuses.injury;
-      inj.severity = maxSeverity(inj.severity, "critical");
-      for (const r of m.rule.regions ?? []) markRegion(inj, r, "critical");
+      inj.severity = maxSeverity(inj.severity, m.severity);
+      for (const r of m.rule.regions ?? []) markRegion(inj, r, m.severity);
     }
   }
 
@@ -103,15 +105,24 @@ export function evaluateCategories(
   }
 
   // Mental health index
+  for (const kind of ["hand", "cold"] as WorkflowKind[]) {
+    if (!readings.reportedConcerns?.[kind]) continue;
+    const status = statuses[WORKFLOWS[kind].category];
+    status.severity = "critical";
+    if (kind === "hand") markRegion(status, "rightHand", "critical");
+  }
+
   statuses.mental.severity = maxSeverity(statuses.mental.severity, mhi.severity);
-  if (mhi.severity !== "nominal") {
-    for (const r of CATEGORY_META.mental.regions) markRegion(statuses.mental, r, mhi.severity);
+  if (statuses.mental.severity !== "nominal") {
+    const regions = statuses.mental.severity === "critical" ? ["head" as const] : CATEGORY_META.mental.regions;
+    for (const r of regions) markRegion(statuses.mental, r, statuses.mental.severity);
   }
 
   return CATEGORIES.map((c) => statuses[c]);
 }
 
 const REGION_LABEL: Record<BodyRegion, string> = {
+  abdomen: "Lower abdomen",
   head: "Head",
   chest: "Chest",
   back: "Back",
@@ -123,8 +134,32 @@ const REGION_LABEL: Record<BodyRegion, string> = {
   rightLeg: "Right leg",
 };
 
-function fmt(n: number): string {
-  return Number.isInteger(n) ? String(n) : n.toFixed(Math.abs(n) < 10 ? 1 : 0);
+export function bodyRegionLabel(region: BodyRegion, readings: Readings, metrics: MetricStatus[]): string {
+  const labels: string[] = [];
+  if (region === "rightHand" && readings.reportedConcerns?.hand) labels.push("Crew-reported urgent hand symptoms");
+  if (readings.injuries[region] && readings.injuries[region] !== "nominal") labels.push(`${REGION_LABEL[region]} injury`);
+  for (const metric of metrics) {
+    if (metric.severity === "nominal" || !metric.rule.regions?.includes(region)) continue;
+    if (metric.metric === "co") {
+      if (metric.value >= (metric.rule.earlyWarningBelow ?? Infinity)) labels.push("CO exposure risk");
+    } else if (metric.category === "injury") labels.push(metric.metric === "coreTemp" ? "Core temperature" : metric.rule.label);
+  }
+  return labels.length ? labels.join(" + ") : REGION_LABEL[region];
+}
+
+/** Add precision when rounding would imply a different configured severity or direction. */
+export function formatMetricValue(metric: NumericMetric | "mhi", value: number, digits = 0): string {
+  const rule = THRESHOLD_RULES.find((rule) => rule.metric === metric);
+  const actual = rule && severityFor(rule, value);
+  for (let precision = digits; precision <= 6; precision++) {
+    const text = value.toFixed(precision);
+    const rounded = Number(text);
+    const displayed = rule && severityFor(rule, rounded);
+    const sameReferences = !rule || [rule.escalateHigh, rule.earlyWarningBelow].every((bound) => bound === undefined || (value >= bound) === (rounded >= bound));
+    const sameMhi = metric !== "mhi" || [MHI_CONFIG.critical, MHI_CONFIG.caution].every((bound) => (value < bound) === (rounded < bound));
+    if (sameReferences && sameMhi && (!actual || (displayed?.severity === actual.severity && displayed.direction === actual.direction))) return text;
+  }
+  return String(value);
 }
 
 /** Alerts without escalation state; the store adds persistence-based escalation. */
@@ -135,38 +170,50 @@ export function buildAlerts(
   now: number,
 ): Alert[] {
   const alerts: Alert[] = [];
+  for (const kind of ["hand", "cold"] as WorkflowKind[]) {
+    if (!readings.reportedConcerns?.[kind]) continue;
+    const config = WORKFLOWS[kind];
+    alerts.push({ key: `report:${kind}`, category: config.category, title: `Crew-reported urgent symptoms: ${config.title}`, severity: "critical", valueText: "Explicit urgent-symptom answer", thresholdText: "Project-defined report-based escalation; no sensor value was changed", citation: CITATIONS[config.sourceId], action: URGENT_REPORT_ACTION, escalation: "flightSurgeon", escalated: true, toAstronautOnly: false, createdAt: now });
+  }
 
   for (const m of metrics) {
     if (m.severity === "nominal") continue;
     const sev = m.severity as Exclude<Severity, "nominal">;
-    const cmp = m.direction === "low" ? "≤" : "≥";
+    const exclusive = m.direction === "low" ? (sev === "critical" ? m.rule.criticalLowExclusive : m.rule.cautionLowExclusive) : (sev === "critical" ? m.rule.criticalHighExclusive : m.rule.cautionHighExclusive);
+    const cmp = m.direction === "low" ? (exclusive ? "<" : "≤") : (exclusive ? ">" : "≥");
+    const escalated = sev === "critical" || (m.rule.escalateHigh !== undefined && m.value >= m.rule.escalateHigh);
+    const longDuration = m.rule.earlyWarningBelow !== undefined && m.value >= m.rule.earlyWarningBelow;
+    const basis = m.rule.escalateHigh !== undefined ? (sev === "critical" ? "1-hour concentration reference" : escalated ? "7-day concentration reference" : longDuration ? "30-180-day concentration reference" : "project early warning") : "";
+    const alertThreshold = sev === "critical" ? m.threshold : escalated ? m.rule.escalateHigh : longDuration ? m.rule.earlyWarningBelow : m.threshold;
+    const citationId = m.rule.earlyCitationId && m.value < (m.rule.earlyWarningBelow ?? 0) ? m.rule.earlyCitationId : m.rule.citationId;
     alerts.push({
       key: `metric:${m.metric}`,
+      metric: m.metric,
+      direction: m.direction,
       category: m.category,
-      title: m.rule.label,
+      title: m.metric === "cumulativeDose" && sev === "critical" ? "Career-dose limit review" : m.rule.label,
       severity: m.severity,
-      valueText: `${fmt(m.value)} ${m.rule.unit}`,
-      thresholdText: `${sev} ${cmp} ${fmt(m.threshold ?? 0)} ${m.rule.unit}`,
-      citation: CITATIONS[m.rule.citationId],
+      valueText: `${formatMetricValue(m.metric, m.value, m.rule.unit === "°C" ? 1 : 0)} ${m.rule.unit}`,
+      thresholdText: `${sev} ${cmp} ${alertThreshold ?? 0} ${m.rule.unit}${basis ? ` (${basis})` : ""}${m.rule.context ? `. ${m.rule.context}` : ""}`,
+      citation: CITATIONS[citationId],
       action: m.rule.actions[sev],
-      escalation: m.severity === "critical" ? "flightSurgeon" : "crew",
-      escalated: m.severity === "critical",
+      escalation: escalated ? "flightSurgeon" : "crew",
+      escalated,
       toAstronautOnly: false,
       createdAt: now,
     });
-    // Critical CO lights the head and chest red; this alert explains those body markers.
-    if (m.metric === "co" && m.severity === "critical") {
+    if (m.metric === "co" && m.value >= (m.rule.earlyWarningBelow ?? Infinity)) {
       alerts.push({
         key: "injury:co-exposure",
         category: "injury",
         title: "CO exposure: brain and heart at risk",
-        severity: "critical",
-        valueText: `${fmt(m.value)} ${m.rule.unit} CO`,
-        thresholdText: `critical ≥ ${fmt(m.threshold ?? 0)} ${m.rule.unit}`,
+        severity: m.severity,
+        valueText: `${formatMetricValue(m.metric, m.value)} ${m.rule.unit} CO`,
+        thresholdText: `${sev} concentration reference; actual exposure duration is not measured`,
         citation: CITATIONS[m.rule.citationId],
-        action: m.rule.actions.critical,
-        escalation: "flightSurgeon",
-        escalated: true,
+        action: m.rule.actions[sev],
+        escalation: escalated ? "flightSurgeon" : "crew",
+        escalated,
         toAstronautOnly: false,
         createdAt: now,
       });
@@ -174,15 +221,16 @@ export function buildAlerts(
   }
 
   if (readings.sepActive) {
+    const event = readings.sepEvent;
     alerts.push({
-      key: "sep",
+      key: event ? `sep:${event.id}` : "sep",
       category: "radiation",
-      title: "Solar particle event in progress",
+      title: event ? "NASA SEP precaution (recorded replay)" : "Simulated solar particle event",
       severity: "caution",
-      valueText: "Active (NASA DONKI event replay)",
-      thresholdText: "Any active SEP event → caution",
-      citation: CITATIONS.teamDoseRate,
-      action: "Prepare to shelter; postpone EVA until the event ends.",
+      valueText: event ? `${event.id} · ${event.eventTime}` : "Simulated SEP condition; not a NASA observation",
+      thresholdText: event ? "Recorded SEP replay → project precaution; not a crew-dose measurement or a current-event claim" : "Project-defined simulated SEP precaution",
+      citation: event ? { ...CITATIONS.donkiSep, url: event.link ?? CITATIONS.donkiSep.url } : CITATIONS.teamDoseRate,
+      action: "Review the recorded event with mission control. Current radiation assessment requires personal/area dosimetry, exposure timing and shielding/location information.",
       escalation: "crew",
       escalated: false,
       toAstronautOnly: false,
@@ -215,7 +263,7 @@ export function buildAlerts(
       category: "mental",
       title: "Mental Health Index low",
       severity: mhi.severity,
-      valueText: `MHI ${Math.round(mhi.index)} / 100`,
+      valueText: `MHI ${formatMetricValue("mhi", mhi.index)} / 100`,
       thresholdText: `${sev} < ${sev === "critical" ? MHI_CONFIG.critical : MHI_CONFIG.caution}`,
       citation: CITATIONS.teamMhi,
       action: MHI_CONFIG.actions[sev],

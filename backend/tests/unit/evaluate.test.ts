@@ -19,8 +19,8 @@ function categories(r: Partial<Readings>, mhi = nominalMhi) {
 
 describe("config invariants", () => {
   it("MHI weights sum to 1", () => {
-    const { biometrics, affect, journal, pvt } = MHI_CONFIG.weights;
-    expect(biometrics + affect + journal + pvt).toBeCloseTo(1);
+    const { biometrics, affect, journal } = MHI_CONFIG.weights;
+    expect(biometrics + affect + journal).toBeCloseTo(1);
   });
 
   it("threshold ordering is consistent and citations exist", () => {
@@ -64,14 +64,14 @@ describe("evaluateCategories", () => {
   });
 
   it("critical CO highlights head and chest as injury", () => {
-    const cats = categories({ co: 60 });
+    const cats = categories({ co: 430 });
     expect(cats.air.severity).toBe("critical");
     expect(cats.injury.regions.head).toBe("critical");
     expect(cats.injury.regions.chest).toBe("critical");
   });
 
-  it("caution CO does not highlight body regions", () => {
-    const cats = categories({ co: 20 });
+  it("early-warning CO does not highlight body regions", () => {
+    const cats = categories({ co: 12 });
     expect(cats.air.severity).toBe("caution");
     expect(cats.injury.severity).toBe("nominal");
   });
@@ -89,7 +89,7 @@ describe("evaluateCategories", () => {
 
   it("active SEP forces radiation to at least caution", () => {
     expect(categories({ sepActive: true }).radiation.severity).toBe("caution");
-    expect(categories({ sepActive: true, doseRate: 12 }).radiation.severity).toBe("critical");
+    expect(categories({ sepActive: true, cumulativeDose: 600 }).radiation.severity).toBe("critical");
   });
 
   it("low MHI drives the mental category", () => {
@@ -100,7 +100,7 @@ describe("evaluateCategories", () => {
 
 describe("buildAlerts", () => {
   it("critical alerts go to flight surgeon, caution to crew, with citation and action", () => {
-    const readings = { ...NOMINAL_READINGS, co: 60, cabinTemp: 28 };
+    const readings = { ...NOMINAL_READINGS, co: 430, cabinTemp: 28 };
     const alerts = buildAlerts(readings, evaluateMetrics(readings), nominalMhi, 0);
     const co = alerts.find((a) => a.key === "metric:co")!;
     const cabin = alerts.find((a) => a.key === "metric:cabinTemp")!;
@@ -113,12 +113,12 @@ describe("buildAlerts", () => {
   });
 
   it("critical CO adds an injury alert explaining the head and chest markers", () => {
-    const readings = { ...NOMINAL_READINGS, co: 60 };
+    const readings = { ...NOMINAL_READINGS, co: 430 };
     const alerts = buildAlerts(readings, evaluateMetrics(readings), nominalMhi, 0);
     const exposure = alerts.find((a) => a.key === "injury:co-exposure")!;
     expect(exposure.category).toBe("injury");
     expect(exposure.escalation).toBe("flightSurgeon");
-    const caution = { ...NOMINAL_READINGS, co: 20 };
+    const caution = { ...NOMINAL_READINGS, co: 12 };
     expect(buildAlerts(caution, evaluateMetrics(caution), nominalMhi, 0).some((a) => a.key === "injury:co-exposure")).toBe(false);
   });
 

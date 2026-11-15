@@ -29,9 +29,9 @@ export function pvtScore(reactionMs: number): number {
   return clamp(100 - Math.max(0, reactionMs - MHI_CONFIG.pvtBaselineMs) * 0.4);
 }
 
-export function computeMhi(input: Partial<Record<MhiSource, number | null>>): MhiResult {
-  const sources: MhiSource[] = ["biometrics", "affect", "journal", "pvt"];
-  const scores = Object.fromEntries(sources.map((s) => [s, input[s] ?? null])) as Record<MhiSource, number | null>;
+export function computeMhi(input: Partial<Record<MhiSource, number | null>>, providedIndex: number | null = null): MhiResult {
+  const sources: MhiSource[] = ["biometrics", "affect", "journal"];
+  const scores = Object.fromEntries(sources.map((s) => [s, providedIndex === null ? input[s] ?? null : null])) as Record<MhiSource, number | null>;
   const available = sources.filter((s) => scores[s] !== null);
   const totalWeight = available.reduce((sum, s) => sum + MHI_CONFIG.weights[s], 0);
 
@@ -41,10 +41,12 @@ export function computeMhi(input: Partial<Record<MhiSource, number | null>>): Mh
     weight: scores[s] === null || totalWeight === 0 ? 0 : MHI_CONFIG.weights[s] / totalWeight,
   }));
 
-  const index =
+  const calculatedIndex =
     totalWeight === 0
       ? 100
       : components.reduce((sum, c) => sum + (c.score ?? 0) * c.weight, 0);
+
+  const index = providedIndex === null ? calculatedIndex : clamp(providedIndex);
 
   let severity: Severity = "nominal";
   if (index < MHI_CONFIG.critical) severity = "critical";
@@ -61,6 +63,7 @@ export function computeMhi(input: Partial<Record<MhiSource, number | null>>): Mh
   }
 
   return {
+    source: providedIndex === null ? "computed" : "provided",
     index,
     severity,
     components,

@@ -12,8 +12,10 @@ export const NOMINAL_READINGS: Readings = {
   hrv: 55,
   sleepHours: 7.5,
   activityLevel: 0.1,
-  affectScore: 75,
-  pvtReactionMs: 255,
+  affectScore: 85,
+  pvtReactionMs: 230,
+  pvtLapses: 1,
+  absorbedDoseGy: 0,
   injuries: {},
   sepActive: false,
 };
@@ -32,6 +34,8 @@ const LIMITS: Partial<Record<keyof Readings, [number, number]>> = {
   activityLevel: [0, 1],
   affectScore: [0, 100],
   pvtReactionMs: [150, 1000],
+  pvtLapses: [0, 30],
+  absorbedDoseGy: [0, 20],
 };
 
 export function clampReadings(r: Readings): Readings {
@@ -66,7 +70,7 @@ export function tickReadings(
   const goal: Readings = { ...NOMINAL_READINGS, ...targets };
 
   for (const key of Object.keys(LIMITS) as (keyof Readings)[]) {
-    if (key === "cumulativeDose") continue;
+    if (key === "cumulativeDose" || key === "absorbedDoseGy" || key === "pvtLapses") continue;
     const cur = prev[key] as number;
     const target = goal[key] as number;
     const noise = ((rand() - 0.5) * 2 * (NOISE[key] ?? 0));
@@ -76,10 +80,13 @@ export function tickReadings(
   // Heart rate follows resting HR plus activity
   next.heartRate = next.restingHeartRate + next.activityLevel * 70 + ((rand() - 0.5) * 2);
 
-  // Cumulative dose: demo-accelerated integration (1 tick ≈ 1 mission day)
-  next.cumulativeDose = targets.cumulativeDose ?? prev.cumulativeDose + next.doseRate * 0.02;
+  // Demo integration adds 0.02 days of exposure at the simulated daily dose rate per tick.
+  next.cumulativeDose = Math.max(prev.cumulativeDose, targets.cumulativeDose ?? prev.cumulativeDose + next.doseRate * 0.02);
 
+  next.pvtLapses = Math.round(goal.pvtLapses);
+  next.absorbedDoseGy = Math.max(prev.absorbedDoseGy, targets.absorbedDoseGy ?? prev.absorbedDoseGy);
   next.injuries = { ...(targets.injuries ?? {}) };
   next.sepActive = targets.sepActive ?? false;
+  next.sepEvent = targets.sepEvent;
   return clampReadings(next);
 }

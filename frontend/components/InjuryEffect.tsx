@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useSyncExternalStore } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { CATEGORY_META } from "@aura/core/config/aura";
+import { getIndicatorColor, type IndicatorContext } from "@aura/core/config/aura";
 import type { Severity } from "@aura/core/lib/types";
 
 const vertex = `
@@ -68,9 +68,10 @@ function regionPatch(geometries: THREE.BufferGeometry[], center: THREE.Vector3, 
   return patch;
 }
 
-export default function InjuryEffect({ geometries, center, radii, severity }: { geometries: THREE.BufferGeometry[]; center: THREE.Vector3; radii: THREE.Vector3; severity: Severity }) {
+export default function InjuryEffect({ geometries, center, radii, severity, context }: { geometries: THREE.BufferGeometry[]; center: THREE.Vector3; radii: THREE.Vector3; severity: Severity; context?: IndicatorContext }) {
   const group = useRef<THREE.Group>(null);
   const opacity = useRef(0);
+  const color = getIndicatorColor("injury", severity, context);
   const reduced = useSyncExternalStore(subscribeMotion, () => matchMedia(motionQuery).matches, () => false);
   const patch = useMemo(() => regionPatch(geometries, center, radii), [geometries, center, radii]);
   useEffect(() => () => patch.dispose(), [patch]);
@@ -79,7 +80,7 @@ export default function InjuryEffect({ geometries, center, radii, severity }: { 
       vertexShader: vertex, fragmentShader: fragment,
       uniforms: {
         uCenter: { value: center }, uRadii: { value: radii },
-        uColor: { value: new THREE.Color(CATEGORY_META.injury.color) },
+        uColor: { value: new THREE.Color() },
         uOpacity: { value: 0 }, uOutline: { value: outline },
         uThickness: { value: outline ? 0.018 : 0.003 },
       },
@@ -111,6 +112,7 @@ export default function InjuryEffect({ geometries, center, radii, severity }: { 
     for (const layer of group.current.children.slice(0, 2)) {
       const material = (layer.children[0] as THREE.Mesh).material as THREE.ShaderMaterial;
       material.uniforms.uOpacity.value = opacity.current * pulse;
+      material.uniforms.uColor.value.set(color);
     }
     group.current.children[2].children.forEach((child, index) => {
       const sprite = child as THREE.Sprite;
@@ -121,6 +123,6 @@ export default function InjuryEffect({ geometries, center, radii, severity }: { 
   });
   return <group ref={group}>
     {materials.map((material, layer) => <group key={layer}><mesh geometry={patch} material={material} /></group>)}
-    <group>{puffs.map((position, index) => <sprite key={index} position={position} scale={Math.max(radii.x, radii.y) * 1.5}><spriteMaterial map={texture} color={CATEGORY_META.injury.color} transparent depthWrite={false} depthTest /></sprite>)}</group>
+    <group>{puffs.map((position, index) => <sprite key={index} position={position} scale={Math.max(radii.x, radii.y) * 1.5}><spriteMaterial map={texture} color={color} transparent depthWrite={false} depthTest /></sprite>)}</group>
   </group>;
 }

@@ -3,7 +3,7 @@
 import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { CATEGORY_META } from "@aura/core/config/aura";
+import { getIndicatorColor } from "@aura/core/config/aura";
 import type { HazardCategory, Severity } from "@aura/core/lib/types";
 
 export default function SmokeAura({ category, severity, geometries }: { category: HazardCategory; severity: Severity; geometries: THREE.BufferGeometry[] }) {
@@ -54,5 +54,5 @@ export default function SmokeAura({ category, severity, geometries }: { category
       (sprite.material as THREE.SpriteMaterial).opacity = opacity.current * pulse;
     });
   });
-  return <group ref={group}>{puffs.map((puff, index) => <sprite key={index} position={puff.position}><spriteMaterial map={texture} color={CATEGORY_META[category].color} transparent depthWrite={false} /></sprite>)}</group>;
+  return <group ref={group}>{puffs.map((puff, index) => <sprite key={index} position={puff.position}><spriteMaterial map={texture} color={getIndicatorColor(category, severity)} transparent depthWrite={false} /></sprite>)}</group>;
 }

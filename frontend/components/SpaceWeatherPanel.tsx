@@ -13,7 +13,9 @@ const fmt = (iso: string) =>
 export default function SpaceWeatherPanel() {
   const { data, failed } = useSpaceWeather();
   const replay = useAuraStore((s) => s.replaySep);
-  const replayId = useAuraStore((s) => (s.scenarioId === "sep" ? s.replayEvent?.id : null));
+  const selected = useAuraStore((s) => s.replayEvent);
+  const clearReplay = useAuraStore((s) => s.clearSepReplay);
+  const replayId = selected?.id;
 
   return (
     <Card className="h-full" aria-label="NASA space weather">
@@ -21,12 +23,19 @@ export default function SpaceWeatherPanel() {
         <CardTitle>NASA space weather</CardTitle>
         {data && (
           <CardAction>
-            <Badge variant={data.source === "nasaLive" ? "tag-signal" : "tag-caution"}>{data.source === "nasaLive" ? "Live" : "Cached"}</Badge>
+            <Badge variant={data.source === "nasaLive" ? "tag-signal" : "tag-caution"}>{data.source === "nasaLive" ? "Retrieved catalog" : "Bundled NASA catalog"}</Badge>
           </CardAction>
         )}
       </CardHeader>
       <CardContent>
-      <p className="text-[12px] text-ink-2">Solar energetic particle events from NASA DONKI. Replay one to drive the radiation aura.</p>
+      <p className="text-[12px] text-ink-2">Recorded solar energetic particle events from NASA DONKI. Replay adds a project precaution; it does not simulate or measure a crew dose.</p>
+      {selected && <section className="space-weather-evidence" aria-label="Selected NASA event">
+        <h3>Recorded event replay · precaution active</h3>
+        <dl><dt>NASA event ID</dt><dd>{selected.id}</dd><dt>Event time (UTC)</dt><dd>{selected.eventTime}</dd><dt>Instrument / model</dt><dd>{selected.instruments.join(", ") || "Not listed"}</dd><dt>Source</dt><dd>{selected.catalogSource === "nasaCached" ? "Bundled NASA catalog" : selected.catalogSource === "nasaLive" ? "Retrieved NASA catalog" : "NASA DONKI catalog record"}</dd></dl>
+        <p>Effect: adds a caution-level space-weather alert. Crew dose, the current injury and any existing dose-limit reviews remain independent.</p>
+        <Button variant="outline" size="xs" onClick={clearReplay}>Clear event replay</Button>
+      </section>}
+      <details className="space-weather-evidence"><summary>What would determine crew exposure?</summary><p>Personal and area dosimetry, exposure duration, crew location/EVA history, shielding and the relevant particle flux/energy measurements. A DONKI event ID alone cannot establish absorbed or effective dose.</p></details>
 
       {!data && !failed && (
         <ul className="mt-3 space-y-1.5" aria-busy>
@@ -40,12 +49,13 @@ export default function SpaceWeatherPanel() {
 
       {data && data.events.length > 0 && (
         <ul className="mt-3 space-y-1.5">
-          {data.events.slice(0, 6).map((e) => {
+          {data.events.slice(0, 10).map((e) => {
             const on = replayId === e.id;
             return (
               <li key={e.id} className={`flex items-center gap-2 rounded-[5px] border px-2.5 py-2 ${on ? "border-signal-text/60 bg-signal-soft" : "border-line bg-panel-2"}`}>
                 <div className="min-w-0 flex-1">
                   <p className="font-mono text-[12px] tnum text-ink">{fmt(e.eventTime)}</p>
+                  <p className="break-all font-mono text-[11px] text-ink-2">{e.id}</p>
                   <p className="truncate text-[11px] text-ink-3" title={e.instruments.join(", ")}>
                     {e.instruments[0] ?? "Instrument not listed"}
                   </p>
@@ -57,7 +67,7 @@ export default function SpaceWeatherPanel() {
                     </a>
                   </Button>
                 )}
-                <Button variant="outline" size="xs" onClick={() => replay(e)} aria-pressed={on}>
+                <Button variant="outline" size="xs" onClick={() => replay({ ...e, catalogSource: data.source, fetchedAt: data.fetchedAt })} aria-pressed={on}>
                   <Play aria-hidden /> {on ? "Replaying" : "Replay"}
                 </Button>
               </li>

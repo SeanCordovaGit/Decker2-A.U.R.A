@@ -14,6 +14,7 @@ const RESPONDER = { none: "You only", crew: "Crew · self-manage", flightSurgeon
 export default function AlertPanel() {
   const alerts = useAuraStore((s) => s.alerts);
   const log = useAuraStore((s) => s.log);
+  const snapshot = useAuraStore((s) => !!s.selectedCrewId && !s.scenarioId);
   const sorted = [...alerts].sort((a, b) => SEVERITY_META[b.severity].rank - SEVERITY_META[a.severity].rank);
 
   return (
@@ -49,17 +50,17 @@ export default function AlertPanel() {
           {log.map((e) => (
             <li key={e.id} className="grid grid-cols-[auto_auto_1fr] items-baseline gap-x-2 text-ink-2">
               <span className="tnum text-ink-3">{new Date(e.time).toLocaleTimeString([], { hour12: false })}</span>
-              <Swatch category={e.category} />
+              <Swatch category={e.category} severity={e.severity} context={e} />
               <span>
                 <span className="text-ink">{e.title}</span> {e.event}
                 {e.event === "escalated" && <span className="text-ink"> → flight surgeon</span>}
-                {(e.event === "opened" || e.event === "changed") && <span className={e.severity === "critical" ? "font-semibold text-ink" : "text-caution"}> · {e.severity}</span>}
+                {(e.event === "opened" || e.event === "changed") && <span className={e.severity === "critical" ? "font-semibold text-critical" : "text-caution"}> · {e.severity}</span>}
               </span>
             </li>
           ))}
         </ol>
       </TabsContent>
-      {alerts.length > 0 && <p className="mt-3 text-[11px] text-ink-3">{ESCALATION.demoTimeNote}</p>}
+      {alerts.length > 0 && <p className="mt-3 text-[11px] text-ink-3">{snapshot ? "CSV snapshot: exposure duration is unknown. Time spent viewing this row does not establish persistent caution." : ESCALATION.demoTimeNote}</p>}
       </CardContent>
     </Card>
     </Tabs>
@@ -71,7 +72,7 @@ function AlertCard({ alert: a }: { alert: Alert }) {
   return (
     <li className={`rounded-[5px] border bg-panel-2 p-3 ${a.severity === "critical" ? "border-ink/45" : "border-line"}`}>
       <div className="flex items-start gap-2">
-        <Swatch category={a.category} active />
+        <Swatch category={a.category} severity={a.severity} context={a} active />
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
             <h3 className="text-[13px] font-semibold leading-snug text-ink">{a.title}</h3>
@@ -93,7 +94,6 @@ function AlertCard({ alert: a }: { alert: Alert }) {
         <dd className={a.escalation === "flightSurgeon" ? "flex items-center gap-1 font-semibold text-ink" : "text-ink-2"}>
           {a.escalation === "flightSurgeon" && <Siren size={12} aria-hidden />}
           {RESPONDER[a.escalation]}
-          {a.escalated && a.severity === "caution" && " (persisting caution)"}
         </dd>
         <dt className="text-ink-3">Source</dt>
         <dd className="text-[11px] leading-relaxed text-ink-2">
