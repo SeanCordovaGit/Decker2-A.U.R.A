@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import { INDICATOR_COLORS } from "@aura/core/config/aura";
 import { X } from "lucide-react";
 import { useAuraStore } from "@/store/useAuraStore";
 import { Button } from "@/components/ui/button";
@@ -13,13 +14,19 @@ import ScenarioDock from "./ScenarioDock";
 import SpaceWeatherPanel from "./SpaceWeatherPanel";
 import TopBar from "./TopBar";
 import Viewport from "./Viewport";
+import JournalComposer from "./JournalComposer";
+import AutomaticDemo from "./AutomaticDemo";
+import { useAutomaticDemo } from "@/hooks/useAutomaticDemo";
+import WorkflowPanel from "./WorkflowPanel";
+import WorkflowDock from "./WorkflowDock";
 
-type Panel = "alerts" | "telemetry" | "mind" | "weather";
+type Panel = "alerts" | "telemetry" | "mind" | "weather" | "assistance";
 const PANEL_LABEL: Record<Panel, string> = {
   alerts: "Alerts",
   telemetry: "Telemetry",
   mind: "Mental health",
   weather: "Space weather",
+  assistance: "Next steps",
 };
 
 function PanelContent({ panel }: { panel: Panel }) {
@@ -28,6 +35,7 @@ function PanelContent({ panel }: { panel: Panel }) {
     case "telemetry": return <TelemetryDetails />;
     case "mind": return <MindPanel />;
     case "weather": return <SpaceWeatherPanel />;
+    case "assistance": return <WorkflowPanel />;
   }
 }
 
@@ -38,11 +46,16 @@ export default function Dashboard() {
   const [panel, setPanel] = useState<Panel | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [crewExpanded, setCrewExpanded] = useState(false);
+  const [assistanceExpanded, setAssistanceExpanded] = useState(false);
+  const [viewerReady, setViewerReady] = useState(false);
+  const onViewerReady = useCallback(() => setViewerReady(true), []);
+  const demo = useAutomaticDemo(viewerReady);
+  const visiblePanel = demo.active ? demo.step?.id === "alerts" ? "alerts" : demo.step?.id === "journal" && demo.elapsed! >= 25000 ? "mind" : null : panel;
 
   useEffect(() => {
-    const id = setInterval(tick, 1000);
+    const id = setInterval(() => { if (!demo.paused) tick(); }, 1000);
     return () => clearInterval(id);
-  }, [tick]);
+  }, [tick, demo.paused]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -65,8 +78,15 @@ export default function Dashboard() {
   }, [menuOpen]);
 
   useEffect(() => {
-    if (panel) detailsDialog.current?.showModal();
-  }, [panel]);
+    if (demo.active) referenceDialog.current?.close();
+  }, [demo.active]);
+
+  useEffect(() => {
+    if (visiblePanel && visiblePanel !== "assistance" && visiblePanel !== "weather") {
+      if (demo.active) detailsDialog.current?.show();
+      else detailsDialog.current?.showModal();
+    }
+  }, [visiblePanel, demo.active]);
 
   const openPanel = (next: Panel) => {
     setPanel(next);
@@ -75,17 +95,20 @@ export default function Dashboard() {
 
   return (
     <TooltipProvider delayDuration={300}>
-      <main className="mission-shell" data-panel={panel ?? ""}>
-        <Viewport />
+      <main className="mission-shell" data-panel={visiblePanel ?? ""} data-assistance-expanded={assistanceExpanded} data-demo-step={demo.step?.id ?? ""} style={{ "--caution": INDICATOR_COLORS.yellow, "--critical": INDICATOR_COLORS.red, "--caution-soft": "color-mix(in srgb, var(--caution) 14%, transparent)", "--critical-soft": "color-mix(in srgb, var(--critical) 14%, transparent)" } as CSSProperties}>
+        <div className="mission-content" inert={demo.active}>
+        <Viewport onReady={onViewerReady} demoRotate={demo.active ? demo.step?.id === "viewer" && !demo.paused : undefined} />
         <div className="mission-edge-shade" aria-hidden />
         <TopBar onOpenReference={() => referenceDialog.current?.showModal()} />
-        <CrewHud expanded={crewExpanded} onToggle={() => setCrewExpanded(!crewExpanded)} />
+        <CrewHud expanded={demo.active ? demo.step?.id === "crew" : crewExpanded} onToggle={() => setCrewExpanded(!crewExpanded)} />
         <VitalsHud onOpen={() => openPanel("telemetry")} />
-        <EnvironmentHud />
+        <EnvironmentHud demoExpanded={demo.active ? demo.step?.id === "environment" : undefined} />
         <AlertHud onOpen={() => openPanel("alerts")} />
+        <JournalComposer demoText={demo.sampleText} />
         <ScenarioDock
+          onScenarioSelect={(id) => { if (id === "evaHandInjury" || id === "cabinCold") openPanel("assistance"); }}
           onOpenPanels={() => { setMenuOpen(!menuOpen); setPanel(null); }}
-          panelMenu={menuOpen ? (
+          panelMenu={menuOpen && !demo.active ? (
             <div className="hud-glass hud-menu" id="dashboard-panel-menu" role="menu" aria-label="Dashboard panels">
               <button role="menuitem" onClick={() => { setCrewExpanded(!crewExpanded); setMenuOpen(false); }}>Crew status</button>
               {(Object.keys(PANEL_LABEL) as Panel[]).map((item) => (
@@ -96,16 +119,18 @@ export default function Dashboard() {
           ) : null}
         />
 
-        {panel && (
-          <dialog ref={detailsDialog} className={`hud-glass hud-popup ${panel === "alerts" ? "hud-popup-alerts" : ""}`} aria-label={`${PANEL_LABEL[panel]} details`} onCancel={() => setPanel(null)}>
+        {(visiblePanel === "assistance" || visiblePanel === "weather") && <WorkflowDock title={PANEL_LABEL[visiblePanel]} expanded={assistanceExpanded} onToggle={() => setAssistanceExpanded(!assistanceExpanded)} onClose={() => setPanel(null)}><PanelContent panel={visiblePanel} /></WorkflowDock>}
+        {visiblePanel && visiblePanel !== "assistance" && visiblePanel !== "weather" && (
+          <dialog ref={detailsDialog} className={`hud-glass hud-popup ${visiblePanel === "alerts" ? "hud-popup-alerts" : ""}`} aria-label={`${PANEL_LABEL[visiblePanel]} details`} onCancel={() => setPanel(null)}>
             <button className="hud-popup-close" onClick={() => setPanel(null)} aria-label="Close details"><X size={18} strokeWidth={1.5} /></button>
-            <PanelContent panel={panel} />
+            <PanelContent panel={visiblePanel} />
           </dialog>
         )}
 
         <dialog ref={referenceDialog} className="reference-dialog" aria-label="Reference">
           <div className="flex max-h-[calc(100dvh-48px)] flex-col gap-3 overflow-auto p-4">
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => { referenceDialog.current?.close(); setPanel(null); setMenuOpen(false); demo.start(); }}>Replay demo</Button>
               <Button variant="outline" onClick={() => referenceDialog.current?.close()}>Close reference</Button>
             </div>
             <ReferencePanel />
@@ -114,6 +139,8 @@ export default function Dashboard() {
             </p>
           </div>
         </dialog>
+        </div>
+        {demo.step && <AutomaticDemo stepIndex={demo.stepIndex} paused={demo.paused} onPause={() => demo.setPaused(!demo.paused)} onFinish={demo.finish} />}
       </main>
     </TooltipProvider>
   );

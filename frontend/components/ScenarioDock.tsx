@@ -8,6 +8,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 
 const SHORT_LABEL: Record<string, string> = {
   sep: "Solar event",
+  acuteDose: "Acute dose",
   coLeak: "CO leak",
   co2Buildup: "CO₂ buildup",
   cabinOverheat: "Overheat",
@@ -18,7 +19,7 @@ const SHORT_LABEL: Record<string, string> = {
   imFine: "I'm fine",
 };
 
-export default function ScenarioDock({ onOpenPanels, panelMenu }: { onOpenPanels: () => void; panelMenu: ReactNode }) {
+export default function ScenarioDock({ onOpenPanels, onScenarioSelect, panelMenu }: { onOpenPanels: () => void; onScenarioSelect: (id: string) => void; panelMenu: ReactNode }) {
   const scenarioId = useAuraStore((s) => s.scenarioId);
   const trigger = useAuraStore((s) => s.triggerScenario);
   const reset = useAuraStore((s) => s.reset);
@@ -30,7 +31,7 @@ export default function ScenarioDock({ onOpenPanels, panelMenu }: { onOpenPanels
           return (
             <Tooltip key={scenario.id}>
               <TooltipTrigger asChild>
-                <button className="hud-dock-button" aria-pressed={scenarioId === scenario.id} onClick={() => trigger(scenario.id)}>
+                <button className="hud-dock-button" aria-pressed={scenarioId === scenario.id} onClick={() => { trigger(scenario.id); onScenarioSelect(scenario.id); }}>
                   {SHORT_LABEL[scenario.id]}
                 </button>
               </TooltipTrigger>
