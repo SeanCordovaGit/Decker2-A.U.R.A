@@ -16,7 +16,7 @@ import TopBar from "./TopBar";
 import Viewport from "./Viewport";
 import JournalComposer from "./JournalComposer";
 import AutomaticDemo from "./AutomaticDemo";
-import { useAutomaticDemo } from "@/hooks/useAutomaticDemo";
+import { JOURNAL_SUBMIT_AT, useAutomaticDemo } from "@/hooks/useAutomaticDemo";
 import WorkflowPanel from "./WorkflowPanel";
 import WorkflowDock from "./WorkflowDock";
 
@@ -50,7 +50,7 @@ export default function Dashboard() {
   const [viewerReady, setViewerReady] = useState(false);
   const onViewerReady = useCallback(() => setViewerReady(true), []);
   const demo = useAutomaticDemo(viewerReady);
-  const visiblePanel = demo.active ? demo.step?.id === "alerts" ? "alerts" : demo.step?.id === "journal" && demo.elapsed! >= 25000 ? "mind" : null : panel;
+  const visiblePanel = demo.active ? demo.step?.id === "vitals" ? "telemetry" : demo.step?.id === "alerts" ? "alerts" : demo.step?.id === "journal" && demo.elapsed! >= JOURNAL_SUBMIT_AT ? "mind" : null : panel;
 
   useEffect(() => {
     const id = setInterval(() => { if (!demo.paused) tick(); }, 1000);

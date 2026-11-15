@@ -116,8 +116,8 @@ export function AlertHud({ onOpen }: { onOpen: () => void }) {
 }
 
 // Slider travel only; caution/critical bands come from THRESHOLD_RULES via the store's evaluation.
-const MANUAL_VITALS: { key: ManualVital; label: string; unit: string; min: number; max: number; step: number; digits: number; note?: string }[] = [
-  { key: "heartRate", label: "Heart rate", unit: "bpm", min: 40, max: 180, step: 1, digits: 0, note: "No research threshold configured; display only." },
+const MANUAL_VITALS: { key: ManualVital; label: string; unit: string; min: number; max: number; step: number; digits: number }[] = [
+  { key: "heartRate", label: "Heart rate", unit: "bpm", min: 40, max: 180, step: 1, digits: 0 },
   { key: "coreTemp", label: "Core temp", unit: "°C", min: 33, max: 41, step: 0.1, digits: 1 },
   { key: "pvtReactionMs", label: "PVT reaction", unit: "ms", min: 150, max: 600, step: 5, digits: 0 },
 ];
@@ -137,10 +137,9 @@ function ManualVitals() {
             <span className="manual-vital-head">
               <span>{vital.label}</span>
               <strong className="tnum" style={{ color: metricColor(metrics, vital.key) }}>{formatMetricValue(vital.key, readings[vital.key], vital.digits)} <small>{vital.unit}</small></strong>
-              {vital.note ? <small className="manual-vital-note">no threshold</small> : <SeverityBadge severity={severity} />}
+              <SeverityBadge severity={severity} />
             </span>
-            <input type="range" min={vital.min} max={vital.max} step={vital.step} value={manual[vital.key] ?? readings[vital.key]} onChange={(event) => setManualVital(vital.key, Number(event.target.value))} aria-describedby={vital.note ? `${vital.key}-note` : undefined} />
-            {vital.note && <small id={`${vital.key}-note`} className="manual-vital-note">{vital.note}</small>}
+            <input type="range" min={vital.min} max={vital.max} step={vital.step} value={manual[vital.key] ?? readings[vital.key]} onChange={(event) => setManualVital(vital.key, Number(event.target.value))} />
           </label>
         );
       })}

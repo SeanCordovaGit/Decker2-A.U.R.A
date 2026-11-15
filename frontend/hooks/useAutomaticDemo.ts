@@ -9,10 +9,15 @@ export const DEMO_STEPS = [
   { id: "viewer", until: 4000, title: "Your astronaut, at the center", text: "The viewer rotates automatically. When the demo ends, drag to turn the astronaut and scroll or pinch to zoom." },
   { id: "crew", until: 8000, title: "Choose a crew profile", text: "Opening Crew status and loading AST-001. These are supplied demo readings, held as a snapshot until you start a scenario." },
   { id: "environment", until: 12000, title: "Check the cabin", text: "Environment expands here. Daily dose, air quality and cabin temperature stay beside the astronaut." },
-  { id: "scenario", until: 18000, title: "Watch a condition develop", text: "Starting the Hand injury scenario. The right hand turns yellow at caution, then red at critical. These readings are simulated." },
-  { id: "alerts", until: 22000, title: "Every alert explains itself", text: "Opening the real alert details: the reported condition, its basis, the suggested action and who should respond." },
-  { id: "journal", until: 28000, title: "Try a private check-in", text: "Typing a sample entry, then opening Mental health. Sentiment is processed locally; the resulting MHI is a demo estimate." },
+  { id: "vitals", until: 16000, title: "Adjust heart rate", text: "Setting a simulated pulse of 145 bpm in Telemetry. Your team-defined bands make this critical and highlight the chest. Core temperature and PVT are adjustable here too." },
+  { id: "scenario", until: 22000, title: "Watch a condition develop", text: "Starting the Hand injury scenario. The right hand turns yellow at caution, then red at critical. These readings are simulated." },
+  { id: "alerts", until: 26000, title: "Every alert explains itself", text: "Opening the real alert details: the reported condition, its basis, the suggested action and who should respond." },
+  { id: "gamma", until: 32000, title: "Gamma Radiation is simulated", text: "Starting the Gamma Radiation condition. The dose trend and green precaution are simulated. Real NASA solar-particle records are available separately in Space weather." },
+  { id: "journal", until: 38000, title: "Try a private check-in", text: "Typing a sample entry, then opening Mental health. Sentiment is processed locally; the resulting MHI is a demo estimate." },
 ] as const;
+
+export const JOURNAL_SUBMIT_AT = DEMO_STEPS[DEMO_STEPS.length - 2].until + 3000;
+const DEMO_DURATION = DEMO_STEPS[DEMO_STEPS.length - 1].until;
 
 export function useAutomaticDemo(ready: boolean) {
   const [elapsed, setElapsed] = useState<number | null>(null);
@@ -54,7 +59,7 @@ export function useAutomaticDemo(ready: boolean) {
     if (!active || paused) return;
     const timer = setInterval(() => {
       clock.current += 1000;
-      if (clock.current >= 28000) finish();
+      if (clock.current >= DEMO_DURATION) finish();
       else setElapsed(clock.current);
     }, 1000);
     return () => clearInterval(timer);
@@ -63,6 +68,11 @@ export function useAutomaticDemo(ready: boolean) {
   useEffect(() => {
     const state = useAuraStore.getState();
     if (step?.id === "crew") state.selectCrew("AST-001");
+    if (step?.id === "vitals") {
+      state.selectCrew(null);
+      useAuraStore.getState().setManualVital("heartRate", 145);
+    }
+    if (step?.id === "gamma") state.triggerScenario("sep");
     if (step?.id === "scenario") {
       state.selectCrew(null);
       useAuraStore.getState().triggerScenario("evaHandInjury");
@@ -71,7 +81,7 @@ export function useAutomaticDemo(ready: boolean) {
   }, [step]);
 
   useEffect(() => {
-    if (elapsed === 25000) useAuraStore.getState().submitJournal(SAMPLE_ENTRY);
+    if (elapsed === JOURNAL_SUBMIT_AT) useAuraStore.getState().submitJournal(SAMPLE_ENTRY);
   }, [elapsed]);
 
   useEffect(() => {
@@ -91,5 +101,5 @@ export function useAutomaticDemo(ready: boolean) {
     saved.current = null;
   }, []);
 
-  return { active, step, stepIndex, elapsed, paused, setPaused, start, finish, sampleText: active ? step?.id === "journal" && elapsed < 25000 ? SAMPLE_ENTRY : "" : undefined };
+  return { active, step, stepIndex, elapsed, paused, setPaused, start, finish, sampleText: active ? step?.id === "journal" && elapsed < JOURNAL_SUBMIT_AT ? SAMPLE_ENTRY : "" : undefined };
 }

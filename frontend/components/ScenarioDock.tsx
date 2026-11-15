@@ -1,13 +1,13 @@
 "use client";
 
-import { Brain, CloudFog, Hand, Moon, PanelsTopLeft, Radiation, RotateCcw, Snowflake, Sun, Thermometer, ThermometerSun, Wind, type LucideIcon } from "lucide-react";
+import { Brain, CloudFog, Hand, Moon, PanelsTopLeft, Radiation, RotateCcw, Snowflake, Thermometer, ThermometerSun, Wind, type LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { SCENARIOS } from "@aura/core/lib/scenarios";
 import { useAuraStore } from "@/store/useAuraStore";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const CONDITION: Record<string, { label: string; Icon: LucideIcon }> = {
-  sep: { label: "Solar Radiation", Icon: Sun },
+  sep: { label: "Gamma Radiation (simulated)", Icon: Radiation },
   acuteDose: { label: "Acute Dose", Icon: Radiation },
   coLeak: { label: "CO Leak", Icon: Wind },
   co2Buildup: { label: "CO₂ Buildup", Icon: CloudFog },

@@ -63,7 +63,7 @@ function WorkflowSession({ kind }: { kind: WorkflowKind }) {
   const [error, setError] = useState("");
   const request = useRef<AbortController | null>(null);
   useEffect(() => () => { request.current?.abort(); }, []);
-  const input: WorkflowInput = { kind, report, answers, cabinTemp: readings.cabinTemp, coreTemp: readings.coreTemp, injurySeverity: readings.injuries.rightHand ?? "nominal", reportedUrgent: !!readings.reportedConcerns?.[kind], readings: Object.fromEntries(WORKFLOW_METRICS.map((metric) => [metric, readings[metric]])), sepActive: readings.sepActive, mhiIndex };
+  const input: WorkflowInput = { kind, report, answers, cabinTemp: readings.cabinTemp, coreTemp: readings.coreTemp, injurySeverity: readings.injuries.rightHand ?? "nominal", reportedUrgent: !!readings.reportedConcerns?.[kind], readings: Object.fromEntries(WORKFLOW_METRICS.map((metric) => [metric, readings[metric]])), sepActive: readings.sepActive, gammaActive: readings.gammaActive, mhiIndex };
   const plan = buildWorkflow(input);
   const clearExplanation = () => { request.current?.abort(); request.current = null; setResult(null); setBusy(false); setError(""); };
   return <div className="workflow-panel">
