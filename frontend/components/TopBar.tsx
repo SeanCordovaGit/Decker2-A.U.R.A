@@ -1,9 +1,9 @@
 "use client";
 
-import { Moon, Sun } from "lucide-react";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { BookOpen } from "lucide-react";
+import { useEffect, useState } from "react";
 import { PROFILE } from "@aura/core/config/aura";
-import { useSpaceWeather } from "@/lib/useSpaceWeather";
+import { useAuraStore } from "@/store/useAuraStore";
 import { Button } from "@/components/ui/button";
 
 function useMissionClock() {
@@ -18,41 +18,6 @@ function useMissionClock() {
   return `T+ ${pad(Math.floor(elapsed / 3600))}:${pad(Math.floor((elapsed % 3600) / 60))}:${pad(elapsed % 60)}`;
 }
 
-function subscribeTheme(onChange: () => void) {
-  const observer = new MutationObserver(onChange);
-  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
-  return () => observer.disconnect();
-}
-
-function ThemeToggle({ className = "" }: { className?: string }) {
-  const theme = useSyncExternalStore(
-    subscribeTheme,
-    () => (document.documentElement.dataset.theme === "light" ? "light" : "dark"),
-    () => "dark",
-  );
-  const next = theme === "dark" ? "light" : "dark";
-  return (
-    <Button
-      variant="outline"
-      size="icon"
-      onClick={() => {
-        const root = document.documentElement;
-        root.dataset.themeSwitching = "";
-        root.dataset.theme = next;
-        requestAnimationFrame(() => requestAnimationFrame(() => delete root.dataset.themeSwitching));
-        try {
-          localStorage.setItem("aura-theme", next);
-        } catch {}
-      }}
-      aria-label={`Switch to ${next} theme`}
-      title={`Switch to ${next} theme`}
-      className={`${className} text-ink-2`}
-    >
-      {theme === "dark" ? <Sun aria-hidden /> : <Moon aria-hidden />}
-    </Button>
-  );
-}
-
 function AuraMark() {
   return (
     <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden>
@@ -64,45 +29,32 @@ function AuraMark() {
   );
 }
 
-export default function TopBar() {
+export default function TopBar({ onOpenReference }: { onOpenReference: () => void }) {
   const clock = useMissionClock();
-  const { data, failed } = useSpaceWeather();
-  const uplink = failed ? "NASA data unavailable" : !data ? "Connecting to NASA DONKI" : data.source === "nasaLive" ? "NASA DONKI live" : "NASA DONKI cached";
-  const dot = failed ? "bg-critical" : !data ? "bg-ink-3" : data.source === "nasaLive" ? "bg-ok" : "bg-caution";
+  const selectedCrewId = useAuraStore((state) => state.selectedCrewId);
 
   return (
-    <header className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-line bg-panel px-4 py-2.5 sm:px-5">
-      <div className="flex flex-1 items-center gap-3 sm:flex-none">
+    <header className="hud-glass mission-header">
+      <div className="mission-brand">
         <AuraMark />
-        <div className="leading-tight">
-          <h1 className="text-[17px] font-bold tracking-[-0.02em] text-ink">
-            Decker2 <span className="text-signal-text">A.U.R.A.</span>
-          </h1>
-          <p className="text-[12px] text-ink-3">Astro-Unified Response Algorithm</p>
+        <div>
+          <h1>Decker2 A.U.R.A.</h1>
+          <p>Astronaut health monitor</p>
         </div>
-        <ThemeToggle className="ml-auto grid sm:hidden" />
       </div>
-
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-      <dl className="flex flex-wrap items-center gap-x-6 gap-y-1 font-mono text-[12px]">
-        <div className="flex items-center gap-2">
-          <dt className="text-ink-3">Crew</dt>
-          <dd className="text-ink">{PROFILE.callsign}</dd>
+      <dl className="mission-header-data">
+        <div>
+          <dt>Crew</dt>
+          <dd>{selectedCrewId ?? PROFILE.callsign}</dd>
         </div>
-        <div className="flex items-center gap-2">
-          <dt className="text-ink-3">Mission clock</dt>
-          <dd className="tnum text-ink">{clock}</dd>
-        </div>
-        <div className="flex items-center gap-2">
-          <dt className="sr-only">Uplink</dt>
-          <dd className="flex items-center gap-2 text-ink-2">
-            <span className={`h-2 w-2 rounded-full ${dot}`} aria-hidden />
-            {uplink}
-          </dd>
+        <div>
+          <dt>Mission clock</dt>
+          <dd className="tnum">{clock}</dd>
         </div>
       </dl>
-      <ThemeToggle className="hidden sm:grid" />
-      </div>
+      <Button variant="ghost" size="sm" onClick={onOpenReference} className="mission-reference">
+        <BookOpen aria-hidden /> Reference
+      </Button>
     </header>
   );
 }

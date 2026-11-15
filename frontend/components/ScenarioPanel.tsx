@@ -26,7 +26,7 @@ export default function ScenarioPanel() {
 
   return (
     <Card className="shrink-0" aria-label="Demo scenarios">
-      <CardHeader>
+      <CardHeader className="lg:min-h-10 lg:px-4 lg:py-2">
         <CardTitle>Demo scenarios</CardTitle>
         <CardAction>
           <Tooltip>
@@ -39,16 +39,16 @@ export default function ScenarioPanel() {
           </Tooltip>
         </CardAction>
       </CardHeader>
-      <CardContent>
-      <div className="grid grid-cols-2 gap-1.5">
+      <CardContent className="lg:p-3">
+      <div className="grid grid-cols-2 gap-2 lg:gap-1">
         {SCENARIOS.map((s) => {
           const Icon = ICON[s.id];
           const on = scenarioId === s.id;
           return (
             <Tooltip key={s.id}>
               <TooltipTrigger asChild>
-                <Button variant="outline" aria-pressed={on} onClick={() => trigger(s.id)} className="h-auto min-h-8 justify-start gap-1.5 px-2 py-1.5 text-left text-[12px] leading-tight whitespace-normal">
-                  {Icon && <Icon className={on ? "text-signal-text" : "text-ink-3"} aria-hidden />}
+                <Button variant="outline" aria-pressed={on} onClick={() => trigger(s.id)} className="h-auto min-h-11 justify-start gap-2 px-3 py-2 text-left text-[12px] leading-tight whitespace-normal lg:min-h-9 lg:px-2 lg:py-1">
+                  {Icon && <Icon className="text-ink-3" strokeWidth={1.5} aria-hidden />}
                   <span>{s.label}</span>
                 </Button>
               </TooltipTrigger>
@@ -57,9 +57,6 @@ export default function ScenarioPanel() {
           );
         })}
       </div>
-      <p className="mt-2.5 text-[11px] text-ink-3">
-        {scenarioId ? SCENARIOS.find((s) => s.id === scenarioId)?.description : "Each scenario drives the simulated readings; the aura reacts within seconds."}
-      </p>
       </CardContent>
     </Card>
   );

@@ -5,9 +5,9 @@ import { NOMINAL_READINGS } from "../../lib/simulation";
 
 describe("computeMhi", () => {
   it("weighted sum with all sources", () => {
-    const r = computeMhi({ biometrics: 80, affect: 60, journal: 40, pvt: 90 });
-    const { biometrics, affect, journal, pvt } = MHI_CONFIG.weights;
-    expect(r.index).toBeCloseTo(80 * biometrics + 60 * affect + 40 * journal + 90 * pvt);
+    const r = computeMhi({ biometrics: 80, affect: 60, journal: 40 });
+    const { biometrics, affect, journal } = MHI_CONFIG.weights;
+    expect(r.index).toBeCloseTo(80 * biometrics + 60 * affect + 40 * journal);
   });
 
   it("redistributes weight of missing sources proportionally", () => {
@@ -21,7 +21,7 @@ describe("computeMhi", () => {
   });
 
   it("severity thresholds", () => {
-    expect(computeMhi({ biometrics: 70, affect: 70, journal: 70 }).severity).toBe("nominal");
+    expect(computeMhi({ biometrics: 80, affect: 80, journal: 80 }).severity).toBe("nominal");
     expect(computeMhi({ biometrics: 50, affect: 50, journal: 50 }).severity).toBe("caution");
     expect(computeMhi({ biometrics: 30, affect: 30, journal: 30 }).severity).toBe("critical");
   });

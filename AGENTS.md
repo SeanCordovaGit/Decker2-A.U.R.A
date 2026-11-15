@@ -193,8 +193,8 @@ All from the repo root:
 
 ### Conventions specific to this repo
 
-- Aura color = hazard category only: radiation green, air quality gray, cabin heat orange, cabin cold blue, mental yellow, injury/cardiovascular red on the affected body region. Severity = intensity: nominal shows no aura, caution steady, critical pulsing.
-- Every threshold cites NASA-STD-3001, NASA SMAC or peer-reviewed literature, in code and in the UI. Comparisons are inclusive at the boundary.
+- All critical conditions use red. At caution: radiation green, air quality gray, lowered temperatures blue, and other general warnings yellow. Nominal has no aura; critical also pulses. Indicator colors and precedence live in `backend/config/aura.ts`.
+- Every threshold cites NASA-STD-3001, NASA SMAC or peer-reviewed literature, in code and in the UI. Comparisons follow the strict or inclusive operators declared in configuration, matching the supplied research tables.
 - Caution alerts → "Crew – self-manage"; critical or persisting caution → "Flight surgeon"; discrepancy alerts go to the astronaut only.
 - Simulated crew data is labeled "Simulated". Say "designed to integrate with" NASA systems, never "integrated with".
 - The app must run fully offline; the DONKI route falls back to the bundled cache and never returns an error status.
@@ -206,7 +206,7 @@ All from the repo root:
 - Do not hard-code threshold numbers or aura colors outside `backend/config/aura.ts`
 - Do not hand-edit `backend/data/donki-sep-cache.json` — only `pnpm fetch:donki` writes it
 - Do not import React, Next.js or browser APIs in `backend/`; do not put threshold or scoring logic in `frontend/`
-- Do not call external AI services (sentiment runs locally)
+- Journal sentiment runs locally. Gemini is authorized only for the optional, explicit research-workflow explanation; it cannot control severity, escalation or treatment.
 - Do not add a database, separate backend, or dependency without a demo-visible reason
 - Do not use npm or yarn
 - Do not commit `.env*` or a NASA API key
@@ -222,5 +222,16 @@ When the user corrects your approach, append a one-line rule here before ending 
 - Never add `Co-Authored-By: Claude` or "Generated with Claude Code" lines to commits or PRs in this repo.
 - When adapting this file, keep sections 0–9 as they are; only rewrite project-specific sections (10, 11). The Next.js block lives in `frontend/AGENTS.md` and is managed by `next dev`.
 - `origin/main` gets work pushed from other machines and PR merges; `git fetch` and merge before pushing, never force-push `main`.
+- Use `astronaut_by_jungle_jim.glb` as the dashboard's 3D astronaut model.
+- Style the mission viewer with neutral black frosted glass surfaces; avoid navy UI backgrounds.
+- Keep the viewer dark-only, allow drag rotation and zoom, expand Environment in place, and open alert details on the left.
+- Use the San Francisco system font stack throughout the dashboard and plain text scenario controls.
+- Place the private journal above the bottom dock and the active-alert notification below the header; size navigation bars to their content.
+- Expand Crew status in place instead of opening a dialog; retain the suit outline when adding smoke to the aura.
+- Anchor the dashboard panel menu directly above its dock button.
+- Label body markers by their triggering condition; preserve threshold-safe decimal readouts, and keep supplied CSV snapshots unchanged until a demo scenario starts.
+- Show journal-save feedback as a temporary notification; leave no permanent caption under the journal input.
+- First-visit onboarding must operate the real dashboard automatically, allow Skip/Pause, and restore the user's session and journal draft afterward.
+- Keep Next steps beside the astronaut in a nonmodal desktop panel; on phones start collapsed and reserve a separate 3D area when expanded.
 
 ---

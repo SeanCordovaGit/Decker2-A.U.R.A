@@ -23,9 +23,9 @@ escalations). Secondary audience: hackathon judges watching a live demo.
 
 An astronaut opens the dashboard and sees a 3D astronaut model. When every reading is nominal, no
 aura is shown. When a reading crosses a caution or critical threshold, an aura appears in the
-color of that hazard category (radiation green, air quality gray, cabin heat orange, cabin cold
-blue, mental/cognitive yellow, injury/cardiovascular red on the affected body region). Caution
-shows a steady glow; critical shows a pulsing glow.
+configured action-indicator color: every critical condition is red; caution radiation is green,
+air quality gray, lowered temperature blue, and other general warnings yellow. Caution is steady;
+critical also pulses. Injury and cardiovascular effects stay on the affected body region.
 
 **Why this priority**: this is the core concept and the centerpiece of the demo.
 
@@ -37,9 +37,9 @@ the aura color, location and intensity match the rules.
 1. **Given** all readings nominal, **When** the dashboard loads, **Then** no aura is visible and
    the status reads "All nominal".
 2. **Given** cabin temperature rises above its caution threshold, **When** the reading updates,
-   **Then** a steady orange aura surrounds the model.
+   **Then** a steady yellow aura surrounds the model.
 3. **Given** an injury is reported on the right hand, **When** the reading updates, **Then** only
-   the right hand region glows red.
+   the right hand region glows yellow at caution or red at critical.
 4. **Given** two categories are abnormal at once, **When** the dashboard renders, **Then** both
    auras are visible and distinguishable, and the panel lists both alerts.
 
@@ -178,14 +178,12 @@ rationale.
 **Visualization**
 
 - **FR-001**: System MUST display a 3D astronaut model that the viewer can rotate.
-- **FR-002**: System MUST show an aura whose color encodes hazard category: radiation green, air
-  quality gray, cabin heat orange, cabin cold blue, mental/cognitive yellow,
-  injury/cardiovascular red.
+- **FR-002** (amended 2026-11-15): Every critical condition MUST use red. At caution, radiation uses green, air quality gray, lowered temperature blue, and other general warnings yellow.
 - **FR-003**: System MUST encode severity by intensity: nominal = no aura, caution = steady glow,
   critical = pulsing glow.
 - **FR-004**: Injury/cardiovascular indications MUST be localized to body regions: head, chest
   (heart), left arm, right arm, left hand, right hand, back, left leg, right leg.
-- **FR-005**: System MUST show a status badge per category using green/amber/red for
+- **FR-005**: System MUST show a status badge per category using neutral/yellow/red for
   nominal/caution/critical.
 
 **Thresholds and monitoring**
@@ -197,12 +195,11 @@ rationale.
 - **FR-007**: Air quality MUST track CO and CO2 against NASA SMAC limits with caution and critical
   levels defined in the shared configuration with citations. Critical CO MUST also highlight the
   head and chest regions red.
-- **FR-008**: Cabin temperature MUST produce an orange aura when above the comfort range and a
-  blue aura when below it, using thresholds from the shared configuration with citations.
+- **FR-008**: Cabin temperature MUST produce yellow for high-temperature caution, blue for low-temperature caution, and red for either critical bound, using thresholds from shared configuration with citations.
 - **FR-009**: Core body temperature MUST be evaluated as a health reading: caution at ≥38.0 °C or
   ≤35.0 °C, critical at ≥40.0 °C or ≤33.0 °C, with deviation from the astronaut's personal
   baseline shown (Stahn et al., 2017). Abnormal core temperature MUST appear in the
-  injury/cardiovascular (red) category on the chest region.
+  injury/cardiovascular category on the chest: yellow for high-temperature caution, blue for low-temperature caution, and red for any critical temperature.
 - **FR-010**: Threshold comparisons MUST be inclusive at boundaries.
 - **FR-011**: All thresholds, colors, actions, escalation rules and citations MUST come from a
   single shared configuration.

@@ -1,0 +1,6 @@
+astronaut_id,daily_radiation_msv,cumulative_radiation_msv,co_ppm,cabin_temp_c,core_body_temp_c,mhi_score,pvt_mean_rt_ms,pvt_lapses,hrv_rmssd_ms
+AST-001,1,145,8,22.8,37,92,215,1,64
+AST-002,1.2,310,14,23.4,37.2,84,240,2,55
+AST-003,1.8,580,52,27.5,37.9,65,295,3,41
+AST-004,2.4,640,120,29.4,39.1,42,380,6,24
+AST-005,0.9,95,5,16.5,35.8,74,260,3,46
