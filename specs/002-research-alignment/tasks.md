@@ -121,3 +121,14 @@ Blocked on the dataset (spec FR-022). No tasks until the team supplies the RR-1 
 1. MVP = Foundational + US1 (CO) + US2 (mental): the two P1 research mismatches.
 2. Then US3 (abdomen) and US4 (citations).
 3. US5 when the RR-1 data arrives.
+
+
+## Feedback follow-up (PDF versions 3 and 4)
+
+- [X] Audit merged changes against feedback and document remaining paper corrections.
+- [X] Reproduce and fix recorded-replay dose accumulation, edited-snapshot history and CO referral mismatch.
+- [X] Apply the confirmed severity-first notification hierarchy through a shared backend comparator.
+- [X] Show the hierarchy in Reference and expose higher-priority additional guidance alongside condition workflows.
+- [X] Verify rules, lint, production build, API referral and desktop/mobile behavior.
+
+- [X] Add smooth Reference tab transitions and verify selection alignment, keyboard navigation and reduced motion on desktop/mobile.

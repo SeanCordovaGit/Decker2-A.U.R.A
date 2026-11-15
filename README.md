@@ -185,3 +185,5 @@ specs/      Spec Kit documents: spec, plan, tasks, research, contracts
 - **Gemini sharing:** only the explicit incident-explanation action sends its report, answers and relevant readings to Google. Journal entries are not sent to Gemini. The app route does not log or persist incident text; this is not a claim about Google's retention policies.
 - **Scientific limits:** project alert tiers are not universal clinical thresholds. Career effective dose and acute absorbed dose remain separate; medical review and mission-specific procedures are still required.
 - A.U.R.A. is a prototype *designed to integrate with* onboard sensors and NASA systems; it is not connected to them. There is no database, live wearable ingestion or delivered emergency notification.
+
+The latest [feedback and hierarchy review](specs/002-research-alignment/feedback-review.md) maps both November 15 feedback documents to implemented behavior, records paper corrections, and describes the confirmed notification order. Critical alerts appear first, followed by the seven hazard domains within each severity.

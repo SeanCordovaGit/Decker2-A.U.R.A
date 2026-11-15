@@ -233,5 +233,6 @@ When the user corrects your approach, append a one-line rule here before ending 
 - Show journal-save feedback as a temporary notification; leave no permanent caption under the journal input.
 - First-visit onboarding must operate the real dashboard automatically, allow Skip/Pause, and restore the user's session and journal draft afterward.
 - Keep Next steps beside the astronaut in a nonmodal desktop panel; on phones start collapsed and reserve a separate 3D area when expanded.
+- Recorded DONKI replay must never accumulate personal dose; only explicitly simulated dose scenarios may change that input.
 
 ---
