@@ -1,7 +1,9 @@
 "use client";
 
+import { compareAlerts } from "@aura/core/lib/evaluate";
+
 import { ShieldCheck, Siren } from "lucide-react";
-import { CATEGORY_META, ESCALATION, SEVERITY_META } from "@aura/core/config/aura";
+import { CATEGORY_META, ESCALATION } from "@aura/core/config/aura";
 import type { Alert } from "@aura/core/lib/types";
 import { isSnapshot, useAuraStore } from "@/store/useAuraStore";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +17,7 @@ export default function AlertPanel() {
   const alerts = useAuraStore((s) => s.alerts);
   const log = useAuraStore((s) => s.log);
   const snapshot = useAuraStore(isSnapshot);
-  const sorted = [...alerts].sort((a, b) => SEVERITY_META[b.severity].rank - SEVERITY_META[a.severity].rank);
+  const sorted = [...alerts].sort(compareAlerts);
 
   return (
     <Tabs defaultValue="active" className="h-full min-h-0 gap-0">

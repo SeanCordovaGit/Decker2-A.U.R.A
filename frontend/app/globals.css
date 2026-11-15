@@ -676,3 +676,15 @@ textarea {
   .mission-shell:is([data-panel="assistance"], [data-panel="weather"]) .viewer-state { visibility: hidden; }
   .mission-shell:is([data-panel="assistance"], [data-panel="weather"]) .viewer-rotate { bottom: 216px; }
 }
+
+
+.reference-tabs-list { position: relative; isolation: isolate; }
+.reference-tab-indicator { position: absolute; top: 0; left: 0; pointer-events: none; transform-origin: top left; border: 1px solid var(--line-strong); border-radius: 7px; background: var(--panel-3); }
+.reference-tabs-list [data-slot="tabs-trigger"] { z-index: 1; background: transparent; box-shadow: none; }
+.reference-tabs[data-animate-tabs="true"] [data-slot="tabs-content"][data-state="active"] { opacity: 1; transform: translateY(0); transition: opacity 180ms var(--surface-ease), transform 180ms var(--surface-ease); }
+@starting-style {
+  .reference-tabs[data-animate-tabs="true"] [data-slot="tabs-content"][data-state="active"] { opacity: 0; transform: translateY(5px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reference-tabs[data-animate-tabs="true"] [data-slot="tabs-content"][data-state="active"] { transition: none; }
+}

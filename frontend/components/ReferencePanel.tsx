@@ -1,24 +1,28 @@
 "use client";
 
+import { useState } from "react";
+import ReferenceTabsList from "./ReferenceTabsList";
 import { INDICATOR_LEGEND, CHALLENGE_OBJECTIVES, MEASUREMENTS } from "@aura/core/config/aura";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsTrigger } from "@/components/ui/tabs";
 import ResearchReference from "./ResearchReference";
 
 export default function ReferencePanel() {
+  const [value, setValue] = useState("measurements");
+  const [animateTabs, setAnimateTabs] = useState(true);
   return (
-    <Tabs defaultValue="measurements" className="gap-0">
+    <Tabs value={value} onValueChange={setValue} className="reference-tabs gap-0" data-animate-tabs={animateTabs} onPointerDownCapture={() => setAnimateTabs(true)} onKeyDownCapture={() => setAnimateTabs(false)}>
       <Card aria-label="Reference">
         <CardHeader>
           <CardTitle>Reference</CardTitle>
           <CardAction>
-            <TabsList aria-label="Reference" className="h-auto flex-wrap">
+            <ReferenceTabsList value={value} animate={animateTabs}>
               <TabsTrigger value="measurements" className="px-2 text-[12px]">What we measure</TabsTrigger>
               <TabsTrigger value="objectives" className="px-2 text-[12px]">Challenge objectives</TabsTrigger>
               <TabsTrigger value="legend" className="px-2 text-[12px]">Reading the aura</TabsTrigger>
               <TabsTrigger value="research" className="px-2 text-[12px]">Research data</TabsTrigger>
-            </TabsList>
+            </ReferenceTabsList>
           </CardAction>
         </CardHeader>
         <CardContent>

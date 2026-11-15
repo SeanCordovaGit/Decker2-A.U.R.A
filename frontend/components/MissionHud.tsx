@@ -1,5 +1,7 @@
 "use client";
 
+import { compareAlerts } from "@aura/core/lib/evaluate";
+
 import { useState } from "react";
 import LiveTrace from "./LiveTrace";
 import StatusPanel from "./StatusPanel";
@@ -99,7 +101,7 @@ export function EnvironmentHud({ demoExpanded }: { demoExpanded?: boolean }) {
 
 export function AlertHud({ onOpen }: { onOpen: () => void }) {
   const alerts = useAuraStore((s) => s.alerts);
-  const alert = [...alerts].sort((a, b) => SEVERITY_META[b.severity].rank - SEVERITY_META[a.severity].rank)[0];
+  const alert = [...alerts].sort(compareAlerts)[0];
   if (!alert) return null;
 
   return (

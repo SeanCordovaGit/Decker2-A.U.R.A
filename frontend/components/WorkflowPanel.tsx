@@ -1,5 +1,7 @@
 "use client";
 
+import { compareAlerts } from "@aura/core/lib/evaluate";
+
 import { useEffect, useRef, useState } from "react";
 import { WORKFLOW_METRICS, buildWorkflow, type WorkflowInput } from "@aura/core/lib/workflow";
 import { WORKFLOWS, workflowForScenario, type WorkflowKind } from "@aura/core/config/workflows";
@@ -16,7 +18,13 @@ export default function WorkflowPanel() {
   const trigger = useAuraStore((state) => state.triggerScenario);
   const alerts = useAuraStore((state) => state.alerts);
   const kind = workflowForScenario(scenario);
-  if (kind) return <WorkflowSession key={kind} kind={kind} />;
+  if (kind) {
+    const keys = WORKFLOWS[kind].alertKeys ?? [];
+    const otherAlerts = alerts.filter((alert) => !keys.includes(alert.metric ?? (alert.key.startsWith("sep:") ? "sep" : alert.key)) && alert.key !== `report:${kind}` && !(kind === "hand" && alert.key === "injury:rightHand"));
+    const leadingAlert = [...alerts].sort(compareAlerts)[0];
+    const showOtherAlerts = otherAlerts.some((alert) => alert.key === leadingAlert?.key);
+    return <>{otherAlerts.length > 0 && <details className="workflow-panel" open={showOtherAlerts}><summary>Other active alerts ({otherAlerts.length})</summary><AlertNextSteps alerts={otherAlerts} /></details>}<WorkflowSession key={kind} kind={kind} /></>;
+  }
   if (alerts.length) return <AlertNextSteps alerts={alerts} />;
   return <div className="workflow-panel"><h2>What should we do next?</h2><p>All readings are within limits. Pick a condition below, or one of the guided research workflows, to see its next steps.</p>{Object.entries(WORKFLOWS).map(([key, workflow]) => <button className="workflow-submit" key={key} onClick={() => trigger(workflow.scenarioId)}>{workflow.title}</button>)}</div>;
 }
@@ -24,7 +32,7 @@ export default function WorkflowPanel() {
 const RESPONDER = { none: "You only", crew: "Crew · self-manage", flightSurgeon: "Flight surgeon" } as const;
 
 function AlertNextSteps({ alerts }: { alerts: Alert[] }) {
-  const sorted = [...alerts].sort((a, b) => SEVERITY_META[b.severity].rank - SEVERITY_META[a.severity].rank);
+  const sorted = [...alerts].sort(compareAlerts);
   return <div className="workflow-panel">
     <h2>What to do next</h2>
     <p className="next-steps-intro">Each step is the <strong>Do now</strong> action from an active alert, most urgent first. Open Alerts for the readings, thresholds and sources behind them.</p>
@@ -68,6 +76,7 @@ function WorkflowSession({ kind }: { kind: WorkflowKind }) {
       {report.trim() && <p>Reported symptoms: {report}</p>}
     </div>
     <h3>What to do next</h3>
+    <p>Team-proposed assessment prompts. Confirm operational actions against the applicable mission procedure.</p>
     <ol>{plan.steps.map((step) => <li key={step.id}>{step.text}</li>)}</ol>
     <p className="workflow-review">Medical protocol review pending. Public references inform these demonstration prompts; no mission-approved treatment protocol is included. Gemini cannot prescribe or change escalation.</p>
     <details><summary>Why this was flagged · readings and sources</summary>
@@ -105,6 +114,6 @@ function WorkflowSession({ kind }: { kind: WorkflowKind }) {
       <p className="workflow-privacy">This button sends your incident report, answers and the relevant simulated readings to Google. Your private journal is not sent. Report text is not logged or saved by this app’s server.</p>
     </form>
     {error && <p role="status">{error}</p>}
-    {result && (result.plan.severity === plan.severity ? <WorkflowExplanation result={result} /> : <p role="status">The status changed since this explanation. Use the current rule-based next steps above and request a fresh summary.</p>)}
+    {result && (result.plan.severity === plan.severity && result.plan.responder === plan.responder ? <WorkflowExplanation result={result} /> : <p role="status">The status changed since this explanation. Use the current rule-based next steps above and request a fresh summary.</p>)}
   </div>;
 }

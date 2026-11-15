@@ -159,7 +159,7 @@ export const useAuraStore = create<AuraState>((set, get) => {
       const s = get();
       const t = s.t + 1;
       const scenario = scenarioById(s.scenarioId);
-      if (s.selectedCrewId && !scenario) {
+      if (isSnapshot(s)) {
         set({ t });
         return;
       }

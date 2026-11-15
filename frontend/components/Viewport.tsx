@@ -1,9 +1,10 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { compareAlerts } from "@aura/core/lib/evaluate";
 import { Pause, Play } from "lucide-react";
 import { useCallback, useState, useSyncExternalStore } from "react";
-import { CATEGORY_META, SEVERITY_META } from "@aura/core/config/aura";
+import { CATEGORY_META } from "@aura/core/config/aura";
 import { isSnapshot, useAuraStore } from "@/store/useAuraStore";
 import { Button } from "@/components/ui/button";
 import { Swatch } from "./hazard";
@@ -26,7 +27,8 @@ export default function Viewport({ onReady, demoRotate }: { onReady?: () => void
   const injuries = useAuraStore((s) => s.readings.injuries);
   const alerts = useAuraStore((s) => s.alerts);
   const snapshot = useAuraStore(isSnapshot);
-  const active = categories.filter((c) => c.severity !== "nominal").sort((a, b) => SEVERITY_META[b.severity].rank - SEVERITY_META[a.severity].rank);
+  const leadAlert = [...alerts].sort(compareAlerts)[0];
+  const active = categories.filter((category) => category.severity !== "nominal").sort((a, b) => Number(b.category === leadAlert?.category) - Number(a.category === leadAlert?.category));
   const context = active[0]?.category === "injury" && Object.values(injuries).every((severity) => severity === "nominal") ? metrics.find((metric) => metric.metric === "coreTemp") : undefined;
   const bodyAlerts = alerts.filter((alert) => alert.category === "injury");
   const activeLabel = active[0]?.category === "injury" && bodyAlerts.length === 1 ? bodyAlerts[0].title : active[0] && CATEGORY_META[active[0].category].label;

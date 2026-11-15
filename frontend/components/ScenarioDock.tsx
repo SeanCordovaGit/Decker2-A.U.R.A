@@ -25,8 +25,8 @@ export default function ScenarioDock({ onOpenPanels, onScenarioSelect, panelMenu
   const reset = useAuraStore((s) => s.reset);
 
   return (
-    <nav className="hud-glass hud-dock" aria-label="Conditions and dashboard panels">
-      <span className="hud-dock-label" id="conditions-label">Conditions</span>
+    <nav className="hud-glass hud-dock" aria-label="Status and dashboard panels">
+      <span className="hud-dock-label" id="conditions-label">Status</span>
       <div className="hud-dock-scenarios" role="group" aria-labelledby="conditions-label">
         {SCENARIOS.map((scenario) => {
           const { label, Icon } = CONDITION[scenario.id];

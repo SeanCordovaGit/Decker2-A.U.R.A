@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { NOTIFICATION_PRIORITIES } from "@aura/core/config/aura";
 import { CREW_PROFILES, REFERENCE_LABS } from "@aura/core/lib/research-data";
 import { runValidationCases } from "@aura/core/lib/validation-cases";
 
@@ -20,6 +21,12 @@ export default function ResearchReference() {
       <p>Simulated test inputs with independently specified expected outcomes. These run the same backend evaluator used by the viewer. They verify implementation behavior, not clinical validity. Numeric bands are aligned to Nasa Space Apps 26 (2).pdf; the confirmed core-temperature gaps remain caution.</p>
       <div className="research-table-scroll"><table><thead><tr><th>Case</th><th>Input</th><th>Expected</th><th>Actual</th><th>Check</th></tr></thead><tbody>{runValidationCases().map((example) => <tr key={`${example.metric}-${example.value}`}><th>{example.label}</th><td>{example.value} {example.unit}</td><td>{example.expected}</td><td>{example.actual}</td><td>{example.passed ? "Pass" : "Fail"}</td></tr>)}</tbody></table></div>
       <p>600 mSv is a NASA career effective-dose reference. Its red review tier and the 150 mSv warning are project display policies, not validated acute-emergency thresholds. Gy/mGy measure absorbed dose; they are not generally interchangeable with mSv.</p>
+    </section>
+    <section>
+      <h3>Notification priority</h3>
+      <p>Critical alerts appear first. Within each severity, alerts follow the team hierarchy from Nasa Space Apps 26 (4).pdf. This is a project notification policy.</p>
+      <div className="research-table-scroll"><table><thead><tr><th>Rank</th><th>Hazard domain</th></tr></thead><tbody>{NOTIFICATION_PRIORITIES.map((priority) => <tr key={priority.rank}><td>{priority.rank}</td><th>{priority.label}</th></tr>)}</tbody></table></div>
+      <p>Recorded SEP events create a precaution. Crew exposure assessment requires dosimetry, timing, location and shielding information.</p>
     </section>
     <section>
       <h3>Research-reported metabolic reference values</h3>
