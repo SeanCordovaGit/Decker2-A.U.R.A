@@ -113,11 +113,13 @@ const SIDE_LAYOUT: Record<Side, { shift: string; flex: string; line: string }> =
 // Hands sit near the viewport edge, so their callouts rise instead of running sideways off-screen.
 const sideFor = (r: BodyRegion | null, x: number): Side => (r === "leftHand" || r === "rightHand" ? "up" : x < 0 || r === "head" || r === "chest" || r === "back" ? "left" : "right");
 
-function Callout({ position, side, color, label, sev }: { position: THREE.Vector3; side: Side; color: string; label: string; sev: Severity }) {
+// Callouts stay mounted and only empty when inactive: unmounting drei's <Html> tears down its own React root
+// mid-render, which React reports as a race when a scenario switch clears several alerts at once.
+function Callout({ position, side, color, label, sev, active }: { position: THREE.Vector3; side: Side; color: string; label: string; sev: Severity; active: boolean }) {
   const layout = SIDE_LAYOUT[side];
   return (
     <Html position={position} zIndexRange={[20, 0]} className="astronaut-callout" style={{ pointerEvents: "none" }}>
-      <div style={{ transform: layout.shift }}>
+      {active && <div style={{ transform: layout.shift }}>
         <div className={`flex ${layout.flex}`}>
           <span className={`h-2 w-2 shrink-0 rounded-full ${sev === "critical" ? "pulse" : ""}`} style={{ background: color, boxShadow: `0 0 8px 1px ${color}` }} />
           <span className={`${layout.line} shrink-0`} style={{ background: color, opacity: 0.8 }} />
@@ -128,7 +130,7 @@ function Callout({ position, side, color, label, sev }: { position: THREE.Vector
             {label} <span className={sev === "critical" ? "font-semibold" : ""} style={{ color: SEVERITY_META[sev].badgeColor }}>· {SEVERITY_META[sev].label.toLowerCase()}</span>
           </span>
         </div>
-      </div>
+      </div>}
     </Html>
   );
 }
@@ -199,20 +201,19 @@ function Astronaut({ onReady }: { onReady?: () => void }) {
       ))}
 
       {categories
-        .filter((c) => c.category !== "injury" && activeShells.has(c.category))
+        .filter((c) => c.category !== "injury")
         .map((c) => {
           const a = CATEGORY_ANCHOR[c.category]!;
           return (
-            <Callout key={c.category} position={anchor(a)} side={sideFor(null, a[0])} color={getIndicatorColor(c.category, c.severity)} label={CALLOUT_LABEL[c.category as Exclude<HazardCategory, "injury">]} sev={c.severity} />
+            <Callout key={c.category} active={activeShells.has(c.category)} position={anchor(a)} side={sideFor(null, a[0])} color={getIndicatorColor(c.category, c.severity)} label={CALLOUT_LABEL[c.category as Exclude<HazardCategory, "injury">]} sev={c.severity} />
           );
         })}
-      {(Object.entries(injury.regions) as [BodyRegion, Severity][])
-        .filter(([, sev]) => sev !== "nominal")
-        .map(([r, sev]) => {
-          const a = REGION_ANCHOR[r];
-          const label = bodyRegionLabel(r, readings, metrics);
-          return <Callout key={r} position={anchor(a)} side={sideFor(r, a[0])} color={getIndicatorColor("injury", sev, r === "chest" && (reportedInjuries[r] ?? "nominal") === "nominal" ? coreTemperature : undefined)} label={label} sev={sev} />;
-        })}
+      {(Object.keys(REGION_ANCHOR) as BodyRegion[]).map((r) => {
+        const sev = injury.regions[r] ?? "nominal";
+        const a = REGION_ANCHOR[r];
+        const active = sev !== "nominal";
+        return <Callout key={r} active={active} position={anchor(a)} side={sideFor(r, a[0])} color={getIndicatorColor("injury", sev, r === "chest" && (reportedInjuries[r] ?? "nominal") === "nominal" ? coreTemperature : undefined)} label={active ? bodyRegionLabel(r, readings, metrics) : ""} sev={sev} />;
+      })}
     </group>
   );
 }
