@@ -29,18 +29,19 @@ export function buildWorkflow(input: WorkflowInput) {
   const readings = { ...NOMINAL_READINGS, ...input.readings, cabinTemp: input.cabinTemp, coreTemp: input.coreTemp, sepActive: !!input.sepActive };
   const metricAlerts = buildAlerts(readings, evaluateMetrics(readings), computeMhi({}, input.mhiIndex ?? 92), 0);
   const alertKey = (alert: (typeof metricAlerts)[number]) => alert.metric ?? (alert.key.startsWith("sep") ? "sep" : alert.key);
-  const findings = input.kind === "hand" ? [{ id: "hand-report", text: `Simulated crew-reported right-hand injury: ${input.injurySeverity}.`, severity: input.injurySeverity, sourceId: "teamInjury" }] : metricAlerts.filter((alert) => config.alertKeys?.includes(alertKey(alert))).map((alert) => ({ id: alertKey(alert), text: `${alert.title}: ${alert.valueText}. ${alert.thresholdText}.`, severity: alert.severity, sourceId: alert.citation.id }));
+  const relevantAlerts = metricAlerts.filter((alert) => config.alertKeys?.includes(alertKey(alert)));
+  const findings = input.kind === "hand" ? [{ id: "hand-report", text: `Simulated crew-reported right-hand injury: ${input.injurySeverity}.`, severity: input.injurySeverity, sourceId: "teamInjury" }] : relevantAlerts.map((alert) => ({ id: alertKey(alert), text: `${alert.title}: ${alert.valueText}. ${alert.thresholdText}.`, severity: alert.severity, sourceId: alert.citation.id }));
   if (!findings.length) findings.push(input.kind === "cold"
     ? { id: "cabinTemp", text: `Cabin temperature: ${formatMetricValue("cabinTemp", input.cabinTemp, 1)} °C; within configured demo bands.`, severity: "nominal", sourceId: "researchCabin" }
     : { id: "no-threshold", text: "No configured threshold is crossed in the current simulated readings.", severity: "nominal", sourceId: config.sourceId });
   if (urgentReport) findings.push({ id: `report-${input.kind}`, text: `${urgentAnswers.length ? `Crew answered Yes: ${urgentAnswers.map((question) => `${question.text} [${question.id}]`).join("; ")}` : "A previously confirmed urgent answer remains active until reset"}. Report-based escalation; not a sensor reading or diagnosis.`, severity: "critical", sourceId: config.sourceId });
   const severity = findings.reduce<Severity>((severity, finding) => maxSeverity(severity, finding.severity), "nominal");
-  const responder = severity === "critical" ? "flightSurgeon" : "crew";
+  const responder = severity === "critical" || relevantAlerts.some((alert) => alert.escalation === "flightSurgeon") ? "flightSurgeon" : "crew";
   // Tiered workflows carry their own critical escalation steps; hand and cold append the shared one.
   const steps = config.criticalSteps
     ? [...(severity === "critical" ? config.criticalSteps : config.steps)]
     : [...config.steps, { id: "escalation", text: severity === "critical" ? URGENT_REPORT_ACTION : "Crew review is indicated by the current demo rules. Unanswered questions or unmeasured symptoms can still require medical assessment.", treatment: false as const }];
-  const status = config.status ? (severity === "critical" ? config.status.critical : severity === "caution" ? config.status.caution : "No configured threshold is crossed yet; keep monitoring.") : null;
+  const status = config.status ? (responder === "flightSurgeon" ? config.status.critical : severity === "caution" ? config.status.caution : "No configured threshold is crossed yet; keep monitoring.") : null;
   return { title: config.title, severity, responder, urgentReport, status, placeholder: config.placeholder ?? null, protocolReview: "pending" as const, questions: config.questions, findings, steps, sources: findings.map((finding) => ({ id: finding.id, citation: CITATIONS[finding.sourceId] })) };
 }
 

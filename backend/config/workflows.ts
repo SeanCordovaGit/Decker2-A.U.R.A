@@ -55,7 +55,7 @@ export const WORKFLOWS: Record<WorkflowKind, WorkflowConfig> = {
   },
   sep: {
     title: "Solar radiation", scenarioId: "sep", category: "radiation", alertKeys: ["sep", "cumulativeDose"], sourceId: "teamSymptomReport",
-    status: { caution: "Elevated solar particle flux; monitor cumulative dose.", critical: CRITICAL_STATUS },
+    status: { caution: "SEP precaution active; verify the event record and personal dosimetry.", critical: CRITICAL_STATUS },
     placeholder: "Describe the module location, shielding status, and how the crew feels.",
     questions: [
       { id: "sep-symptoms", text: "Is anyone experiencing sudden nausea, vomiting, or unusual fatigue?", urgent: true },
@@ -64,18 +64,18 @@ export const WORKFLOWS: Record<WorkflowKind, WorkflowConfig> = {
     ],
     steps: [
       step("sep-c1", "Log current module location and verify personal dosimeter readings."),
-      step("sep-c2", "Minimize time near unshielded viewports and prepare to pause non-essential tasks."),
-      step("sep-c3", "Follow mission-approved space weather monitoring protocols until proton flux subsides."),
+      step("sep-c2", "Ask mission control to review location, shielding and any EVA exposure history."),
+      step("sep-c3", "Request the applicable mission-approved space-weather procedure and record its identifier."),
     ],
     criticalSteps: [
       step("sep-r1", "Report module location, cumulative dosimeter readings, and any crew symptoms to mission control or the crew medical officer."),
-      step("sep-r2", "Relocate immediately to the mission-designated radiation storm shelter (water- or polyethylene-shielded area)."),
+      step("sep-r2", "Ask mission control to assess sheltering needs using current dosimetry and the applicable mission procedure."),
       step("sep-r3", "Request prompt flight-surgeon assessment and follow mission-approved radiation emergency procedures."),
     ],
   },
   acuteDose: {
     title: "Acute dose", scenarioId: "acuteDose", category: "injury", alertKeys: ["absorbedDoseGy"], regions: ["abdomen"], sourceId: "teamSymptomReport",
-    status: { caution: "Elevated localized particle flux detected; verify dosimeter metrics.", critical: CRITICAL_STATUS },
+    status: { caution: "Review the independent absorbed-dose input and dosimeter evidence.", critical: CRITICAL_STATUS },
     placeholder: "Describe the module location, radiation spike readings, and physical symptoms.",
     questions: [
       { id: "acute-gi", text: "Are any crew members suffering from sudden abdominal pain, nausea, or cramping?", urgent: true },
@@ -83,13 +83,13 @@ export const WORKFLOWS: Record<WorkflowKind, WorkflowConfig> = {
       { id: "acute-dosimeters", text: "Do crew dosimeters validate the environmental telemetry alerts?", urgent: false },
     ],
     steps: [
-      step("acute-c1", "Vacate the designated radiation hotspot and log personal dosimeter totals."),
+      step("acute-c1", "Report the suspected exposure location and log independently measured personal dosimeter totals."),
       step("acute-c2", "Perform a baseline status assessment to report any early gastrointestinal discomfort."),
       step("acute-c3", "Follow mission-approved radiation exposure logging until evaluated by the flight surgeon."),
     ],
     criticalSteps: [
       step("acute-r1", "Transmit accumulated exposure dose, anatomical indicator status (lower abdomen/GI), and symptoms to mission control or the crew medical officer."),
-      step("acute-r2", "Relocate immediately to heavy shielding structures and halt activities near the affected zone."),
+      step("acute-r2", "Request mission-control assessment of location, exposure duration and shielding before selecting an exposure response."),
       step("acute-r3", "Request immediate flight-surgeon evaluation and execute mission-approved acute radiation protocols."),
     ],
   },
@@ -104,12 +104,12 @@ export const WORKFLOWS: Record<WorkflowKind, WorkflowConfig> = {
     ],
     steps: [
       step("co-c1", "Log ambient CO levels and report the impacted module location to ground control."),
-      step("co-c2", "Inspect atmospheric scrubbing systems and verify telemetry across neighboring modules."),
+      step("co-c2", "Report atmospheric-system status and available telemetry from neighboring modules for mission-control review."),
       step("co-c3", "Track heart rate shifts and cognitive symptoms using established air-quality standards."),
     ],
     criticalSteps: [
       step("co-r1", "Report module location, carbon monoxide concentration, and any physiological symptoms to flight surgeons."),
-      step("co-r2", "Execute toxic atmosphere protocols immediately; cross-validate sensor spikes with crew vital shifts."),
+      step("co-r2", "Request the applicable mission-approved toxic-atmosphere procedure and a review of sensor readings and crew symptoms."),
       step("co-r3", "Request prompt flight-surgeon assessment and follow mission-approved environmental emergency procedures."),
     ],
   },
@@ -123,13 +123,13 @@ export const WORKFLOWS: Record<WorkflowKind, WorkflowConfig> = {
       { id: "co2-stagnation", text: "Is there localized air stagnation from multiple crew members in unventilated areas?", urgent: false },
     ],
     steps: [
-      step("co2-c1", "Log cabin CO₂ partial pressure and confirm CDRA airflow performance."),
-      step("co2-c2", "Suspend strenuous physical tasks in the affected sector until scrubbers stabilize."),
-      step("co2-c3", "Execute environmental control procedures while monitoring for hypercapnia symptoms."),
+      step("co2-c1", "Log cabin CO2 partial pressure and report available ventilation-system readings."),
+      step("co2-c2", "Ask the crew medical officer to review workload and reported symptoms alongside cabin readings."),
+      step("co2-c3", "Request the applicable environmental-control procedure and record any reported symptoms."),
     ],
     criticalSteps: [
       step("co2-r1", "Report module location, hypercapnia metrics, and crew vital trends to flight surgeons."),
-      step("co2-r2", "Activate emergency CDRA scrubber backup loops immediately to restore baseline air quality."),
+      step("co2-r2", "Request mission-control direction using the installed ventilation equipment and its approved procedure."),
       step("co2-r3", "Request immediate flight-surgeon assessment and follow mission-approved hypercapnia protocols."),
     ],
   },
@@ -144,12 +144,12 @@ export const WORKFLOWS: Record<WorkflowKind, WorkflowConfig> = {
     ],
     steps: [
       step("heat-c1", "Record ambient module temperatures and inspect ECLSS cooling loop performance."),
-      step("heat-c2", "Limit exertion protocol demands and enforce crew hydration schedules."),
+      step("heat-c2", "Report activity level and hydration concerns for crew-medical-officer assessment."),
       step("heat-c3", "Follow thermal-control procedures; environmental spikes require correlation with physiological vitals."),
     ],
     criticalSteps: [
       step("heat-r1", "Report module location, ambient thermal data, and physiological vitals to flight surgeons."),
-      step("heat-r2", "Deploy emergency active-cooling protocols; isolate ambient heat spikes from core body temperature shifts."),
+      step("heat-r2", "Request a mission-specific thermal response after reviewing cabin readings and core temperature separately."),
       step("heat-r3", "Request immediate flight-surgeon consultation and proceed with hyperthermia emergency steps."),
     ],
   },
@@ -169,14 +169,14 @@ export const WORKFLOWS: Record<WorkflowKind, WorkflowConfig> = {
     ],
     criticalSteps: [
       step("fever-r1", "Report core temperature readings, duration, and any crew symptoms to mission control or the crew medical officer."),
-      step("fever-r2", "Follow mission-approved crew isolation and medical monitoring procedures while awaiting ground guidance."),
+      step("fever-r2", "Ask the crew medical officer to determine monitoring and any isolation requirements using the applicable procedure."),
       step("fever-r3", "Request prompt flight-surgeon assessment and follow mission-approved emergency medical procedures."),
     ],
   },
   sleep: {
     title: "Sleep loss", scenarioId: "sleepDeprivation", category: "mental", alertKeys: ["pvtReactionMs", "pvtLapses", "hrv", "mhi"], sourceId: "teamSymptomReport",
     status: { caution: "Moderate cognitive fatigue; schedule & recovery adjustment advised.", critical: CRITICAL_STATUS },
-    placeholder: "Describe recent sleep interruptions, workload strain, and current alertness.",
+    placeholder: "Report uninterrupted sleep hours in the last 24-48 hours, workload strain, and current alertness.",
     questions: [
       { id: "sleep-deficit", text: "Has the astronaut had less uninterrupted sleep than scheduled in the last 24–48 hours?", urgent: false },
       { id: "sleep-operations", text: "Is the astronaut scheduled for high-risk or safety-critical operations today?", urgent: false },
@@ -189,7 +189,7 @@ export const WORKFLOWS: Record<WorkflowKind, WorkflowConfig> = {
     ],
     criticalSteps: [
       step("sleep-r1", "Report PVT+ test lapses, MHI score, and sleep deficit history to mission control or the crew medical officer."),
-      step("sleep-r2", "Stand down from high-risk operations (EVA, robotics, docking) per mission-approved fatigue rules."),
+      step("sleep-r2", "Request a review of fitness for high-risk operations against the mission-approved fatigue criteria."),
       step("sleep-r3", "Request prompt flight-surgeon assessment to restructure work-rest cycles."),
     ],
   },

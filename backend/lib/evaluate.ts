@@ -3,6 +3,7 @@ import {
   CITATIONS,
   INJURY_ACTIONS,
   MHI_CONFIG,
+  NOTIFICATION_PRIORITIES,
   SEVERITY_META,
   THRESHOLD_RULES,
 } from "../config/aura";
@@ -19,6 +20,19 @@ import type {
   Severity,
   ThresholdRule,
 } from "./types";
+
+export function getAlertPriority(alert: Alert): number {
+  return NOTIFICATION_PRIORITIES.find((priority) =>
+    priority.metrics?.includes(alert.metric ?? "") ||
+    priority.keys?.includes(alert.key) ||
+    priority.keyPrefixes?.some((prefix) => alert.key.startsWith(prefix)) ||
+    priority.categories?.includes(alert.category)
+  )?.rank ?? NOTIFICATION_PRIORITIES[NOTIFICATION_PRIORITIES.length - 1].rank;
+}
+
+export function compareAlerts(a: Alert, b: Alert): number {
+  return SEVERITY_META[b.severity].rank - SEVERITY_META[a.severity].rank || getAlertPriority(a) - getAlertPriority(b);
+}
 
 export const CATEGORIES: HazardCategory[] = [
   "radiation",

@@ -125,6 +125,23 @@ export const SEVERITY_META: Record<
   critical: { label: "Critical", badgeColor: INDICATOR_COLORS.red, opacity: 0.38, pulse: true, rank: 2 },
 };
 
+export const NOTIFICATION_PRIORITIES: readonly {
+  rank: number;
+  label: string;
+  metrics?: readonly string[];
+  keys?: readonly string[];
+  keyPrefixes?: readonly string[];
+  categories?: readonly HazardCategory[];
+}[] = [
+  { rank: 1, label: "Toxic gas (CO / CO2)", categories: ["air"], keys: ["injury:co-exposure"] },
+  { rank: 2, label: "Acute absorbed dose / SEP precaution", metrics: ["absorbedDoseGy"], keys: ["report:acuteDose", "report:sep", "sep"], keyPrefixes: ["sep:"] },
+  { rank: 3, label: "Core thermoregulation", metrics: ["coreTemp"], keys: ["report:fever"] },
+  { rank: 4, label: "Physical injury / cardiovascular", categories: ["injury"] },
+  { rank: 5, label: "Cabin thermal conditions", categories: ["cabinHot", "cabinCold"] },
+  { rank: 6, label: "Cognitive / mental fatigue", categories: ["mental"] },
+  { rank: 7, label: "Cumulative career-dose review", categories: ["radiation"] },
+];
+
 export const MENTAL_ACTIONS = {
   caution: "Protect sleep time, reduce workload, repeat the PVT+ assessment and arrange a private check-in.",
   critical: "Contact the flight surgeon; adjust the work-rest schedule and delay high-risk tasks.",
@@ -160,8 +177,8 @@ export const THRESHOLD_RULES: ThresholdRule[] = [
     context: "Reference limits: 15 ppm (30-180 days), 55 ppm (7 days), 425 ppm (1 hour). Actual exposure duration is not measured.",
     citationId: "jsc20584Co",
     actions: {
-      caution: "Increase ventilation, check the source, and track the trend; request medical assessment at the 7-day reference limit.",
-      critical: "Don masks, move to clean air, and contact the flight surgeon. Potential CNS effects and cardiac arrhythmia; this alert does not confirm a fire.",
+      caution: "Report the CO concentration, location and symptoms; request medical assessment at the configured referral reference and use the applicable atmosphere procedure.",
+      critical: "Request prompt flight-surgeon and mission-control assessment using the approved toxic-atmosphere procedure. Potential CNS effects and cardiac arrhythmia; this alert does not confirm a fire.",
     },
     regions: ["head", "chest"],
   },
@@ -174,8 +191,8 @@ export const THRESHOLD_RULES: ThresholdRule[] = [
     criticalHigh: 5.3,
     citationId: "std3001Co2",
     actions: {
-      caution: "Increase airflow near sleep station; check CO₂ scrubber status. Expect headaches.",
-      critical: "Activate backup CO₂ removal; reduce crew activity in the module.",
+      caution: "Report CO2 partial pressure, ventilation status and any symptoms for mission-control review.",
+      critical: "Request prompt mission-control and flight-surgeon assessment using the applicable environmental-control procedure.",
     },
   },
   {
@@ -194,8 +211,8 @@ export const THRESHOLD_RULES: ThresholdRule[] = [
     criticalLowExclusive: true,
     citationId: "researchCabin",
     actions: {
-      caution: "Adjust thermal control setpoint; hydrate / add layers.",
-      critical: "Check thermal control system; relocate crew to a nominal module.",
+      caution: "Report cabin temperature, location and symptoms; request review of the applicable thermal-control procedure.",
+      critical: "Request prompt mission-control assessment of cabin temperature, crew symptoms and the approved thermal response.",
     },
   },
   {
@@ -212,8 +229,8 @@ export const THRESHOLD_RULES: ThresholdRule[] = [
     criticalLowExclusive: true,
     citationId: "researchCore",
     actions: {
-      caution: "Rest, hydrate, re-measure in 30 min; compare with personal space baseline.",
-      critical: "Begin cooling/warming protocol and contact flight surgeon immediately.",
+      caution: "Report core temperature, trend and symptoms for crew-medical-officer review; confirm the recheck schedule in the applicable procedure.",
+      critical: "Request prompt flight-surgeon assessment of core temperature and symptoms using the applicable mission medical procedure.",
     },
     regions: ["chest"],
   },
@@ -224,7 +241,7 @@ export const THRESHOLD_RULES: ThresholdRule[] = [
 ];
 
 export const INJURY_ACTIONS = {
-  caution: "Apply first aid from the onboard medical kit; log symptoms.",
+  caution: "Log the affected region and symptoms and request crew-medical-officer assessment using the approved injury procedure.",
   critical: "Stop current task; flight surgeon consultation for treatment plan.",
 };
 
