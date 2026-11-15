@@ -11,7 +11,7 @@ export default function ResearchReference() {
       <p>Exact values from sample.csv (5 rows, 10 columns), matching Nasa Space Apps 26.pdf, page 1. These are demonstration profiles, not live astronaut records. No observation timestamps or exposure durations were supplied.</p>
       <p>CSV snapshots stay unchanged until a demo scenario starts. Heart rate, CO₂ and acute absorbed dose were not supplied and are shown as missing. Scenarios generate simulated readings; reset restores the supplied row. Alert bands follow the team research and are not a clinically validated diagnostic system.</p>
       <div className="research-table-scroll"><table>
-        <thead><tr>{["Crew", "Daily mSv", "Total mSv", "CO ppm", "Cabin °C", "Core °C", "MHI", "PVT+ ms", "Lapses / 300 s", "HRV ms"].map((heading) => <th key={heading}>{heading}</th>)}</tr></thead>
+        <thead><tr>{["Crew", "Daily dose mSv/day", "Cumulative mSv", "CO ppm", "Cabin °C", "Core °C", "MHI", "PVT+ ms", "Lapses / 300 s", "HRV ms"].map((heading) => <th key={heading}>{heading}</th>)}</tr></thead>
         <tbody>{CREW_PROFILES.map((crew) => <tr key={crew.id}><th>{crew.id}</th>{[crew.readings.doseRate, crew.readings.cumulativeDose, crew.readings.co, crew.readings.cabinTemp, crew.readings.coreTemp, crew.mhiScore, crew.readings.pvtReactionMs, crew.readings.pvtLapses, crew.readings.hrv].map((value, index) => <td key={index}>{value}</td>)}</tr>)}</tbody>
       </table></div>
     </section>

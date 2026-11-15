@@ -70,7 +70,7 @@ export function EnvironmentHud({ demoExpanded }: { demoExpanded?: boolean }) {
   const metrics = useAuraStore((s) => s.metrics);
   const snapshot = useAuraStore((s) => !s.scenarioId && crewProfile(s.selectedCrewId));
   const rows = [
-    { metric: "doseRate", label: snapshot ? "Daily dose" : "Dose rate", value: formatMetricValue("doseRate", readings.doseRate, 1), unit: snapshot ? "mSv" : "mSv/day", Icon: Radio },
+    { metric: "doseRate", label: "Daily dose", value: formatMetricValue("doseRate", readings.doseRate, 1), unit: "mSv/day", Icon: Radio },
     { metric: "co", label: "CO", value: formatMetricValue("co", readings.co), unit: "ppm", Icon: Wind },
     { metric: "co2", label: "CO₂", value: snapshot ? "—" : formatMetricValue("co2", readings.co2, 1), unit: snapshot ? "not supplied" : "mmHg", Icon: Wind },
     { metric: "cabinTemp", label: "Cabin temp", value: formatMetricValue("cabinTemp", readings.cabinTemp, 1), unit: "°C", Icon: Thermometer },
@@ -115,9 +115,9 @@ export function AlertHud({ onOpen }: { onOpen: () => void }) {
 const TELEMETRY_ROWS = [
   { key: "absorbedDoseGy", label: "Acute absorbed dose", unit: "Gy", digits: 2 },
   { key: "cumulativeDose", label: "Cumulative effective dose", unit: "mSv", digits: 1 },
-  { key: "pvtLapses", label: "PVT+ lapses / 300 s", unit: "lapses", digits: 0 },
+  { key: "pvtLapses", label: "PVT+ lapses", unit: "per 300 s", digits: 0 },
   { key: "hrv", label: "HRV (RMSSD)", unit: "ms", digits: 0 },
-  { key: "doseRate", label: "Dose rate", unit: "mSv/day", digits: 1 },
+  { key: "doseRate", label: "Daily dose", unit: "mSv/day", digits: 1 },
   { key: "co", label: "CO", unit: "ppm", digits: 0 },
   { key: "co2", label: "CO₂", unit: "mmHg", digits: 1 },
   { key: "cabinTemp", label: "Cabin temp", unit: "°C", digits: 1 },
@@ -140,8 +140,8 @@ export function TelemetryDetails() {
           const missing = snapshot && !(row.key in snapshot.readings);
           return (
             <div key={row.key}>
-              <dt>{snapshot && row.key === "doseRate" ? "Daily radiation dose" : row.label}</dt>
-              <dd className="tnum" style={{ color: missing ? undefined : metricColor(metrics, row.key) }}>{missing ? "Not supplied" : <>{formatMetricValue(row.key, readings[row.key], row.digits)} <small>{snapshot && row.key === "doseRate" ? "mSv" : row.unit}</small>{severity !== "nominal" && <span className="hud-reading-severity" style={{ color: SEVERITY_META[severity].badgeColor }}>{severity}</span>}</>}</dd>
+              <dt>{row.label}</dt>
+              <dd className="tnum" style={{ color: missing ? undefined : metricColor(metrics, row.key) }}>{missing ? "Not supplied" : <>{formatMetricValue(row.key, readings[row.key], row.digits)} <small>{row.unit}</small>{severity !== "nominal" && <span className="hud-reading-severity" style={{ color: SEVERITY_META[severity].badgeColor }}>{severity}</span>}</>}</dd>
             </div>
           );
         })}
