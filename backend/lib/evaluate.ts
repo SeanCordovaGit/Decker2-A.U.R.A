@@ -105,11 +105,11 @@ export function evaluateCategories(
   }
 
   // Mental health index
-  for (const kind of ["hand", "cold"] as WorkflowKind[]) {
+  for (const kind of Object.keys(WORKFLOWS) as WorkflowKind[]) {
     if (!readings.reportedConcerns?.[kind]) continue;
     const status = statuses[WORKFLOWS[kind].category];
     status.severity = "critical";
-    if (kind === "hand") markRegion(status, "rightHand", "critical");
+    for (const region of WORKFLOWS[kind].regions ?? []) markRegion(status, region, "critical");
   }
 
   statuses.mental.severity = maxSeverity(statuses.mental.severity, mhi.severity);
@@ -170,7 +170,7 @@ export function buildAlerts(
   now: number,
 ): Alert[] {
   const alerts: Alert[] = [];
-  for (const kind of ["hand", "cold"] as WorkflowKind[]) {
+  for (const kind of Object.keys(WORKFLOWS) as WorkflowKind[]) {
     if (!readings.reportedConcerns?.[kind]) continue;
     const config = WORKFLOWS[kind];
     alerts.push({ key: `report:${kind}`, category: config.category, title: `Crew-reported urgent symptoms: ${config.title}`, severity: "critical", valueText: "Explicit urgent-symptom answer", thresholdText: "Project-defined report-based escalation; no sensor value was changed", citation: CITATIONS[config.sourceId], action: URGENT_REPORT_ACTION, escalation: "flightSurgeon", escalated: true, toAstronautOnly: false, createdAt: now });

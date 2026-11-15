@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { buildWorkflow, type WorkflowInput } from "@aura/core/lib/workflow";
-import { WORKFLOWS, type WorkflowKind } from "@aura/core/config/workflows";
+import { WORKFLOW_METRICS, buildWorkflow, type WorkflowInput } from "@aura/core/lib/workflow";
+import { WORKFLOWS, workflowForScenario, type WorkflowKind } from "@aura/core/config/workflows";
 import { Siren } from "lucide-react";
 import { SEVERITY_META, getIndicatorColor } from "@aura/core/config/aura";
 import type { Alert } from "@aura/core/lib/types";
@@ -15,7 +15,7 @@ export default function WorkflowPanel() {
   const scenario = useAuraStore((state) => state.scenarioId);
   const trigger = useAuraStore((state) => state.triggerScenario);
   const alerts = useAuraStore((state) => state.alerts);
-  const kind = scenario === "evaHandInjury" ? "hand" : scenario === "cabinCold" ? "cold" : null;
+  const kind = workflowForScenario(scenario);
   if (kind) return <WorkflowSession key={kind} kind={kind} />;
   if (alerts.length) return <AlertNextSteps alerts={alerts} />;
   return <div className="workflow-panel"><h2>What should we do next?</h2><p>All readings are within limits. Pick a condition below, or one of the guided research workflows, to see its next steps.</p>{Object.entries(WORKFLOWS).map(([key, workflow]) => <button className="workflow-submit" key={key} onClick={() => trigger(workflow.scenarioId)}>{workflow.title}</button>)}</div>;
@@ -32,7 +32,7 @@ function AlertNextSteps({ alerts }: { alerts: Alert[] }) {
       {sorted.map((alert) => {
         const Icon = CATEGORY_ICON[alert.category];
         const color = getIndicatorColor(alert.category, alert.severity, alert);
-        return <li key={alert.key} className="next-step" style={{ borderLeftColor: color }}>
+        return <li key={alert.key} className="next-step">
           <header><Icon size={16} strokeWidth={1.5} aria-hidden style={{ color }} /><strong>{alert.title}</strong><SeverityBadge severity={alert.severity} /></header>
           <p className="next-step-action">{alert.action}</p>
           <p className="next-step-meta">{alert.escalation === "flightSurgeon" && <Siren size={12} aria-hidden />}{RESPONDER[alert.escalation]} · {alert.valueText}</p>
@@ -44,6 +44,7 @@ function AlertNextSteps({ alerts }: { alerts: Alert[] }) {
 
 function WorkflowSession({ kind }: { kind: WorkflowKind }) {
   const readings = useAuraStore((state) => state.readings);
+  const mhiIndex = useAuraStore((state) => state.mhi.index);
   const reportUrgent = useAuraStore((state) => state.reportUrgentConcern);
   const incident = useAuraStore((state) => state.incidentReports[kind]);
   const setIncident = useAuraStore((state) => state.setIncidentReport);
@@ -54,16 +55,16 @@ function WorkflowSession({ kind }: { kind: WorkflowKind }) {
   const [error, setError] = useState("");
   const request = useRef<AbortController | null>(null);
   useEffect(() => () => { request.current?.abort(); }, []);
-  const input: WorkflowInput = { kind, report, answers, cabinTemp: readings.cabinTemp, coreTemp: readings.coreTemp, injurySeverity: readings.injuries.rightHand ?? "nominal", reportedUrgent: !!readings.reportedConcerns?.[kind] };
+  const input: WorkflowInput = { kind, report, answers, cabinTemp: readings.cabinTemp, coreTemp: readings.coreTemp, injurySeverity: readings.injuries.rightHand ?? "nominal", reportedUrgent: !!readings.reportedConcerns?.[kind], readings: Object.fromEntries(WORKFLOW_METRICS.map((metric) => [metric, readings[metric]])), sepActive: readings.sepActive, mhiIndex };
   const plan = buildWorkflow(input);
   const clearExplanation = () => { request.current?.abort(); request.current = null; setResult(null); setBusy(false); setError(""); };
   return <div className="workflow-panel">
     <span className="workflow-research">Research demonstration · Simulated readings</span>
     <h2>{plan.title}: next steps</h2>
-    <p className="workflow-report-source">{kind === "hand" ? "Affected side: right hand · Source: simulated crew assessment and explicit symptom answers." : "Source: simulated cabin/core readings and explicit crew symptom answers."}</p>
+    <p className="workflow-report-source">{kind === "hand" ? "Affected side: right hand · Source: simulated crew assessment and explicit symptom answers." : kind === "cold" ? "Source: simulated cabin/core readings and explicit crew symptom answers." : "Source: simulated readings, team-supplied next steps and explicit crew symptom answers."}</p>
     <div className="workflow-assessment" style={{ borderColor: SEVERITY_META[plan.severity].badgeColor }}>
-      <strong style={{ color: SEVERITY_META[plan.severity].badgeColor }}>Rule-based status: {plan.severity}</strong>
-      <p>{plan.responder === "flightSurgeon" ? "Flight surgeon / crew medical officer assessment indicated" : "Crew review indicated; clarify symptoms below"}</p>
+      <strong style={{ color: SEVERITY_META[plan.severity].badgeColor }}>Rule-based status: {plan.severity}{plan.status && ` — ${plan.status}`}</strong>
+      {!plan.status && <p>{plan.responder === "flightSurgeon" ? "Flight surgeon / crew medical officer assessment indicated" : "Crew review indicated; clarify symptoms below"}</p>}
       {report.trim() && <p>Reported symptoms: {report}</p>}
     </div>
     <h3>What to do next</h3>
@@ -91,7 +92,7 @@ function WorkflowSession({ kind }: { kind: WorkflowKind }) {
       } finally { if (request.current === controller) setBusy(false); }
     }}>
       <label className="workflow-report-label" htmlFor="incident-report">What happened?</label>
-      <textarea id="incident-report" maxLength={2000} rows={3} value={report} onChange={(event) => { clearExplanation(); setIncident(kind, event.target.value, answers); }} placeholder={kind === "hand" ? "Example: I injured my right hand while moving equipment. It hurts when I try to grip something." : "Describe the cold cabin area and how the crew feels."} />
+      <textarea id="incident-report" maxLength={2000} rows={3} value={report} onChange={(event) => { clearExplanation(); setIncident(kind, event.target.value, answers); }} placeholder={plan.placeholder ?? (kind === "hand" ? "Example: I injured my right hand while moving equipment. It hurts when I try to grip something." : "Describe the cold cabin area and how the crew feels.")} />
       <h3>Clarifying questions</h3>
       {plan.questions.map((question) => <label className="workflow-question" key={question.id}><span>{question.text}</span><select aria-label={question.text} value={answers[question.id] ?? "unknown"} onChange={(event) => {
         clearExplanation();

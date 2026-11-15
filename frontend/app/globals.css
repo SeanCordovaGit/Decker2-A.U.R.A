@@ -661,7 +661,7 @@ textarea {
 /* Next steps: one bordered section per active alert. */
 .next-steps-intro strong { color: var(--hud-text); font-weight: 600; }
 .workflow-panel ol.next-steps { display: grid; gap: 10px; padding: 0; list-style: none; }
-.workflow-panel .next-step { margin: 0; padding: 12px 14px; border: 1px solid var(--hud-border); border-left-width: 3px; border-radius: 10px; }
+.workflow-panel .next-step { margin: 0; padding: 12px 14px; border: 1px solid var(--hud-border); border-radius: 10px; }
 .next-step header { display: flex; align-items: center; gap: 8px; }
 .next-step header strong { flex: 1; font-size: 13px; font-weight: 600; }
 .workflow-panel .next-step-action { margin: 8px 0 6px; color: var(--hud-text); font-size: 13px; line-height: 1.5; }
