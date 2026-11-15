@@ -228,10 +228,10 @@ A near-monochrome ink instrument panel where colour is rationed to two jobs: cya
 - **Signal Cyan** (signal-cyan): interaction, focus and selection only. Primary button fill, pressed scenario state, focus rings, text selection, input caret, the "A.U.R.A." wordmark, the corner brackets on the viewport, and the rotating stage ring under the model. In the light theme, text-bearing cyan darkens to signal-cyan-text-light for contrast while fills keep the full cyan. Never used for data.
 
 ### Secondary
-- **Caution Amber** (caution-amber; caution-amber-light on porcelain): the caution severity tier (badge, crew-status summary, telemetry value and trace colour, the dashed caution-threshold line) and attention-level provenance tags such as "Verify" and "Cached". Inside the observation window the caution word uses caution-on-observation, because the light-theme amber would sink into the void.
+- **Caution Yellow**: general caution badges and warnings use the configured yellow; environmental and lowered-temperature caution indicators retain green, gray, and blue respectively.
 
 ### Hazard Category Colours (referenced, not owned)
-Category colours live only in `backend/config/aura.ts` (`CATEGORY_META[*].color`). At time of writing: radiation #00FF90, air quality #A3AEC2, cabin heat #FF8A3D, cabin cold #4D7CFF, mental #FFD23F, injury/cardiovascular #FF3366. Read them from that file in code; never copy the hex into the frontend. They appear only where a hazard is meant: auras, callout markers and borders, swatches beside a category label, the radiation dose meter, and the MHI component bars.
+Action indicator colors live only in `backend/config/aura.ts`. Use `getIndicatorColor(category, severity, context)` for active indicators: every critical condition is red; caution radiation is green, caution air quality is gray, caution low temperature is blue, and other caution conditions are yellow. Pass metric direction for low core temperature. Apply the result to auras, callouts, swatches, alert values, dose meters, and MHI bars.
 
 ### Neutral
 - **Ink Ground** (ink-ground): page background in the dark theme; also the inverted critical badge text.
@@ -243,9 +243,9 @@ Category colours live only in `backend/config/aura.ts` (`CATEGORY_META[*].color`
 - **Uplink OK** (uplink-ok): the live-data dot in the top bar only.
 
 ### Named Rules
-**The Category-Only Colour Rule.** A saturated hue on screen means a hazard category, read from `CATEGORY_META`. If a colour is not a category and not cyan or amber, it is a neutral.
+**The Action Indicator Rule.** Read all indicator colors from the central configuration. Critical severity overrides every category with red; keep explicit category and severity labels beside indicators.
 
-**The Red Is Injury Rule.** Red never encodes severity, because red means injury. Critical is shown by pulsing aura plus an inverted ink badge (ink fill, ground-colour text), never by turning things red.
+**The Critical Is Red Rule.** All critical conditions use red, including environmental hazards and low temperatures. Injury effects remain localized, with yellow at caution and red at critical.
 
 **The Cyan Is the Operator Rule.** Signal Cyan marks what the user can touch, what has focus and what is selected. A cyan number or chart is a bug.
 

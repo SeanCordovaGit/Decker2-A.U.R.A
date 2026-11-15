@@ -1,5 +1,6 @@
 <!--
 Sync Impact Report
+- 2026-11-15: Version 2.0.0 redefines Principle V per the updated action-indicator table; critical red overrides all other colors.
 - Version change: 1.0.0 → 1.0.1 (PATCH: Technical Constraints name Next.js 16 + pnpm from `main`)
 - Previous: template (unversioned) → 1.0.0
 - Modified principles: all template placeholders replaced (initial ratification)
@@ -56,14 +57,13 @@ Rationale: keeps the research document, the dashboard, and the pitch consistent.
 
 ### V. Visual Clarity
 
-- Aura color MUST encode hazard category only; severity MUST be encoded by intensity and pulse.
-- The nominal state MUST show no aura.
-- Category colors: radiation = green, air quality = gray, cabin heat = orange, cabin cold = blue,
-  mental/cognitive = yellow, injury/cardiovascular = red localized to the affected body region.
-- Severity levels: nominal, caution, critical. Status badges (not aura colors) MAY use
-  green/amber/red.
+- Every critical condition MUST use red, including radiation, air quality, and low temperature.
+- At caution: radiation = green, air quality = gray, lowered temperature = blue, and other general warnings = yellow.
+- The nominal state MUST show no aura. Caution is steady; critical also pulses, with a steady alternative for reduced motion.
+- Injury and cardiovascular indicators MUST remain localized to the affected body region.
+- All colors and precedence MUST be read from `backend/config/aura.ts`.
 
-Rationale: one color with one meaning is readable at a glance during a demo.
+Rationale: red always communicates an immediate critical breach; caution colors identify the type of warning.
 
 ### VI. Simplicity
 
@@ -116,4 +116,4 @@ Rationale: logic errors produce wrong alerts; UI issues are caught by rehearsal.
   PATCH for clarifications.
 - Any deviation (e.g., adding a backend) MUST be justified in the plan's Complexity Tracking.
 
-**Version**: 1.0.1 | **Ratified**: 2026-11-14 | **Last Amended**: 2026-11-14
+**Version**: 2.0.0 | **Ratified**: 2026-11-14 | **Last Amended**: 2026-11-15

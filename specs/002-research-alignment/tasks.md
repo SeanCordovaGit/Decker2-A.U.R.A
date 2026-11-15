@@ -4,6 +4,8 @@ description: "Task list for aligning A.U.R.A. with the revised research"
 
 # Tasks: Align A.U.R.A. with the Revised Research
 
+> The 2026-11-15 supplied PDFs supersede earlier numeric assumptions in this checklist (notably 480 mSv, old temperature bands, and four-source MHI). Current delivery and verification are tracked in [updated-data.md](updated-data.md).
+
 **Input**: Design documents from `specs/002-research-alignment/`
 
 **Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/

@@ -27,7 +27,7 @@ One glance at one body: hazard category is encoded as aura color and severity as
 
 ## Capabilities and Constraints
 
-- Hazard categories and aura colors (color = category only): radiation green, air quality gray, cabin heat orange, cabin cold blue, mental/cognitive yellow, injury/cardiovascular red on the affected body region. Nominal = no aura, caution = steady, critical = pulsing.
+- Action indicators: every critical condition is red. At caution, radiation is green, air quality gray, low temperature blue, and other general warnings yellow. Nominal = no aura, caution = steady, critical = pulsing. Injury/cardiovascular effects remain localized.
 - Mental Health Index (0–100) from biometrics, affect/voice, journal sentiment and PVT reaction time; a discrepancy alert goes to the astronaut only.
 - Escalation: caution → crew self-manage; critical or persistent caution → flight surgeon.
 - Stack: pnpm workspace; `frontend` (Next.js 16, React 19, Tailwind 4, three.js via React Three Fiber) and `backend` (`@aura/core`, pure TypeScript logic, Vitest). No database, no separate server.

@@ -18,7 +18,7 @@
 
 ## About
 
-A.U.R.A. is our entry for the NASA Space Apps Challenge 2026 challenge *Create Health Monitoring Software for Astronauts on Space Missions*. The dashboard shows a rotatable 3D astronaut. When a body or environment reading crosses a threshold, an aura appears around the astronaut: its color tells you which hazard it is, and a steady or pulsing glow tells you how serious it is. When everything is normal, there is no aura.
+A.U.R.A. is our entry for the NASA Space Apps Challenge 2026 challenge *Create Health Monitoring Software for Astronauts on Space Missions*. The dashboard shows a rotatable 3D astronaut. When a body or environment reading crosses a threshold, an aura appears around the astronaut: every critical condition is red, while caution colors identify general, temperature and environmental warnings. When everything is normal, there is no aura.
 
 Every alert explains itself: the reading, the threshold it crossed, the source of that threshold, a recommended action, and whether the crew can handle it or the flight surgeon on the ground needs to know. Radiation status is driven by real solar particle events from NASA's DONKI space weather database. Crew biometrics are simulated, because astronaut medical data is not public, and the app labels them as simulated.
 
@@ -26,29 +26,31 @@ Every alert explains itself: the reading, the threshold it crossed, the source o
 
 ## Key Features
 
-- **The aura:** one color per hazard, steady for caution, pulsing for critical. Injuries glow only on the affected body part.
+- **The aura:** red for every critical condition; caution uses yellow for general warnings, blue for low temperature, green for radiation and gray for air quality. Injuries glow only on the affected body part.
 - **Alerts that explain themselves:** reading, threshold, source citation, recommended action and who should respond on every alert.
 - **Crew first, then ground:** caution alerts go to the crew to self-manage; critical or long-lasting ones escalate to the flight surgeon.
-- **Real NASA data:** solar energetic particle events from NASA DONKI drive the radiation aura, and any real event can be replayed.
+- **Real NASA data:** recorded solar energetic particle events from NASA DONKI add a space-weather precaution and radiation aura. Replays show event ID/time and never infer a personal crew dose.
 - **Mental Health Index:** combines biometrics, voice/affect and a private journal into one score, and flags when they disagree (for example, the journal says "I'm fine" while the body shows strain). That flag goes to the astronaut only.
 - **Live demo scenarios:** one click triggers a solar particle event, CO leak, CO₂ buildup, cabin overheat or cold, fever, sleep deprivation, an EVA hand injury or the "I'm fine" discrepancy.
 - **Works offline:** a bundled copy of real NASA data is used automatically when the network or API is down.
 - **Measurements reference:** what is measured, with which onboard device, and why it matters in space.
 
-## Aura Colors
+## Updated Research and Indicators
 
-| Color | Hazard | Example trigger |
-|---|---|---|
-| 🟢 Green | Radiation | Solar particle event, high cumulative mission dose |
-| ⚪ Gray | Air quality | Carbon monoxide or CO₂ buildup |
-| 🟠 Orange | Cabin heat | Cabin temperature above the habitable range |
-| 🔵 Blue | Cabin cold | Cabin temperature below the habitable range |
-| 🟡 Yellow | Mental / cognitive | Low Mental Health Index |
-| 🔴 Red | Injury / cardiovascular | Injury or fever, shown on the affected body region |
+- On the first visit, a 28-second automatic demo operates the real controls, with Pause, Skip and Replay in Reference. The active area stays sharp while surrounding UI dims/blurs; captions occupy side space on desktop and the upper area on mobile. Completion/Skip is remembered locally. Demo data and sample journal entries are discarded and the previous session is restored.
+- Hand injury and Cabin cold open **Next steps**: deterministic findings, follow-up questions, referral guidance, source links and an optional Gemini evidence summary. Explicit urgent-symptom answers create report-based alerts; they do not invent sensor measurements. Medical protocol review is pending and treatment instructions are withheld.
+- To enable Gemini, add `GEMINI_API_KEY` to the root `.env.local` and restart the app. Optional `GEMINI_MODEL` defaults to `gemini-3.5-flash-lite` (verified with the configured key); the model must support the generateContent JSON-schema response format. Keep the key server-only. **Explain with Gemini** explicitly sends the incident report, structured answers and relevant simulated readings to Google; journal entries are not sent. No key/network/model response is required for rule-based next steps.
+- Gemini can return exact report excerpts and known source IDs only. Unrecognized fields, invented quotes/IDs, omitted critical findings and blocked/malformed responses are rejected. Severity, emergency escalation and guidance text are controlled by configuration. In-session response traces show source IDs and whether model output was accepted. No incident text is logged by the route. The route caps requests at 20/minute per server instance; a public deployment still needs appropriate access controls and provider-side quotas.
 
-No aura = nominal · steady glow = caution · pulsing glow = critical.
+- Every critical condition is red. Caution uses yellow for general warnings, blue for low temperatures, green for radiation and gray for air quality. Nominal has no aura; critical also pulses.
+- Five selectable AST demo profiles reproduce the supplied research rows. Supplied MHI values stay labeled as supplied until a scored journal check-in switches to the local three-source composite (biometrics, affect, journal; project-defined weights). PVT+ reaction time, lapses per 300-second test and absolute HRV bands are evaluated independently.
+- `backend/data/crew-sample.csv` preserves the supplied `sample.csv` byte for byte. All five rows and 45 numeric fields are checked against the profiles. CSV snapshots remain fixed until a scenario is started; missing heart rate, CO2 and acute Gy values are shown as not supplied. Viewing a static snapshot does not infer sustained exposure. Core-temperature markers identify their cause, and readouts retain enough decimal places to avoid rounding across alert boundaries.
+- CO has a team early warning at 10 ppm, 15 ppm long-duration context, escalation at the 55 ppm 7-day concentration reference, and critical at the 425 ppm 1-hour reference. The demo compares concentration; it does not establish exposure duration or confirm a fire.
+- Cabin temperature is nominal at 18.3-26.7 C and critical below 16 C or above 29 C. Core temperature is nominal at 36.5-37.5 C and critical below 35 C or at/above 39 C. Intervening values remain caution, including the clarified gaps in the source table.
+- Cumulative effective dose has a project warning above 150 mSv and a red career-dose review tier at 600 mSv; the career reference is not an acute emergency threshold. The independent experimental absorbed-dose input highlights a lower-abdomen research risk marker at 1 Gy, not a clinical diagnosis. Gy/mGy and mSv are not treated as interchangeable.
+- The Research data reference tab contains the supplied lab table and figures. They are static research references, not live lab or RR-1 feeds. DONKI remains the bundled real NASA dataset used by the app.
 
-Thresholds and their sources (NASA-STD-3001, NASA SMAC tables, peer-reviewed literature) are listed in [`research.md`](specs/001-aura-health-dashboard/research.md).
+Sources and operators live in `backend/config/aura.ts`. Project-defined bands and unverified source transcriptions are labeled in the UI. The implementation record is in [updated-data.md](specs/002-research-alignment/updated-data.md). The latest paper audit, checklist evidence and injury-first presenter script are in [judging-readiness.md](specs/002-research-alignment/judging-readiness.md).
 
 ## Tech Stack
 

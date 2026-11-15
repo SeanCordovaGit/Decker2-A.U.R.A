@@ -137,7 +137,7 @@ The radiation reading can be driven by NASA's Rodent Research-1 (RR-1) accumulat
 
 **Colour system**
 
-- **FR-019**: The shipped colour rules MUST stay: colour = hazard category (radiation green, air gray, cabin heat orange, cabin cold blue, mental yellow, injury red on the affected body part), severity = steady (caution) or pulsing (critical), nominal = no aura. The research document's colour table is updated by the team to match; the draft's blue default, red radiation, yellow CO and red-brain proposals are not adopted.
+- **FR-019** (amended 2026-11-15): Every critical condition MUST use red. At caution, radiation uses green, air quality gray, lowered temperature blue, and other general warnings yellow. Nominal shows no aura; caution is steady and critical also pulses. Injury/cardiovascular effects stay localized. The updated team action-indicator table supersedes the previous category-only scheme.
 
 **Sources and data**
 
