@@ -92,3 +92,19 @@ describe("condition workflows", () => {
     expect(() => validateWorkflowInput(base("fever", { mhiIndex: 140 }))).toThrow();
   });
 });
+
+
+it("retains flight-surgeon referral at the CO caution escalation reference", () => {
+  const plan = buildWorkflow(base("co", { readings: { co: 55 } }));
+  expect(plan.severity).toBe("caution");
+  expect(plan.responder).toBe("flightSurgeon");
+  expect(plan.status).toContain("Flight surgeon");
+});
+
+
+it("uses assessment guidance for unreviewed equipment responses", () => {
+  const co2 = buildWorkflow(base("co2", { readings: { co2: 5.5 } }));
+  expect(co2.steps.find(step => step.id === "co2-r2")!.text).toContain("mission-control direction");
+  expect(co2.steps.some(step => step.text.includes("Activate emergency CDRA"))).toBe(false);
+  expect(co2.protocolReview).toBe("pending");
+});

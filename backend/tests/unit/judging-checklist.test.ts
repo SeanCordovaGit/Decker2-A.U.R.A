@@ -106,3 +106,27 @@ describe("incident evidence lifetime", () => {
     useAuraStore.getState().reset();
   });
 });
+
+
+describe("feedback replay dose separation", () => {
+  it("keeps personal dose unchanged through ticks of a recorded event alongside an injury", () => {
+    useAuraStore.getState().selectCrew(null);
+    useAuraStore.getState().triggerScenario("evaHandInjury");
+    const before = useAuraStore.getState().readings.cumulativeDose;
+    useAuraStore.getState().replaySep(parseSepEvents(cache.raw)[0]);
+    for (let i = 0; i < 30; i++) useAuraStore.getState().tick();
+    expect(useAuraStore.getState().readings.cumulativeDose).toBe(before);
+    expect(useAuraStore.getState().readings.injuries.rightHand).toBe("critical");
+    useAuraStore.getState().selectCrew(null);
+  });
+  it("advances history after manually editing a CSV snapshot", () => {
+    useAuraStore.getState().selectCrew("AST-001");
+    useAuraStore.getState().setManualVital("coreTemp", 39.4);
+    const count = useAuraStore.getState().history.length;
+    useAuraStore.getState().tick();
+    expect(useAuraStore.getState().history.length).toBe(count + 1);
+    expect(useAuraStore.getState().alerts.find((alert) => alert.metric === "coreTemp")?.severity).toBe("critical");
+    expect(useAuraStore.getState().readings.coreTemp).toBe(39.4);
+    useAuraStore.getState().selectCrew(null);
+  });
+});
