@@ -21,7 +21,7 @@ describe("condition workflows", () => {
       expect(SCENARIOS.some((scenario) => scenario.id === workflow.scenarioId)).toBe(true);
       expect(workflowForScenario(workflow.scenarioId)).toBe(kind);
     }
-    expect(workflowForScenario("imFine")).toBeNull();
+    expect(workflowForScenario("imFine")).toBe("distress");
   });
 
   it("switches fever steps and status between caution and critical from the core reading", () => {

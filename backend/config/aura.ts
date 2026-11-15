@@ -16,6 +16,7 @@ import type {
 } from "../lib/types";
 
 export const CITATIONS: Record<string, Citation> = {
+  teamMentalCheckIn: { id: "teamMentalCheckIn", text: "Team-designed optional check-in prompts for duration, task impact and support preference. Answers provide context; this demonstration is not a diagnostic assessment. Medical review pending.", verified: true, teamDefined: true },
   teamGammaDemo: { id: "teamGammaDemo", text: "Team-requested simulated gamma-radiation dose trend and precaution. Generated demonstration values; no gamma sensor or measured gamma spectrum is connected.", verified: true, teamDefined: true },
   teamHeartRate: { id: "teamHeartRate", text: "Team-confirmed heart-rate demo bands: 60-100 bpm nominal, above 100 and below 140 caution, below 60 or at least 140 critical. Project-defined assessment triggers; activity and individual baseline require medical context.", verified: true, teamDefined: true },
   donkiSep: { id: "donkiSep", text: "NASA CCMC DONKI recorded SEP event. A replay activates a project-defined space-weather precaution only; it is not current telemetry or a crew-dose measurement.", url: "https://ccmc.gsfc.nasa.gov/tools/DONKI/", verified: true, teamDefined: true },

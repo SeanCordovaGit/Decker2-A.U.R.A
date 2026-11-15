@@ -1,9 +1,10 @@
 import type { BodyRegion, HazardCategory } from "../lib/types";
 import { ruleFor } from "./aura";
 
-export type WorkflowKind = "hand" | "cold" | "sep" | "acuteDose" | "co" | "co2" | "overheat" | "fever" | "sleep";
+export type WorkflowKind = "hand" | "cold" | "sep" | "acuteDose" | "co" | "co2" | "overheat" | "fever" | "sleep" | "distress";
 export interface WorkflowStep { id: string; text: string; treatment: false }
-export interface WorkflowQuestion { id: string; text: string; urgent: boolean }
+export type WorkflowAnswer = "yes" | "no" | "unknown" | "today" | "days" | "weeks" | "longer";
+export interface WorkflowQuestion { id: string; text: string; urgent: boolean; options?: readonly { value: WorkflowAnswer; label: string }[] }
 export interface WorkflowConfig {
   title: string;
   scenarioId: string;
@@ -27,6 +28,32 @@ const step = (id: string, text: string): WorkflowStep => ({ id, text, treatment:
 const CRITICAL_STATUS = "Flight surgeon / crew medical officer assessment indicated.";
 
 export const WORKFLOWS: Record<WorkflowKind, WorkflowConfig> = {
+  distress: {
+    title: "Mental Distress", scenarioId: "imFine", category: "mental", sourceId: "teamMentalCheckIn",
+    alertKeys: ["discrepancy", "mhi", "pvtReactionMs", "pvtLapses", "hrv"],
+    placeholder: "Describe how you are feeling, if you would like to share.",
+    status: { caution: "Optional private check-in; review the readings and how you feel.", critical: CRITICAL_STATUS },
+    questions: [
+      { id: "distress-duration", text: "How long have you felt this way?", urgent: false, options: [
+        { value: "unknown", label: "Prefer not to say / unsure" },
+        { value: "today", label: "Today" }, { value: "days", label: "A few days" },
+        { value: "weeks", label: "A few weeks" }, { value: "longer", label: "Longer" },
+      ] },
+      { id: "distress-function", text: "Is this affecting your sleep, concentration or ability to complete tasks?", urgent: false },
+      { id: "distress-support", text: "Would you like to request support from the crew medical officer?", urgent: false },
+    ],
+    steps: [
+      step("distress-c1", "Review the simulated readings and any discrepancy below alongside your own account."),
+      step("distress-c2", "Share only the check-in details you choose. Duration and task-impact answers provide context."),
+      step("distress-c3", "If you want support, contact the crew medical officer through your approved private channel."),
+    ],
+    criticalSteps: [
+      step("distress-r1", "Request flight-surgeon or crew-medical-officer assessment of the flagged fatigue readings using the applicable mission procedure."),
+      step("distress-r2", "Choose which personal check-in details to share through the mission's private medical channel."),
+      step("distress-r3", "Review fitness for safety-critical tasks against the mission-approved fatigue criteria."),
+    ],
+  },
+
   hand: {
     title: "Right-hand injury", scenarioId: "evaHandInjury", category: "injury", regions: ["rightHand"],
     sourceId: "handUrgentReference", sourceUrl: "https://www.healthdirect.gov.au/accidents-and-injuries/hand-and-finger-fractures",

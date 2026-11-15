@@ -1,9 +1,9 @@
 import { CITATIONS } from "../config/aura";
-import { URGENT_REPORT_ACTION, WORKFLOWS, type WorkflowKind } from "../config/workflows";
+import { URGENT_REPORT_ACTION, WORKFLOWS, type WorkflowKind, type WorkflowAnswer } from "../config/workflows";
 import { buildAlerts, evaluateMetrics, formatMetricValue, maxSeverity } from "./evaluate";
 import { computeMhi } from "./mhi";
 import { NOMINAL_READINGS } from "./simulation";
-import type { Severity } from "./types";
+import type { MhiSource, Severity } from "./types";
 
 /** Readings a workflow may receive to rebuild its alert-based findings. */
 export const WORKFLOW_METRICS = ["heartRate", "doseRate", "cumulativeDose", "absorbedDoseGy", "co", "co2", "cabinTemp", "coreTemp", "pvtReactionMs", "pvtLapses", "hrv"] as const;
@@ -12,7 +12,7 @@ type WorkflowMetric = (typeof WORKFLOW_METRICS)[number];
 export interface WorkflowInput {
   kind: WorkflowKind;
   report: string;
-  answers: Record<string, "yes" | "no" | "unknown">;
+  answers: Record<string, WorkflowAnswer>;
   cabinTemp: number;
   coreTemp: number;
   injurySeverity: Severity;
@@ -21,14 +21,16 @@ export interface WorkflowInput {
   sepActive?: boolean;
   gammaActive?: boolean;
   mhiIndex?: number;
+  mhiSources?: Partial<Record<MhiSource, number | null>>;
 }
 
 export function buildWorkflow(input: WorkflowInput) {
   const config = WORKFLOWS[input.kind];
   const urgentAnswers = config.questions.filter((question) => question.urgent && input.answers[question.id] === "yes");
-  const urgentReport = !!input.reportedUrgent || urgentAnswers.length > 0;
+  const urgentReport = input.kind !== "distress" && (!!input.reportedUrgent || urgentAnswers.length > 0);
   const readings = { ...NOMINAL_READINGS, ...input.readings, cabinTemp: input.cabinTemp, coreTemp: input.coreTemp, sepActive: !!input.sepActive, gammaActive: !!input.gammaActive };
-  const metricAlerts = buildAlerts(readings, evaluateMetrics(readings), computeMhi({}, input.mhiIndex ?? 92), 0);
+  const mhi = computeMhi(input.mhiSources ?? {}, input.mhiSources ? null : input.mhiIndex ?? 92);
+  const metricAlerts = buildAlerts(readings, evaluateMetrics(readings), mhi, 0);
   const alertKey = (alert: (typeof metricAlerts)[number]) => alert.metric ?? (alert.key.startsWith("sep") ? "sep" : alert.key);
   const relevantAlerts = metricAlerts.filter((alert) => config.alertKeys?.includes(alertKey(alert)));
   const findings = input.kind === "hand" ? [{ id: "hand-report", text: `Simulated crew-reported right-hand injury: ${input.injurySeverity}.`, severity: input.injurySeverity, sourceId: "teamInjury" }] : relevantAlerts.map((alert) => ({ id: alertKey(alert), text: `${alert.title}: ${alert.valueText}. ${alert.thresholdText}.`, severity: alert.severity, sourceId: alert.citation.id }));
@@ -43,7 +45,7 @@ export function buildWorkflow(input: WorkflowInput) {
     ? [...(severity === "critical" ? config.criticalSteps : config.steps)]
     : [...config.steps, { id: "escalation", text: severity === "critical" ? URGENT_REPORT_ACTION : "Crew review is indicated by the current demo rules. Unanswered questions or unmeasured symptoms can still require medical assessment.", treatment: false as const }];
   const status = config.status ? (responder === "flightSurgeon" ? config.status.critical : severity === "caution" ? config.status.caution : "No configured threshold is crossed yet; keep monitoring.") : null;
-  return { title: config.title, severity, responder, urgentReport, status, placeholder: config.placeholder ?? null, protocolReview: "pending" as const, questions: config.questions, findings, steps, sources: findings.map((finding) => ({ id: finding.id, citation: CITATIONS[finding.sourceId] })) };
+  return { title: config.title, severity, responder, urgentReport, supportRequested: input.kind === "distress" && input.answers["distress-support"] === "yes", status, placeholder: config.placeholder ?? null, protocolReview: "pending" as const, questions: config.questions, findings, steps, sources: findings.map((finding) => ({ id: finding.id, citation: CITATIONS[finding.sourceId] })) };
 }
 
 export type WorkflowPlan = ReturnType<typeof buildWorkflow>;
@@ -55,14 +57,18 @@ export function validateWorkflowInput(value: unknown): WorkflowInput {
   if (typeof input.kind !== "string" || !Object.hasOwn(WORKFLOWS, input.kind) || typeof input.report !== "string" || !input.report.trim() || input.report.length > 2000) throw new Error("Choose a workflow and provide a report of 1–2000 characters.");
   if (!Number.isFinite(input.cabinTemp) || !Number.isFinite(input.coreTemp) || !["nominal", "caution", "critical"].includes(input.injurySeverity)) throw new Error("Invalid readings");
   if (!input.answers || typeof input.answers !== "object" || Array.isArray(input.answers)) throw new Error("Invalid answers");
-  const ids: readonly string[] = WORKFLOWS[input.kind].questions.map((question) => question.id);
-  if (Object.entries(input.answers).some(([id, answer]) => !ids.includes(id) || !["yes", "no", "unknown"].includes(answer))) throw new Error("Invalid follow-up answer");
+  for (const [id, answer] of Object.entries(input.answers)) {
+    const question = WORKFLOWS[input.kind].questions.find((item) => item.id === id);
+    const allowed = question?.options?.map((option) => option.value) ?? ["yes", "no", "unknown"];
+    if (!question || !allowed.includes(answer)) throw new Error("Invalid follow-up answer");
+  }
   if (input.reportedUrgent !== undefined && typeof input.reportedUrgent !== "boolean") throw new Error("Invalid report flag");
   if (input.readings !== undefined && (!input.readings || typeof input.readings !== "object" || Array.isArray(input.readings) || Object.entries(input.readings).some(([key, value]) => !(WORKFLOW_METRICS as readonly string[]).includes(key) || !Number.isFinite(value)))) throw new Error("Invalid readings");
   if (input.sepActive !== undefined && typeof input.sepActive !== "boolean") throw new Error("Invalid SEP flag");
   if (input.gammaActive !== undefined && typeof input.gammaActive !== "boolean") throw new Error("Invalid gamma flag");
   if (input.mhiIndex !== undefined && (!Number.isFinite(input.mhiIndex) || input.mhiIndex < 0 || input.mhiIndex > 100)) throw new Error("Invalid MHI");
-  return { kind: input.kind, report: input.report.trim(), answers: input.answers, cabinTemp: input.cabinTemp, coreTemp: input.coreTemp, injurySeverity: input.injurySeverity, reportedUrgent: input.reportedUrgent, readings: input.readings, sepActive: input.sepActive, gammaActive: input.gammaActive, mhiIndex: input.mhiIndex };
+  if (input.mhiSources !== undefined && (!input.mhiSources || typeof input.mhiSources !== "object" || Array.isArray(input.mhiSources) || Object.entries(input.mhiSources).some(([key, score]) => !["biometrics", "affect", "journal"].includes(key) || (score !== null && (!Number.isFinite(score) || score < 0 || score > 100))))) throw new Error("Invalid MHI sources");
+  return { kind: input.kind, report: input.report.trim(), answers: input.answers, cabinTemp: input.cabinTemp, coreTemp: input.coreTemp, injurySeverity: input.injurySeverity, reportedUrgent: input.reportedUrgent, readings: input.readings, sepActive: input.sepActive, gammaActive: input.gammaActive, mhiIndex: input.mhiIndex, mhiSources: input.mhiSources };
 }
 
 export function validateExplanation(value: unknown, report: string, plan: WorkflowPlan): GroundedExplanation {
