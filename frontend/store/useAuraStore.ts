@@ -5,7 +5,7 @@ import { ESCALATION } from "@aura/core/config/aura";
 import { buildAlerts, evaluateCategories, evaluateMetrics } from "@aura/core/lib/evaluate";
 import { biometricScore, computeMhi } from "@aura/core/lib/mhi";
 import { crewProfile } from "@aura/core/lib/research-data";
-import type { WorkflowKind } from "@aura/core/config/workflows";
+import type { WorkflowKind, WorkflowAnswer } from "@aura/core/config/workflows";
 import { scenarioById } from "@aura/core/lib/scenarios";
 import { scoreSentiment } from "@aura/core/lib/sentiment";
 import { NOMINAL_READINGS, clampReadings, tickReadings } from "@aura/core/lib/simulation";
@@ -34,7 +34,7 @@ interface Derived {
   rawAlerts: Alert[];
 }
 
-type IncidentReport = { report: string; answers: Record<string, "yes" | "no" | "unknown"> };
+type IncidentReport = { report: string; answers: Record<string, WorkflowAnswer> };
 export type ManualVital = "heartRate" | "coreTemp" | "pvtReactionMs";
 
 interface AuraState extends Derived {
@@ -48,6 +48,7 @@ interface AuraState extends Derived {
   scenarioStart: number;
   replayEvent: SpaceWeatherEvent | null;
   journal: JournalEntry[];
+  checkInJournalEntry: string | null;
   alerts: Alert[];
   openedAt: Record<string, number>;
   log: AlertLogEntry[];
@@ -125,6 +126,7 @@ function initial(selectedCrewId: string | null = null) {
     scenarioStart: 0,
     replayEvent: null as SpaceWeatherEvent | null,
     journal: [] as JournalEntry[],
+    checkInJournalEntry: null as string | null,
     incidentReports: {} as Partial<Record<WorkflowKind, IncidentReport>>,
     manual: {} as Partial<Record<ManualVital, number>>,
     alerts: [] as Alert[],
@@ -178,7 +180,7 @@ export const useAuraStore = create<AuraState>((set, get) => {
       const start = scenario.targets(0);
       const readings = clampReadings({ ...fresh.readings, ...start, cumulativeDose: Math.max(fresh.readings.cumulativeDose, start.cumulativeDose ?? 0), absorbedDoseGy: Math.max(fresh.readings.absorbedDoseGy, start.absorbedDoseGy ?? 0) });
       const cleared = reconcile([], s.alerts, {}, s.t, s.logSeq);
-      set({ ...fresh, readings, history: [point(readings)], providedMhiScore: null, scenarioId: id, scenarioStart: s.t, t: s.t, alerts: [], openedAt: {}, log: [...cleared.entries, ...s.log].slice(0, LOG_LEN), logSeq: cleared.seq });
+      set({ ...fresh, checkInJournalEntry: id === "imFine" ? s.scenarioId === "imFine" ? s.checkInJournalEntry : s.journal.at(-1)?.text ?? null : null, readings, history: [point(readings)], providedMhiScore: null, scenarioId: id, scenarioStart: s.t, t: s.t, alerts: [], openedAt: {}, log: [...cleared.entries, ...s.log].slice(0, LOG_LEN), logSeq: cleared.seq });
       if (scenario.journalText) get().submitJournal(scenario.journalText);
       get().tick();
     },
