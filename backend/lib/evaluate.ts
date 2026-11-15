@@ -107,7 +107,7 @@ export function evaluateCategories(
   }
 
   // Active solar particle event forces radiation to at least caution
-  if (readings.sepActive) {
+  if (readings.sepActive || readings.gammaActive) {
     statuses.radiation.severity = maxSeverity(statuses.radiation.severity, "caution");
   }
 
@@ -234,17 +234,18 @@ export function buildAlerts(
     }
   }
 
-  if (readings.sepActive) {
+  if (readings.sepActive || readings.gammaActive) {
     const event = readings.sepEvent;
+    const gamma = !!readings.gammaActive && !event;
     alerts.push({
-      key: event ? `sep:${event.id}` : "sep",
+      key: event ? `sep:${event.id}` : gamma ? "gamma" : "sep",
       category: "radiation",
-      title: event ? "NASA SEP precaution (recorded replay)" : "Simulated solar particle event",
+      title: event ? "NASA SEP precaution (recorded replay)" : gamma ? "Gamma Radiation (simulated)" : "Simulated solar particle event",
       severity: "caution",
-      valueText: event ? `${event.id} · ${event.eventTime}` : "Simulated SEP condition; not a NASA observation",
-      thresholdText: event ? "Recorded SEP replay → project precaution; not a crew-dose measurement or a current-event claim" : "Project-defined simulated SEP precaution",
-      citation: event ? { ...CITATIONS.donkiSep, url: event.link ?? CITATIONS.donkiSep.url } : CITATIONS.teamDoseRate,
-      action: "Review the recorded event with mission control. Current radiation assessment requires personal/area dosimetry, exposure timing and shielding/location information.",
+      valueText: event ? `${event.id} · ${event.eventTime}` : gamma ? "Simulated gamma-dose condition" : "Simulated SEP condition; not a NASA observation",
+      thresholdText: event ? "Recorded SEP replay → project precaution; not a crew-dose measurement or a current-event claim" : gamma ? "Project-defined simulated gamma precaution" : "Project-defined simulated SEP precaution",
+      citation: event ? { ...CITATIONS.donkiSep, url: event.link ?? CITATIONS.donkiSep.url } : gamma ? CITATIONS.teamGammaDemo : CITATIONS.teamDoseRate,
+      action: event ? "Review the recorded event with mission control. Current radiation assessment requires personal/area dosimetry, exposure timing and shielding/location information." : "Review the simulated dose trend. A mission assessment requires personal/area dosimetry, exposure timing and shielding/location information.",
       escalation: "crew",
       escalated: false,
       toAstronautOnly: false,

@@ -72,7 +72,7 @@ describe("scenario isolation", () => {
     expect(s.metrics.find((metric) => metric.metric === "coreTemp")!.severity).toBe("critical");
     expect(s.metrics.find((metric) => metric.metric === "pvtReactionMs")!.severity).toBe("critical");
     expect(s.readings.heartRate).toBe(150);
-    expect(s.alerts.some((alert) => alert.metric === "heartRate")).toBe(false);
+    expect(s.alerts.find((alert) => alert.metric === "heartRate")?.severity).toBe("critical");
     store().triggerScenario("fever");
     expect(store().manual).toEqual({});
   });

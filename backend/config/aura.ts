@@ -16,6 +16,8 @@ import type {
 } from "../lib/types";
 
 export const CITATIONS: Record<string, Citation> = {
+  teamGammaDemo: { id: "teamGammaDemo", text: "Team-requested simulated gamma-radiation dose trend and precaution. Generated demonstration values; no gamma sensor or measured gamma spectrum is connected.", verified: true, teamDefined: true },
+  teamHeartRate: { id: "teamHeartRate", text: "Team-confirmed heart-rate demo bands: 60-100 bpm nominal, above 100 and below 140 caution, below 60 or at least 140 critical. Project-defined assessment triggers; activity and individual baseline require medical context.", verified: true, teamDefined: true },
   donkiSep: { id: "donkiSep", text: "NASA CCMC DONKI recorded SEP event. A replay activates a project-defined space-weather precaution only; it is not current telemetry or a crew-dose measurement.", url: "https://ccmc.gsfc.nasa.gov/tools/DONKI/", verified: true, teamDefined: true },
   handUrgentReference: { id: "handUrgentReference", text: "Public hand/finger-injury urgent-assessment reference (healthdirect). Mission adaptation and medical review pending; not an onboard treatment protocol.", url: "https://www.healthdirect.gov.au/accidents-and-injuries/hand-and-finger-fractures", verified: false, teamDefined: true },
   teamSymptomReport: { id: "teamSymptomReport", text: "Team-supplied clarifying questions and next steps. A Yes to a symptom question escalates by project rule; it is not a sensor reading, diagnosis or mission-approved protocol.", verified: true, teamDefined: true },
@@ -134,7 +136,7 @@ export const NOTIFICATION_PRIORITIES: readonly {
   categories?: readonly HazardCategory[];
 }[] = [
   { rank: 1, label: "Toxic gas (CO / CO2)", categories: ["air"], keys: ["injury:co-exposure"] },
-  { rank: 2, label: "Acute absorbed dose / SEP precaution", metrics: ["absorbedDoseGy"], keys: ["report:acuteDose", "report:sep", "sep"], keyPrefixes: ["sep:"] },
+  { rank: 2, label: "Acute radiation / gamma demo / SEP precaution", metrics: ["absorbedDoseGy"], keys: ["report:acuteDose", "report:sep", "sep", "gamma"], keyPrefixes: ["sep:"] },
   { rank: 3, label: "Core thermoregulation", metrics: ["coreTemp"], keys: ["report:fever"] },
   { rank: 4, label: "Physical injury / cardiovascular", categories: ["injury"] },
   { rank: 5, label: "Cabin thermal conditions", categories: ["cabinHot", "cabinCold"] },
@@ -233,6 +235,23 @@ export const THRESHOLD_RULES: ThresholdRule[] = [
       critical: "Request prompt flight-surgeon assessment of core temperature and symptoms using the applicable mission medical procedure.",
     },
     regions: ["chest"],
+  },
+  {
+    metric: "heartRate",
+    label: "Heart rate",
+    unit: "bpm",
+    category: "injury",
+    cautionHigh: 100,
+    cautionHighExclusive: true,
+    criticalHigh: 140,
+    criticalLow: 60,
+    criticalLowExclusive: true,
+    citationId: "teamHeartRate",
+    regions: ["chest"],
+    actions: {
+      caution: "Report heart rate, activity level, symptoms and recent trend for crew-medical-officer assessment.",
+      critical: "Request prompt flight-surgeon assessment of heart rate and symptoms using the applicable mission medical procedure.",
+    },
   },
   { metric: "pvtReactionMs", label: "PVT+ mean reaction time", unit: "ms", category: "mental", cautionHigh: 250, criticalHigh: 350, criticalHighExclusive: true, citationId: "pvtPlus", actions: MENTAL_ACTIONS },
   { metric: "pvtLapses", label: "PVT+ lapses", unit: "lapses / 300 s", category: "mental", cautionHigh: 3, criticalHigh: 5, citationId: "pvtPlus", actions: MENTAL_ACTIONS },

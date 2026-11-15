@@ -192,13 +192,13 @@ export const useAuraStore = create<AuraState>((set, get) => {
 
     replaySep: (event) => {
       const s = get();
-      const readings = { ...s.readings, sepActive: true, sepEvent: event };
+      const readings = { ...s.readings, gammaActive: false, sepActive: true, sepEvent: event };
       set({ replayEvent: event, scenarioId: s.scenarioId === "sep" ? null : s.scenarioId, readings, ...apply(readings, s.journal, s.t, s.providedMhiScore) });
     },
 
     clearSepReplay: () => {
       const s = get();
-      const readings = { ...s.readings, sepActive: s.scenarioId === "sep", sepEvent: undefined };
+      const readings = { ...s.readings, sepActive: false, sepEvent: undefined };
       set({ replayEvent: null, readings, ...apply(readings, s.journal, s.t, s.providedMhiScore) });
     },
 

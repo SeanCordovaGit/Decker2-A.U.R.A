@@ -44,6 +44,7 @@ export interface Readings {
   absorbedDoseGy: number; // independent acute absorbed dose, never derived from mSv
   injuries: Partial<Record<BodyRegion, Severity>>;
   reportedConcerns?: Partial<Record<WorkflowKind, boolean>>;
+  gammaActive?: boolean;
   sepActive: boolean;
   sepEvent?: SpaceWeatherEvent;
 }

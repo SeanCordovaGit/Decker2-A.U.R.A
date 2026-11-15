@@ -57,15 +57,18 @@ describe("judging checklist: functional real NASA input", () => {
     expect(useAuraStore.getState().readings.injuries).toEqual(before.readings.injuries);
     useAuraStore.getState().selectCrew(null);
   });
-  it("labels a synthetic SEP scenario as simulation", () => {
+  it("labels the gamma scenario as simulation", () => {
     useAuraStore.getState().selectCrew(null);
     useAuraStore.getState().triggerScenario("sep");
-    const alert = useAuraStore.getState().alerts.find((item) => item.key === "sep")!;
+    const alert = useAuraStore.getState().alerts.find((item) => item.key === "gamma")!;
     expect(alert.valueText).toContain("Simulated");
+    expect(alert.citation.id).toBe("teamGammaDemo");
+    expect(useAuraStore.getState().readings.gammaActive).toBe(true);
+    expect(useAuraStore.getState().readings.sepActive).toBe(false);
     expect(useAuraStore.getState().readings.absorbedDoseGy).toBe(NOMINAL_READINGS.absorbedDoseGy);
     useAuraStore.getState().selectCrew(null);
   });
-  it("stops the synthetic SEP dose ramp when a real catalog replay is chosen", () => {
+  it("stops the simulated gamma dose ramp when a real catalog replay is chosen", () => {
     useAuraStore.getState().selectCrew(null);
     useAuraStore.getState().triggerScenario("sep");
     const before = useAuraStore.getState().readings.cumulativeDose;

@@ -87,7 +87,7 @@ describe("condition workflows", () => {
   it("validates new kinds and rejects unknown readings", () => {
     const valid = validateWorkflowInput(base("fever", { readings: { coreTemp: 38 }, mhiIndex: 70, sepActive: false }));
     expect(valid.kind).toBe("fever");
-    expect(() => validateWorkflowInput(base("fever", { readings: { heartRate: 90 } as never }))).toThrow();
+    expect(() => validateWorkflowInput(base("fever", { readings: { unrecognizedSensor: 90 } as never }))).toThrow();
     expect(() => validateWorkflowInput({ ...base("fever"), kind: "toString" })).toThrow();
     expect(() => validateWorkflowInput(base("fever", { mhiIndex: 140 }))).toThrow();
   });
@@ -107,4 +107,12 @@ it("uses assessment guidance for unreviewed equipment responses", () => {
   expect(co2.steps.find(step => step.id === "co2-r2")!.text).toContain("mission-control direction");
   expect(co2.steps.some(step => step.text.includes("Activate emergency CDRA"))).toBe(false);
   expect(co2.protocolReview).toBe("pending");
+});
+
+
+it("keeps gamma simulation evidence distinct from recorded solar particles", () => {
+  const plan = buildWorkflow(base("sep", { gammaActive: true, readings: { cumulativeDose: 140 } }));
+  expect(plan.title).toBe("Gamma Radiation (simulated)");
+  expect(plan.findings[0].id).toBe("gamma");
+  expect(plan.sources[0].citation.id).toBe("teamGammaDemo");
 });

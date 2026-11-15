@@ -17,6 +17,7 @@ export const NOMINAL_READINGS: Readings = {
   pvtLapses: 1,
   absorbedDoseGy: 0,
   injuries: {},
+  gammaActive: false,
   sepActive: false,
 };
 
@@ -80,12 +81,13 @@ export function tickReadings(
   // Heart rate follows resting HR plus activity
   next.heartRate = next.restingHeartRate + next.activityLevel * 70 + ((rand() - 0.5) * 2);
 
-  // Only a simulated SEP integrates dose; a recorded catalog event supplies no personal dosimetry.
-  next.cumulativeDose = Math.max(prev.cumulativeDose, targets.cumulativeDose ?? prev.cumulativeDose + (targets.sepActive && !targets.sepEvent ? next.doseRate * 0.02 : 0));
+  // Only simulated radiation integrates dose; a recorded catalog event supplies no personal dosimetry.
+  next.cumulativeDose = Math.max(prev.cumulativeDose, targets.cumulativeDose ?? prev.cumulativeDose + ((targets.gammaActive || targets.sepActive) && !targets.sepEvent ? next.doseRate * 0.02 : 0));
 
   next.pvtLapses = Math.round(goal.pvtLapses);
   next.absorbedDoseGy = Math.max(prev.absorbedDoseGy, targets.absorbedDoseGy ?? prev.absorbedDoseGy);
   next.injuries = { ...(targets.injuries ?? {}) };
+  next.gammaActive = targets.gammaActive ?? false;
   next.sepActive = targets.sepActive ?? false;
   next.sepEvent = targets.sepEvent;
   return clampReadings(next);

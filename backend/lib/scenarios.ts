@@ -7,9 +7,9 @@ const ramp = (elapsed: number, seconds: number, from: number, to: number) =>
 export const SCENARIOS: Scenario[] = [
   {
     id: "sep",
-    label: "Solar particle event",
-    description: "Radiation dose rate spikes during a solar energetic particle event.",
-    targets: (t) => ({ doseRate: ramp(t, 8, 3, 14), cumulativeDose: ramp(t, 12, 140, 650), sepActive: true }),
+    label: "Gamma Radiation (simulated)",
+    description: "Simulated gamma-radiation dose trend for the research demonstration; independently measured dosimetry would be needed in a mission.",
+    targets: (t) => ({ doseRate: ramp(t, 8, 3, 14), cumulativeDose: ramp(t, 12, 140, 650), gammaActive: true, sepActive: false }),
   },
   {
     id: "acuteDose", label: "Acute absorbed dose", description: "Independent experimental absorbed-dose input in Gy; does not convert mSv or diagnose injury.",

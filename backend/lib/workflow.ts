@@ -6,7 +6,7 @@ import { NOMINAL_READINGS } from "./simulation";
 import type { Severity } from "./types";
 
 /** Readings a workflow may receive to rebuild its alert-based findings. */
-export const WORKFLOW_METRICS = ["doseRate", "cumulativeDose", "absorbedDoseGy", "co", "co2", "cabinTemp", "coreTemp", "pvtReactionMs", "pvtLapses", "hrv"] as const;
+export const WORKFLOW_METRICS = ["heartRate", "doseRate", "cumulativeDose", "absorbedDoseGy", "co", "co2", "cabinTemp", "coreTemp", "pvtReactionMs", "pvtLapses", "hrv"] as const;
 type WorkflowMetric = (typeof WORKFLOW_METRICS)[number];
 
 export interface WorkflowInput {
@@ -19,6 +19,7 @@ export interface WorkflowInput {
   reportedUrgent?: boolean;
   readings?: Partial<Record<WorkflowMetric, number>>;
   sepActive?: boolean;
+  gammaActive?: boolean;
   mhiIndex?: number;
 }
 
@@ -26,7 +27,7 @@ export function buildWorkflow(input: WorkflowInput) {
   const config = WORKFLOWS[input.kind];
   const urgentAnswers = config.questions.filter((question) => question.urgent && input.answers[question.id] === "yes");
   const urgentReport = !!input.reportedUrgent || urgentAnswers.length > 0;
-  const readings = { ...NOMINAL_READINGS, ...input.readings, cabinTemp: input.cabinTemp, coreTemp: input.coreTemp, sepActive: !!input.sepActive };
+  const readings = { ...NOMINAL_READINGS, ...input.readings, cabinTemp: input.cabinTemp, coreTemp: input.coreTemp, sepActive: !!input.sepActive, gammaActive: !!input.gammaActive };
   const metricAlerts = buildAlerts(readings, evaluateMetrics(readings), computeMhi({}, input.mhiIndex ?? 92), 0);
   const alertKey = (alert: (typeof metricAlerts)[number]) => alert.metric ?? (alert.key.startsWith("sep") ? "sep" : alert.key);
   const relevantAlerts = metricAlerts.filter((alert) => config.alertKeys?.includes(alertKey(alert)));
@@ -59,8 +60,9 @@ export function validateWorkflowInput(value: unknown): WorkflowInput {
   if (input.reportedUrgent !== undefined && typeof input.reportedUrgent !== "boolean") throw new Error("Invalid report flag");
   if (input.readings !== undefined && (!input.readings || typeof input.readings !== "object" || Array.isArray(input.readings) || Object.entries(input.readings).some(([key, value]) => !(WORKFLOW_METRICS as readonly string[]).includes(key) || !Number.isFinite(value)))) throw new Error("Invalid readings");
   if (input.sepActive !== undefined && typeof input.sepActive !== "boolean") throw new Error("Invalid SEP flag");
+  if (input.gammaActive !== undefined && typeof input.gammaActive !== "boolean") throw new Error("Invalid gamma flag");
   if (input.mhiIndex !== undefined && (!Number.isFinite(input.mhiIndex) || input.mhiIndex < 0 || input.mhiIndex > 100)) throw new Error("Invalid MHI");
-  return { kind: input.kind, report: input.report.trim(), answers: input.answers, cabinTemp: input.cabinTemp, coreTemp: input.coreTemp, injurySeverity: input.injurySeverity, reportedUrgent: input.reportedUrgent, readings: input.readings, sepActive: input.sepActive, mhiIndex: input.mhiIndex };
+  return { kind: input.kind, report: input.report.trim(), answers: input.answers, cabinTemp: input.cabinTemp, coreTemp: input.coreTemp, injurySeverity: input.injurySeverity, reportedUrgent: input.reportedUrgent, readings: input.readings, sepActive: input.sepActive, gammaActive: input.gammaActive, mhiIndex: input.mhiIndex };
 }
 
 export function validateExplanation(value: unknown, report: string, plan: WorkflowPlan): GroundedExplanation {

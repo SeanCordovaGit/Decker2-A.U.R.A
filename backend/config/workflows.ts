@@ -54,8 +54,8 @@ export const WORKFLOWS: Record<WorkflowKind, WorkflowConfig> = {
     ],
   },
   sep: {
-    title: "Solar radiation", scenarioId: "sep", category: "radiation", alertKeys: ["sep", "cumulativeDose"], sourceId: "teamSymptomReport",
-    status: { caution: "SEP precaution active; verify the event record and personal dosimetry.", critical: CRITICAL_STATUS },
+    title: "Gamma Radiation (simulated)", scenarioId: "sep", category: "radiation", alertKeys: ["gamma", "sep", "cumulativeDose"], sourceId: "teamSymptomReport",
+    status: { caution: "Simulated gamma-dose precaution; review the dose trend and dosimetry context.", critical: CRITICAL_STATUS },
     placeholder: "Describe the module location, shielding status, and how the crew feels.",
     questions: [
       { id: "sep-symptoms", text: "Is anyone experiencing sudden nausea, vomiting, or unusual fatigue?", urgent: true },
@@ -65,7 +65,7 @@ export const WORKFLOWS: Record<WorkflowKind, WorkflowConfig> = {
     steps: [
       step("sep-c1", "Log current module location and verify personal dosimeter readings."),
       step("sep-c2", "Ask mission control to review location, shielding and any EVA exposure history."),
-      step("sep-c3", "Request the applicable mission-approved space-weather procedure and record its identifier."),
+      step("sep-c3", "Request the applicable mission-approved radiation assessment procedure and record its identifier."),
     ],
     criticalSteps: [
       step("sep-r1", "Report module location, cumulative dosimeter readings, and any crew symptoms to mission control or the crew medical officer."),
@@ -76,7 +76,7 @@ export const WORKFLOWS: Record<WorkflowKind, WorkflowConfig> = {
   acuteDose: {
     title: "Acute dose", scenarioId: "acuteDose", category: "injury", alertKeys: ["absorbedDoseGy"], regions: ["abdomen"], sourceId: "teamSymptomReport",
     status: { caution: "Review the independent absorbed-dose input and dosimeter evidence.", critical: CRITICAL_STATUS },
-    placeholder: "Describe the module location, radiation spike readings, and physical symptoms.",
+    placeholder: "Describe the module location, independent absorbed-dose reading and reported symptoms.",
     questions: [
       { id: "acute-gi", text: "Are any crew members suffering from sudden abdominal pain, nausea, or cramping?", urgent: true },
       { id: "acute-shielded", text: "Have personnel moved into shielded spaces away from unshielded sources?", urgent: false },
