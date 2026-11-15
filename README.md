@@ -2,7 +2,7 @@
 
 # Decker2 A.U.R.A.
 
-**Astro-Unified Response Algorithm: an astronaut health monitor where a 3D astronaut's aura shows what is wrong at a glance.**
+**Astro-Unified Response Algorithm: an immersive 3D research dashboard for astronaut health and environmental awareness.**
 
 ![Next.js](https://img.shields.io/badge/Next.js-16.4-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-149ECA?style=for-the-badge&logo=react&logoColor=white)
@@ -20,22 +20,35 @@
 
 A.U.R.A. is our entry for the NASA Space Apps Challenge 2026 challenge *Create Health Monitoring Software for Astronauts on Space Missions*. The dashboard shows a rotatable 3D astronaut. When a body or environment reading crosses a threshold, an aura appears around the astronaut: every critical condition is red, while caution colors identify general, temperature and environmental warnings. When everything is normal, there is no aura.
 
-Every alert explains itself: the reading, the threshold it crossed, the source of that threshold, a recommended action, and whether the crew can handle it or the flight surgeon on the ground needs to know. Radiation status is driven by real solar particle events from NASA's DONKI space weather database. Crew biometrics are simulated, because astronaut medical data is not public, and the app labels them as simulated.
+Alerts show their readings or reported symptoms, configured thresholds, source citations and recommended responder. Recorded NASA DONKI events can activate a space-weather precaution; they do not establish a current event or measure crew exposure. Crew readings come from labeled demo profiles or simulated scenarios. Escalation is displayed in the dashboard: no flight surgeon or mission-control service is contacted.
 
-> **Status:** in development for NASA Space Apps 2026. Progress is tracked in [`specs/001-aura-health-dashboard/tasks.md`](specs/001-aura-health-dashboard/tasks.md).
+> **Research demonstration for NASA Space Apps 2026.** This prototype is not a diagnostic or treatment system. Medical protocol review is pending; no mission-approved treatment procedure is included. See the [judging-readiness audit](specs/002-research-alignment/judging-readiness.md) for verified behavior, source limitations and remaining paper corrections.
 
 ## Key Features
 
+- **Astronaut-first interface:** a full-screen, dark frosted-glass viewer with drag rotation, zoom, localized injury effects and smoke layered over the suit outline. Compact navigation and contextual panels keep the astronaut visible.
+- **Contextual interactions:** Environment and Crew status expand in place; Next steps and Space weather sit beside the viewer on desktop and collapse on phones. Fade/pop transitions respect reduced-motion preferences.
 - **The aura:** red for every critical condition; caution uses yellow for general warnings, blue for low temperature, green for radiation and gray for air quality. Injuries glow only on the affected body part.
 - **Alerts that explain themselves:** reading, threshold, source citation, recommended action and who should respond on every alert.
-- **Crew first, then ground:** caution alerts go to the crew to self-manage; critical or long-lasting ones escalate to the flight surgeon.
+- **Responder recommendations:** rule-based alerts identify crew review or flight-surgeon assessment, including configured persistence escalation. These are demonstration recommendations, not delivered notifications.
 - **Real NASA data:** recorded solar energetic particle events from NASA DONKI add a space-weather precaution and radiation aura. Replays show event ID/time and never infer a personal crew dose.
-- **Mental Health Index:** combines biometrics, voice/affect and a private journal into one score, and flags when they disagree (for example, the journal says "I'm fine" while the body shows strain). That flag goes to the astronaut only.
-- **Live demo scenarios:** one click triggers a solar particle event, CO leak, CO₂ buildup, cabin overheat or cold, fever, sleep deprivation, an EVA hand injury or the "I'm fine" discrepancy.
-- **Works offline:** a bundled copy of real NASA data is used automatically when the network or API is down.
+- **Private check-ins:** journal sentiment is processed locally and contributes to a project-defined MHI with simulated biometric/affect scores. Discrepancies appear privately in the UI. No microphone or voice analysis is implemented; entries live in browser memory and are lost on reload.
+- **Demo scenarios:** one click triggers simulated solar particles, acute absorbed dose, CO leak, CO2 buildup, cabin overheat or cold, fever, sleep deprivation, right-hand injury or the "I'm fine" discrepancy. Real DONKI record replay is a separate control.
+- **Offline fallback:** the locally served dashboard, deterministic rules, local journal scoring and bundled NASA catalog work without external APIs. Gemini explanations require a network connection and fall back to rule-based guidance.
 - **Measurements reference:** what is measured, with which onboard device, and why it matters in space.
 
-## Updated Research and Indicators
+## Demonstrate A.U.R.A.
+
+1. Let the first-visit walkthrough run, or select **Skip demo**. Use **Reference > Replay demo** to show it again.
+2. Expand **Crew status** and select an AST profile to inspect the supplied CSV snapshot.
+3. Select **Hand injury**. Identify the affected right hand, simulated severity and source in **Next steps**. Enter an incident report and answer the follow-up questions. Explicit urgent answers create a separate report-based escalation.
+4. Optionally select **Explain with Gemini** to organize evidence. Inspect the trace and source IDs; the model cannot change the rule-based status.
+5. Open the dashboard panel menu > **Space weather** and replay a GOES or SOHO record. Show its event ID, UTC time and source. The precaution is added without replacing the injury or inventing a crew-dose measurement.
+6. Open **Reference > Research data > Known-input rule checks** to compare expected and actual rule outputs. Use **Reset scenario** to restore the selected baseline.
+
+The [presenter script](specs/002-research-alignment/judging-readiness.md#injury-first-presenter-script) includes a fuller injury-first demonstration and the exposure measurements still needed.
+
+## Research Rules and AI Boundaries
 
 - On the first visit, a 28-second automatic demo operates the real controls, with Pause, Skip and Replay in Reference. The active area stays sharp while surrounding UI dims/blurs; captions occupy side space on desktop and the upper area on mobile. Completion/Skip is remembered locally. Demo data and sample journal entries are discarded and the previous session is restored.
 - Hand injury and Cabin cold open **Next steps**: deterministic findings, follow-up questions, referral guidance, source links and an optional Gemini evidence summary. Explicit urgent-symptom answers create report-based alerts; they do not invent sensor measurements. Medical protocol review is pending and treatment instructions are withheld.
@@ -74,23 +87,28 @@ Sources and operators live in `backend/config/aura.ts`. Project-defined bands an
 
 ### Environment variables
 
-Copy the example file and add your key:
+Copy the example file at the repository root. API keys are optional:
 
 ```bash
 cp .env.example .env.local
 ```
 
-[`.env.example`](.env.example):
+The [example file](.env.example) includes `NASA_API_KEY`. Add the Gemini entries only if you want cloud incident explanations:
 
 ```bash
 NASA_API_KEY=
+# Optional additions for incident explanations:
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-3.5-flash-lite
 ```
 
 | Variable | Required | Purpose |
 |---|---|---|
 | `NASA_API_KEY` | No | Key for NASA's DONKI API. Without it the app uses `DEMO_KEY` and the bundled data. |
+| `GEMINI_API_KEY` | No | Server-only key for explicit incident explanations. Rule-based guidance works without it. |
+| `GEMINI_MODEL` | No | Model supporting `generateContent` JSON-schema responses; defaults to `gemini-3.5-flash-lite`. |
 
-Both live at the repository root and are shared by the frontend and the backend scripts. `.env.local` is git-ignored and kept out of the Docker image. On Vercel, set `NASA_API_KEY` under Project Settings → Environment Variables.
+Environment files live at the repository root. `.env.local` is git-ignored and excluded from the Docker build context; Docker Compose passes it at runtime. Restart the app after changing keys. On Vercel, use Project Settings > Environment Variables and redeploy. Never prefix these keys with `NEXT_PUBLIC_` or put them in client code.
 
 ### Run locally
 
@@ -100,6 +118,15 @@ pnpm dev
 ```
 
 `pnpm dev` first builds and starts the Docker container (needs Docker Desktop running), then the dev server. Open [http://localhost:3000](http://localhost:3000) for the dev server with hot reload; the container's production build is at [http://localhost:3001](http://localhost:3001). Run `pnpm docker:down` to stop the container when you're done.
+
+To run just the web app without Docker:
+
+```bash
+pnpm install
+pnpm --filter frontend dev
+```
+
+Open [http://localhost:3000](http://localhost:3000). Run `pnpm test` separately for unit checks; the frontend-only command does not start the test watcher.
 
 ### Run with Docker
 
@@ -119,18 +146,30 @@ If the build fails with `ERR_PNPM_OUTDATED_LOCKFILE`, someone changed a `package
 
 | Command | What it does |
 |---|---|
+| `pnpm --filter frontend dev` | Start only the Next.js development server without Docker |
 | `pnpm dev` | Build and start the Docker container (port 3001), then the Next.js dev server (port 3000) and the backend unit tests in watch mode |
 | `pnpm build` | Production build |
 | `pnpm start` | Serve the production build |
 | `pnpm lint` | Lint the frontend |
 | `pnpm test` | Run the unit tests |
+| `pnpm fetch:donki` | Refresh the bundled DONKI catalog through the maintained script; requires network access |
 | `pnpm docker:up` / `docker:logs` / `docker:down` | Build and run the app in Docker on port 3001, follow its logs, stop it |
 | `bash backend/smoke-test.sh [url]` | Check the running app's API against its contract |
+
+## Verification
+
+```bash
+pnpm test
+pnpm lint
+pnpm build
+```
+
+The latest recorded verification passed **148 tests across 11 files**, frontend lint and the production build. Tests cover threshold boundaries, colors, CSV accuracy, MHI, sentiment, independent dose units, NASA replay and Gemini output validation. The in-app Reference includes 14 known-input checks. Browser verification covered desktop/mobile layouts, rotation, panel behavior and reduced motion; details are in the [judging audit](specs/002-research-alignment/judging-readiness.md#verification-record).
 
 ## Project Structure
 
 ```text
-frontend/   Next.js app: pages, API route, 3D scene and dashboard panels
+frontend/   Next.js app: pages, DONKI/Gemini API routes, 3D scene and dashboard panels
 backend/    @aura/core: thresholds config, evaluation logic, NASA data cache
 specs/      Spec Kit documents: spec, plan, tasks, research, contracts
 .specify/   Spec Kit templates, scripts and the project constitution
@@ -138,6 +177,9 @@ specs/      Spec Kit documents: spec, plan, tasks, research, contracts
 
 ## Data and Honesty
 
-- **Real:** NASA DONKI solar energetic particle events.
+- **Real NASA input:** recorded DONKI solar energetic particle events, with catalog provenance. Historical replay is not current telemetry.
 - **Simulated:** crew biometrics, affect/voice scores and injuries, labeled "Simulated" in the app.
-- A.U.R.A. is a prototype *designed to integrate with* onboard sensors and NASA systems; it is not connected to them.
+- **Team-supplied:** five demo crew rows and static research references; these are not real astronaut medical records or a live RR-1 series.
+- **Gemini sharing:** only the explicit incident-explanation action sends its report, answers and relevant readings to Google. Journal entries are not sent to Gemini. The app route does not log or persist incident text; this is not a claim about Google's retention policies.
+- **Scientific limits:** project alert tiers are not universal clinical thresholds. Career effective dose and acute absorbed dose remain separate; medical review and mission-specific procedures are still required.
+- A.U.R.A. is a prototype *designed to integrate with* onboard sensors and NASA systems; it is not connected to them. There is no database, live wearable ingestion or delivered emergency notification.
