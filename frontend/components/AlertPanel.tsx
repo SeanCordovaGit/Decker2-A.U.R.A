@@ -3,7 +3,7 @@
 import { ShieldCheck, Siren } from "lucide-react";
 import { CATEGORY_META, ESCALATION, SEVERITY_META } from "@aura/core/config/aura";
 import type { Alert } from "@aura/core/lib/types";
-import { useAuraStore } from "@/store/useAuraStore";
+import { isSnapshot, useAuraStore } from "@/store/useAuraStore";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,7 +14,7 @@ const RESPONDER = { none: "You only", crew: "Crew · self-manage", flightSurgeon
 export default function AlertPanel() {
   const alerts = useAuraStore((s) => s.alerts);
   const log = useAuraStore((s) => s.log);
-  const snapshot = useAuraStore((s) => !!s.selectedCrewId && !s.scenarioId);
+  const snapshot = useAuraStore(isSnapshot);
   const sorted = [...alerts].sort((a, b) => SEVERITY_META[b.severity].rank - SEVERITY_META[a.severity].rank);
 
   return (
@@ -60,7 +60,8 @@ export default function AlertPanel() {
           ))}
         </ol>
       </TabsContent>
-      {alerts.length > 0 && <p className="mt-3 text-[11px] text-ink-3">{snapshot ? "CSV snapshot: exposure duration is unknown. Time spent viewing this row does not establish persistent caution." : ESCALATION.demoTimeNote}</p>}
+      {alerts.length > 0 && <p className="mt-3 text-[11px] text-ink-3">Next steps (Panels menu) lists every Do now action below in priority order.</p>}
+      {alerts.length > 0 && <p className="mt-1 text-[11px] text-ink-3">{snapshot ? "CSV snapshot: exposure duration is unknown. Time spent viewing this row does not establish persistent caution." : ESCALATION.demoTimeNote}</p>}
       </CardContent>
     </Card>
     </Tabs>

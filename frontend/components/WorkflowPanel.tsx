@@ -3,17 +3,43 @@
 import { useEffect, useRef, useState } from "react";
 import { buildWorkflow, type WorkflowInput } from "@aura/core/lib/workflow";
 import { WORKFLOWS, type WorkflowKind } from "@aura/core/config/workflows";
-import { SEVERITY_META } from "@aura/core/config/aura";
+import { Siren } from "lucide-react";
+import { SEVERITY_META, getIndicatorColor } from "@aura/core/config/aura";
+import type { Alert } from "@aura/core/lib/types";
 import { useAuraStore } from "@/store/useAuraStore";
+import { CATEGORY_ICON, SeverityBadge } from "./hazard";
 import type { WorkflowResponse } from "@/lib/gemini-workflow";
 import WorkflowExplanation from "./WorkflowExplanation";
 
 export default function WorkflowPanel() {
   const scenario = useAuraStore((state) => state.scenarioId);
   const trigger = useAuraStore((state) => state.triggerScenario);
+  const alerts = useAuraStore((state) => state.alerts);
   const kind = scenario === "evaHandInjury" ? "hand" : scenario === "cabinCold" ? "cold" : null;
   if (kind) return <WorkflowSession key={kind} kind={kind} />;
-  return <div className="workflow-panel"><h2>What should we do next?</h2><p>Select a supported research scenario to see findings, follow-up questions and source-linked next steps.</p>{Object.entries(WORKFLOWS).map(([key, workflow]) => <button className="workflow-submit" key={key} onClick={() => trigger(workflow.scenarioId)}>{workflow.title}</button>)}</div>;
+  if (alerts.length) return <AlertNextSteps alerts={alerts} />;
+  return <div className="workflow-panel"><h2>What should we do next?</h2><p>All readings are within limits. Pick a condition below, or one of the guided research workflows, to see its next steps.</p>{Object.entries(WORKFLOWS).map(([key, workflow]) => <button className="workflow-submit" key={key} onClick={() => trigger(workflow.scenarioId)}>{workflow.title}</button>)}</div>;
+}
+
+const RESPONDER = { none: "You only", crew: "Crew · self-manage", flightSurgeon: "Flight surgeon" } as const;
+
+function AlertNextSteps({ alerts }: { alerts: Alert[] }) {
+  const sorted = [...alerts].sort((a, b) => SEVERITY_META[b.severity].rank - SEVERITY_META[a.severity].rank);
+  return <div className="workflow-panel">
+    <h2>What to do next</h2>
+    <p className="next-steps-intro">Each step is the <strong>Do now</strong> action from an active alert, most urgent first. Open Alerts for the readings, thresholds and sources behind them.</p>
+    <ol className="next-steps">
+      {sorted.map((alert) => {
+        const Icon = CATEGORY_ICON[alert.category];
+        const color = getIndicatorColor(alert.category, alert.severity, alert);
+        return <li key={alert.key} className="next-step" style={{ borderLeftColor: color }}>
+          <header><Icon size={16} strokeWidth={1.5} aria-hidden style={{ color }} /><strong>{alert.title}</strong><SeverityBadge severity={alert.severity} /></header>
+          <p className="next-step-action">{alert.action}</p>
+          <p className="next-step-meta">{alert.escalation === "flightSurgeon" && <Siren size={12} aria-hidden />}{RESPONDER[alert.escalation]} · {alert.valueText}</p>
+        </li>;
+      })}
+    </ol>
+  </div>;
 }
 
 function WorkflowSession({ kind }: { kind: WorkflowKind }) {
