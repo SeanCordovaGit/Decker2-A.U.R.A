@@ -38,8 +38,8 @@ export default function TopBar({ onOpenReference }: { onOpenReference: () => voi
       <div className="mission-brand">
         <AuraMark />
         <div>
-          <h1>Decker2 A.U.R.A.</h1>
-          <p>Astronaut health monitor</p>
+          <h1>A²U.R.A.</h1>
+          <p>A.I. Astro-Unified Response Algorithm</p>
         </div>
       </div>
       <dl className="mission-header-data">

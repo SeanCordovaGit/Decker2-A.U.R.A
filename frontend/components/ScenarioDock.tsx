@@ -1,22 +1,22 @@
 "use client";
 
-import { CloudFog, Hand, Moon, PanelsTopLeft, Radiation, RotateCcw, Smile, Snowflake, Sun, Thermometer, ThermometerSun, Wind, type LucideIcon } from "lucide-react";
+import { Brain, CloudFog, Hand, Moon, PanelsTopLeft, Radiation, RotateCcw, Snowflake, Sun, Thermometer, ThermometerSun, Wind, type LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { SCENARIOS } from "@aura/core/lib/scenarios";
 import { useAuraStore } from "@/store/useAuraStore";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const CONDITION: Record<string, { label: string; Icon: LucideIcon }> = {
-  sep: { label: "Solar event", Icon: Sun },
-  acuteDose: { label: "Acute dose", Icon: Radiation },
-  coLeak: { label: "CO leak", Icon: Wind },
-  co2Buildup: { label: "CO₂ buildup", Icon: CloudFog },
+  sep: { label: "Solar Radiation", Icon: Sun },
+  acuteDose: { label: "Acute Dose", Icon: Radiation },
+  coLeak: { label: "CO Leak", Icon: Wind },
+  co2Buildup: { label: "CO₂ Buildup", Icon: CloudFog },
   cabinOverheat: { label: "Overheat", Icon: ThermometerSun },
-  cabinCold: { label: "Cabin cold", Icon: Snowflake },
+  cabinCold: { label: "Cabin Cold", Icon: Snowflake },
   fever: { label: "Fever", Icon: Thermometer },
-  sleepDeprivation: { label: "Sleep loss", Icon: Moon },
-  evaHandInjury: { label: "Hand injury", Icon: Hand },
-  imFine: { label: "How I feel", Icon: Smile },
+  sleepDeprivation: { label: "Sleep Loss", Icon: Moon },
+  evaHandInjury: { label: "Hand Injury", Icon: Hand },
+  imFine: { label: "Mental Distress", Icon: Brain },
 };
 
 export default function ScenarioDock({ onOpenPanels, onScenarioSelect, panelMenu }: { onOpenPanels: () => void; onScenarioSelect: (id: string) => void; panelMenu: ReactNode }) {
