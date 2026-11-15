@@ -113,12 +113,14 @@ const SIDE_LAYOUT: Record<Side, { shift: string; flex: string; line: string }> =
 // Hands sit near the viewport edge, so their callouts rise instead of running sideways off-screen.
 const sideFor = (r: BodyRegion | null, x: number): Side => (r === "leftHand" || r === "rightHand" ? "up" : x < 0 || r === "head" || r === "chest" || r === "back" ? "left" : "right");
 
-// Callouts stay mounted and only empty when inactive: unmounting drei's <Html> tears down its own React root
-// mid-render, which React reports as a race when a scenario switch clears several alerts at once.
+// drei's <Html> unmounts its own React root synchronously whenever its target element changes, and by default
+// the target flips from the canvas parent to events.connected once the canvas wires up, which React reports as a
+// race. A fixed overlay element keeps the target constant; callouts also stay mounted and only empty when inactive.
+const calloutLayer = { current: null } as unknown as React.RefObject<HTMLElement>;
 function Callout({ position, side, color, label, sev, active }: { position: THREE.Vector3; side: Side; color: string; label: string; sev: Severity; active: boolean }) {
   const layout = SIDE_LAYOUT[side];
   return (
-    <Html position={position} zIndexRange={[20, 0]} className="astronaut-callout" style={{ pointerEvents: "none" }}>
+    <Html portal={calloutLayer} position={position} zIndexRange={[20, 0]} className="astronaut-callout" style={{ pointerEvents: "none" }}>
       {active && <div style={{ transform: layout.shift }}>
         <div className={`flex ${layout.flex}`}>
           <span className={`h-2 w-2 shrink-0 rounded-full ${sev === "critical" ? "pulse" : ""}`} style={{ background: color, boxShadow: `0 0 8px 1px ${color}` }} />
@@ -249,10 +251,15 @@ function Stage() {
   );
 }
 
+// Stable callback: an inline ref function would reset the layer to null on every render and send Html back to its default target.
+const setCalloutLayer = (node: HTMLDivElement | null) => { (calloutLayer as { current: HTMLElement | null }).current = node; };
+
 export default function AstronautScene({ autoRotate, onInteract, onReady }: { autoRotate: boolean; onInteract: () => void; onReady?: () => void }) {
   const { active, progress } = useProgress();
   return (
     <>
+    {/* before the canvas so its ref is set before any callout reads it */}
+    <div ref={setCalloutLayer} className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden />
     <Canvas dpr={[1, 2]} camera={{ position: [0, 1.1, 4.2], fov: 36 }} gl={{ antialias: true }}>
       <color attach="background" args={["#050505"]} />
       <Stars radius={60} depth={40} count={2200} factor={3} fade speed={0.4} />
