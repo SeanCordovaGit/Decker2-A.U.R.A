@@ -1,16 +1,18 @@
 # Automatic first-visit demo
 
-Approved direction: the website operates its own real controls, then hands control to the visitor. A skippable 28-second sequence runs after the astronaut model loads. Replay is available in Reference. Completion or Skip is remembered locally; unavailable storage does not prevent using the app.
+Approved direction: the website operates its own real controls, then hands control to the visitor. A skippable 38-second sequence runs after the astronaut model loads. Replay is available in Reference. Completion or Skip is remembered locally; unavailable storage does not prevent using the app.
 
 | Element | Role | Starts | Duration | Motion | Relationship |
 | --- | --- | --- | --- | --- | --- |
 | Astronaut | Lead | 0 s | 4 s | Existing automatic rotation | Caption explains rotation and zoom; disabled with reduced motion |
 | Crew status | Lead | 4 s | 4 s | Existing dropdown | Select AST-001 using the real store |
 | Environment | Lead | 8 s | 4 s | Existing dropdown | Close Crew before opening Environment |
-| Hand injury scenario | Lead | 12 s | 6 s | Existing scenario/aura | Actual simulation progresses from caution to critical |
-| Alert details | Support | 18 s | 4 s | Open existing alert content | Explain reading, source and responder |
-| Sample journal | Lead | 22 s | 6 s | Type explicitly labeled example; submit at 25 s | Show the real mental-health panel after local scoring |
-| Caption, Pause, Skip | Static | 0 s | 28 s | No entrance or countdown animation | Remain accessible above the demo |
+| Heart-rate adjustment | Lead | 12 s | 4 s | Open Telemetry and set simulated HR to 145 bpm | Show critical assessment and chest indicator |
+| Hand injury scenario | Lead | 16 s | 6 s | Existing scenario/aura | Actual simulation progresses from caution to critical |
+| Alert details | Support | 22 s | 4 s | Open existing alert content | Explain reading, source and responder |
+| Gamma Radiation | Lead | 26 s | 6 s | Run the simulated gamma-dose condition | Distinguish the generated trend from NASA SEP records |
+| Sample journal | Lead | 32 s | 6 s | Type explicitly labeled example; submit at 35 s | Show the real mental-health panel after local scoring |
+| Caption, Pause, Skip | Static | 0 s | 38 s | No entrance or countdown animation | Remain accessible above the demo |
 
 The demo temporarily replaces store data, captures the existing session, and restores it on completion, Skip, Escape or unmount. Input draft and manual viewer preference remain intact. Background controls are inert while the demonstration operates them. Pause stops timeline and simulated readings. Reduced motion removes automatic rotation and sample typing, preserving the explanation sequence.
 

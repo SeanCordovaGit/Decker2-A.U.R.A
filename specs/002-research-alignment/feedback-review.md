@@ -8,7 +8,7 @@ Reviewed against `Nasa Space Apps 26 (3).pdf` (10 pages), `Nasa Space Apps 26 (4
 | --- | --- |
 | Exact crew profiles and consistent units | Already implemented. Preserve all five original CSV rows, including intentionally abnormal profiles. AST-001 cumulative dose is 145 mSv. Idle simulation no longer accumulates dose. Daily-dose labels and PVT lapse units are consistent. |
 | Independent conditions and reliable Mental Distress | Already implemented and tested. Each condition resets to the selected crew baseline. The mismatch scenario has caution-level strain and a private discrepancy alert. |
-| HR, core temperature and PVT controls | Already implemented. Fixed edited CSV snapshots failing to advance graph history. Heart rate remains display-only because the supplied research specifies no HR alert limits. Core temperature and PVT use configured rules. Additional active alerts now remain accessible alongside condition-specific guidance. |
+| HR, core temperature and PVT controls | Already implemented. Fixed edited CSV snapshots failing to advance graph history. A later team clarification adds HR bands: 60-100 nominal, above 100 and below 140 caution, below 60 or at least 140 critical. These project assessment triggers highlight the chest. Core temperature and PVT use configured rules. Additional active alerts now remain accessible alongside condition-specific guidance. |
 | Icons, labels and closing controls | Icons, labeled Reset/Panels controls, slider hints and X close controls were already implemented. Changed the selector label to Status, matching the feedback's suggested terminology. |
 | Missing condition guidance | All nine supported workflows already exist. Retained their questions and tier-dependent guidance. Corrected CO at 55 ppm to retain a flight-surgeon referral while severity stays caution. |
 | Readable next steps and Do now relationship | Bordered alert-action sections and the explanation were already implemented. Higher-priority additional alerts now open above the selected condition workflow. |
@@ -48,7 +48,7 @@ Use consistent left-to-right columns in the research manuscript. The supplied fe
 | PVT mean reaction | Below 250 | 250-350 inclusive | Above 350 | ms |
 | PVT lapses | 0-2 | 3-4 | At least 5 | Count per 300-second test |
 | HRV RMSSD | Above 50 | 30-50 inclusive | Below 30 | ms; individual baselines were not supplied |
-| Heart rate | Display only | No supplied cutoff | No supplied cutoff | bpm |
+| Heart rate | 60-100 inclusive | Above 100 and below 140 | Below 60 or at least 140 | bpm; later team-defined clarification |
 
 ### Consolidated indicator summary
 
@@ -67,7 +67,7 @@ Retain the user's confirmed category colors for caution and red for every critic
 
 A2U.R.A. demonstrates **Solar Energetic Particle (SEP)** events from DONKI. CME and solar-flare catalog entries are distinct event types. Exposure during IVA and EVA depends on particle energy/flux, shielding, location and time. Personal/area dosimetry is needed to assess actual crew dose. The application does not infer acute dose from a catalog event or convert the RR-1 mGy reference figure to mSv.
 
-The implemented architecture is a Next.js viewer, in-memory local state, deterministic rules, local journal scoring, a bundled DONKI catalog and optional server-side Gemini incident explanations. A future sensor adapter could accept time-stamped wearable and cabin measurements locally, validate units and feed the same evaluator. A local database, wearable ingestion and offline telemetry transport are proposed work. They are not current integrations. Multiple measured hazards generate independent alerts; each category takes the worst configured severity, and notifications use the hierarchy above. HR has no configured clinical alert threshold.
+The implemented architecture is a Next.js viewer, in-memory local state, deterministic rules, local journal scoring, a bundled DONKI catalog and optional server-side Gemini incident explanations. A future sensor adapter could accept time-stamped wearable and cabin measurements locally, validate units and feed the same evaluator. A local database, wearable ingestion and offline telemetry transport are proposed work. They are not current integrations. Multiple measured hazards generate independent alerts; each category takes the worst configured severity, and notifications use the hierarchy above. HR uses the later team-defined demonstration bands with activity and baseline context required.
 
 Scientific wording still required in the manuscript:
 
@@ -92,3 +92,5 @@ Primary references: [NASA career-dose requirements](https://www.nasa.gov/referen
 - Latest production build is running locally at http://localhost:3000.
 
 The supplied PDFs were reviewed as feedback sources. Their original files were not rewritten. The paper-ready corrections above are the revision material for the manuscript. Clinical review, real sensor ingestion, a local telemetry database and a verified EMU replacement asset remain pending.
+
+The Solar Radiation condition was subsequently renamed Gamma Radiation (simulated) at the user's request, with a distinct simulation flag and source citation. Recorded NASA DONKI events retain their SEP provenance in Space weather. Acute Dose remains a separate independent Gy input. The automatic tour now includes heart-rate adjustment and Gamma Radiation steps and lasts 38 seconds.
