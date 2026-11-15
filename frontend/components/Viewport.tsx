@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { Pause, Play } from "lucide-react";
 import { useCallback, useState, useSyncExternalStore } from "react";
 import { CATEGORY_META, SEVERITY_META } from "@aura/core/config/aura";
-import { useAuraStore } from "@/store/useAuraStore";
+import { isSnapshot, useAuraStore } from "@/store/useAuraStore";
 import { Button } from "@/components/ui/button";
 import { Swatch } from "./hazard";
 
@@ -25,7 +25,7 @@ export default function Viewport({ onReady, demoRotate }: { onReady?: () => void
   const metrics = useAuraStore((s) => s.metrics);
   const injuries = useAuraStore((s) => s.readings.injuries);
   const alerts = useAuraStore((s) => s.alerts);
-  const snapshot = useAuraStore((s) => !!s.selectedCrewId && !s.scenarioId);
+  const snapshot = useAuraStore(isSnapshot);
   const active = categories.filter((c) => c.severity !== "nominal").sort((a, b) => SEVERITY_META[b.severity].rank - SEVERITY_META[a.severity].rank);
   const context = active[0]?.category === "injury" && Object.values(injuries).every((severity) => severity === "nominal") ? metrics.find((metric) => metric.metric === "coreTemp") : undefined;
   const bodyAlerts = alerts.filter((alert) => alert.category === "injury");
@@ -40,7 +40,7 @@ export default function Viewport({ onReady, demoRotate }: { onReady?: () => void
       <div className="absolute inset-0">
         <AstronautScene autoRotate={rotate} onInteract={onInteract} onReady={onReady} />
       </div>
-      <div className="viewer-state" aria-live="polite">
+      <div className="hud-glass viewer-state" aria-live="polite" data-severity={active[0]?.severity ?? "nominal"}>
         {active.length === 0 ? <><span className="hud-dot hud-dot-ok" /> {snapshot ? "Supplied readings within bands" : "All nominal"}</> : <><Swatch category={active[0].category} severity={active[0].severity} context={context} active /> {active.length === 1 ? activeLabel : `${active.length} active hazards`} · {active[0].severity}</>}
       </div>
       <Button variant="outline" size="sm" onClick={() => setRotate(!rotate)} aria-pressed={!rotate} className="hud-glass viewer-rotate">

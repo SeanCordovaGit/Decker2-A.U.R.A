@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { CREW_PROFILES } from "../../lib/research-data";
 import { bodyRegionLabel, buildAlerts, evaluateMetrics } from "../../lib/evaluate";
 import { computeMhi } from "../../lib/mhi";
-import { NOMINAL_READINGS } from "../../lib/simulation";
+import { NOMINAL_READINGS, tickReadings } from "../../lib/simulation";
 import { useAuraStore } from "../../../frontend/store/useAuraStore";
 
 const rows = readFileSync(new URL("../../data/crew-sample.csv", import.meta.url), "utf8").trim().split(/\r?\n/).map((line) => line.split(","));
@@ -46,6 +46,21 @@ describe("CSV fidelity", () => {
     expect(useAuraStore.getState().readings.coreTemp).toBe(37);
     expect(useAuraStore.getState().mhi.index).toBe(92);
     useAuraStore.getState().selectCrew(null);
+  });
+
+  it("keeps the nominal profiles strictly below the 150 mSv cumulative warning", () => {
+    for (const id of ["AST-001", "AST-005"]) {
+      const readings = { ...NOMINAL_READINGS, ...CREW_PROFILES.find((crew) => crew.id === id)!.readings };
+      expect(readings.cumulativeDose).toBeLessThan(150);
+    }
+    expect(NOMINAL_READINGS.cumulativeDose).toBeLessThan(150);
+  });
+
+  it("leaves the idle live baseline nominal for two hours instead of drifting past 150 mSv", () => {
+    let readings = { ...NOMINAL_READINGS };
+    for (let i = 0; i < 7200; i++) readings = tickReadings(readings, {}, () => 0.5);
+    expect(readings.cumulativeDose).toBeLessThan(150);
+    expect(evaluateMetrics(readings).every((metric) => metric.severity === "nominal")).toBe(true);
   });
 
   it("does not invent source-channel discrepancies for a supplied aggregate MHI", () => {

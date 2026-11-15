@@ -627,3 +627,52 @@ textarea {
   .viewer-state, .viewer-rotate, .mission-shell:has(.hud-alert) .viewer-rotate { bottom: 170px; }
   .mission-shell:has(.hud-alert) .viewer-state { display: flex; }
 }
+
+/* Navigation clarity: labeled condition bar, labeled dock actions, prominent hazard status. */
+.hud-dock-label { flex: none; padding: 0 10px 0 6px; border-right: 1px solid var(--hud-border); color: var(--hud-muted); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+.hud-dock-button svg { flex: none; opacity: 0.85; }
+.hud-dock-labeled { width: auto; padding: 0 12px; font-size: 12px; }
+.hud-vital { position: relative; }
+.hud-vital-hint { position: absolute; top: 8px; right: 8px; color: var(--hud-muted); }
+.hud-vital:hover .hud-vital-hint { color: var(--hud-text); }
+.viewer-state { min-height: 44px; padding: 10px 18px; border: 1px solid var(--hud-border); border-radius: 999px; font-family: inherit; font-size: 15px; font-weight: 600; text-transform: capitalize; }
+.viewer-state .hud-dot, .viewer-state > span[aria-hidden] { width: 12px; height: 12px; }
+.viewer-state[data-severity="caution"] { border-color: var(--caution); }
+.viewer-state[data-severity="critical"] { border-color: var(--critical); color: var(--critical); box-shadow: 0 0 0 3px var(--critical-soft); }
+.reference-close { position: static; float: none; margin: 0; }
+
+/* Severity key under Crew status rows. */
+.severity-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); font-size: 11px; color: var(--text-2); }
+.severity-legend > span { display: inline-flex; align-items: center; gap: 6px; }
+.severity-legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+.severity-legend p { flex-basis: 100%; color: var(--text-3); }
+
+/* Manual vitals in the Telemetry panel. */
+.manual-vitals { margin-top: 16px; padding: 12px; border: 1px solid var(--hud-border); border-radius: 12px; }
+.manual-vitals legend { padding: 0 6px; font-size: 13px; font-weight: 600; }
+.manual-vital { display: grid; gap: 6px; padding: 8px 0; border-bottom: 1px solid var(--hud-border); font-size: 12px; }
+.manual-vital-head { display: flex; align-items: center; gap: 8px; }
+.manual-vital-head > span:first-child { flex: 1; color: var(--hud-muted); }
+.manual-vital-head strong { font-family: var(--font-mono); font-weight: 500; }
+.manual-vital-head small, .manual-vital-note { color: var(--hud-muted); font-size: 10px; }
+.manual-vital input[type="range"] { width: 100%; accent-color: var(--hud-text); }
+.manual-vitals > p { margin-top: 10px; color: var(--hud-muted); font-size: 11px; line-height: 1.5; }
+
+/* Next steps: one bordered section per active alert. */
+.next-steps-intro strong { color: var(--hud-text); font-weight: 600; }
+.workflow-panel ol.next-steps { display: grid; gap: 10px; padding: 0; list-style: none; }
+.workflow-panel .next-step { margin: 0; padding: 12px 14px; border: 1px solid var(--hud-border); border-left-width: 3px; border-radius: 10px; }
+.next-step header { display: flex; align-items: center; gap: 8px; }
+.next-step header strong { flex: 1; font-size: 13px; font-weight: 600; }
+.workflow-panel .next-step-action { margin: 8px 0 6px; color: var(--hud-text); font-size: 13px; line-height: 1.5; }
+.workflow-panel .next-step-meta { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 11px; }
+@media (max-width: 800px) {
+  .hud-dock-label, .hud-dock-labeled span { display: none; }
+  .hud-dock-labeled { width: 44px; padding: 0; }
+  .viewer-state { font-size: 13px; min-height: 38px; padding: 8px 14px; }
+}
+@media (max-width: 800px) {
+  /* The Next steps bar sits where the status pill and rotate control live; the header alert already names the hazard. */
+  .mission-shell:is([data-panel="assistance"], [data-panel="weather"]) .viewer-state { visibility: hidden; }
+  .mission-shell:is([data-panel="assistance"], [data-panel="weather"]) .viewer-rotate { bottom: 216px; }
+}

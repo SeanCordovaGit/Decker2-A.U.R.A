@@ -18,7 +18,7 @@ const SEVERITY_LABEL: Record<Severity, string> = { nominal: "Nominal", caution: 
 export function SeverityBadge({ severity }: { severity: Severity }) {
   return (
     <Badge variant={severity} style={severity === "nominal" ? undefined : { color: SEVERITY_META[severity].badgeColor, borderColor: SEVERITY_META[severity].badgeColor, backgroundColor: `${SEVERITY_META[severity].badgeColor}1f` }}>
-      <span className={`h-1.5 w-1.5 rounded-full bg-current ${severity === "critical" ? "pulse" : ""} ${severity === "nominal" ? "opacity-60" : ""}`} />
+      <span className={`h-1.5 w-1.5 rounded-full bg-current ${severity === "critical" ? "pulse" : ""}`} style={severity === "nominal" ? { background: SEVERITY_META.nominal.badgeColor } : undefined} />
       {SEVERITY_LABEL[severity]}
     </Badge>
   );

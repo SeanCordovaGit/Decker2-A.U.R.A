@@ -33,7 +33,8 @@ Alerts show their readings or reported symptoms, configured thresholds, source c
 - **Responder recommendations:** rule-based alerts identify crew review or flight-surgeon assessment, including configured persistence escalation. These are demonstration recommendations, not delivered notifications.
 - **Real NASA data:** recorded solar energetic particle events from NASA DONKI add a space-weather precaution and radiation aura. Replays show event ID/time and never infer a personal crew dose.
 - **Private check-ins:** journal sentiment is processed locally and contributes to a project-defined MHI with simulated biometric/affect scores. Discrepancies appear privately in the UI. No microphone or voice analysis is implemented; entries live in browser memory and are lost on reload.
-- **Demo scenarios:** one click triggers simulated solar particles, acute absorbed dose, CO leak, CO2 buildup, cabin overheat or cold, fever, sleep deprivation, right-hand injury or the "I'm fine" discrepancy. Real DONKI record replay is a separate control.
+- **Conditions bar:** one click triggers simulated solar particles, acute absorbed dose, CO leak, CO2 buildup, cabin overheat or cold, fever, sleep deprivation, right-hand injury or the **How I feel** ("I'm fine") discrepancy. Each condition starts from the clean crew baseline, so hazards from the previous one never carry over, and opens **Next steps** with the active alerts' actions in priority order. Real DONKI record replay is a separate control.
+- **Adjust vitals:** click any vitals card to open Telemetry and drag Heart rate, Core temp or PVT reaction. Core temp and PVT move the aura, alerts and Next steps immediately; heart rate has no research threshold and is display only.
 - **Offline fallback:** the locally served dashboard, deterministic rules, local journal scoring and bundled NASA catalog work without external APIs. Gemini explanations require a network connection and fall back to rule-based guidance.
 - **Measurements reference:** what is measured, with which onboard device, and why it matters in space.
 
@@ -44,7 +45,7 @@ Alerts show their readings or reported symptoms, configured thresholds, source c
 3. Select **Hand injury**. Identify the affected right hand, simulated severity and source in **Next steps**. Enter an incident report and answer the follow-up questions. Explicit urgent answers create a separate report-based escalation.
 4. Optionally select **Explain with Gemini** to organize evidence. Inspect the trace and source IDs; the model cannot change the rule-based status.
 5. Open the dashboard panel menu > **Space weather** and replay a GOES or SOHO record. Show its event ID, UTC time and source. The precaution is added without replacing the injury or inventing a crew-dose measurement.
-6. Open **Reference > Research data > Known-input rule checks** to compare expected and actual rule outputs. Use **Reset scenario** to restore the selected baseline.
+6. Open **Reference > Research data > Known-input rule checks** to compare expected and actual rule outputs. Use **Reset** to restore the selected baseline.
 
 The [presenter script](specs/002-research-alignment/judging-readiness.md#injury-first-presenter-script) includes a fuller injury-first demonstration and the exposure measurements still needed.
 
@@ -133,12 +134,13 @@ Open [http://localhost:3000](http://localhost:3000). Run `pnpm test` separately 
 The easiest way to run the app without worrying about your local Node or package versions. The image installs exactly what `pnpm-lock.yaml` pins, and rebuilds that step whenever `package.json` or the lockfile changes. It uses the same root `.env.local` (optional).
 
 ```bash
-pnpm docker:up     # build and start in the background
+pnpm docker:up       # start in the background; builds only if no image exists yet
+pnpm docker:rebuild  # force a rebuild after changing code or dependencies
 pnpm docker:logs   # follow the app's logs (Ctrl+C to stop following)
 pnpm docker:down   # stop and remove the container
 ```
 
-Open [http://localhost:3001](http://localhost:3001) (port 3001, so it can run next to the dev server on 3000). Without Node or pnpm installed, run the same commands with `docker compose` directly: `docker compose up --build -d`, `docker compose logs -f aura`, `docker compose down`.
+Open [http://localhost:3001](http://localhost:3001) (port 3001, so it can run next to the dev server on 3000). Without Node or pnpm installed, run the same commands with `docker compose` directly: `docker compose up -d` (add `--build` to rebuild), `docker compose logs -f aura`, `docker compose down`.
 
 If the build fails with `ERR_PNPM_OUTDATED_LOCKFILE`, someone changed a `package.json` without updating the lockfile. Run `pnpm install` and commit `pnpm-lock.yaml`.
 
@@ -153,7 +155,7 @@ If the build fails with `ERR_PNPM_OUTDATED_LOCKFILE`, someone changed a `package
 | `pnpm lint` | Lint the frontend |
 | `pnpm test` | Run the unit tests |
 | `pnpm fetch:donki` | Refresh the bundled DONKI catalog through the maintained script; requires network access |
-| `pnpm docker:up` / `docker:logs` / `docker:down` | Build and run the app in Docker on port 3001, follow its logs, stop it |
+| `pnpm docker:up` / `docker:rebuild` / `docker:logs` / `docker:down` | Run the app in Docker on port 3001 (builds only if no image exists), force a rebuild, follow its logs, stop it |
 | `bash backend/smoke-test.sh [url]` | Check the running app's API against its contract |
 
 ## Verification

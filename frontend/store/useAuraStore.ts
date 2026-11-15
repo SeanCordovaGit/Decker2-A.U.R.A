@@ -7,7 +7,7 @@ import { biometricScore, computeMhi } from "@aura/core/lib/mhi";
 import { crewProfile } from "@aura/core/lib/research-data";
 import { scenarioById } from "@aura/core/lib/scenarios";
 import { scoreSentiment } from "@aura/core/lib/sentiment";
-import { NOMINAL_READINGS, tickReadings } from "@aura/core/lib/simulation";
+import { NOMINAL_READINGS, clampReadings, tickReadings } from "@aura/core/lib/simulation";
 import type {
   Alert,
   AlertLogEntry,
@@ -34,6 +34,7 @@ interface Derived {
 }
 
 type IncidentReport = { report: string; answers: Record<string, "yes" | "no" | "unknown"> };
+export type ManualVital = "heartRate" | "coreTemp" | "pvtReactionMs";
 
 interface AuraState extends Derived {
   t: number;
@@ -58,8 +59,14 @@ interface AuraState extends Derived {
   incidentReports: Partial<Record<"hand" | "cold", IncidentReport>>;
   setIncidentReport: (kind: "hand" | "cold", report: string, answers: IncidentReport["answers"]) => void;
   reportUrgentConcern: (kind: "hand" | "cold") => void;
+  manual: Partial<Record<ManualVital, number>>;
+  setManualVital: (key: ManualVital, value: number) => void;
   reset: () => void;
 }
+
+/** A supplied CSV row shown unchanged: no scenario running and no manual edits. */
+export const isSnapshot = (s: Pick<AuraState, "selectedCrewId" | "scenarioId" | "manual">) =>
+  !!s.selectedCrewId && !s.scenarioId && Object.keys(s.manual).length === 0;
 
 function derive(readings: Readings, journal: JournalEntry[], now: number, providedMhiScore: number | null = null): Derived {
   const mhi = computeMhi({
@@ -118,6 +125,7 @@ function initial(selectedCrewId: string | null = null) {
     replayEvent: null as SpaceWeatherEvent | null,
     journal: [] as JournalEntry[],
     incidentReports: {} as Partial<Record<"hand" | "cold", IncidentReport>>,
+    manual: {} as Partial<Record<ManualVital, number>>,
     alerts: [] as Alert[],
     openedAt: {} as Record<string, number>,
     log: [] as AlertLogEntry[],
@@ -155,16 +163,30 @@ export const useAuraStore = create<AuraState>((set, get) => {
         return;
       }
       const base = crewProfile(s.selectedCrewId)?.readings ?? {};
-      const readings = tickReadings(s.readings, { ...base, ...(scenario ? scenario.targets(t - s.scenarioStart) : {}), ...(s.replayEvent ? { sepActive: true, sepEvent: s.replayEvent } : {}) });
+      // Manual slider values override the simulation exactly until the next scenario, reset or crew change.
+      const readings = { ...tickReadings(s.readings, { ...base, ...(scenario ? scenario.targets(t - s.scenarioStart) : {}), ...(s.replayEvent ? { sepActive: true, sepEvent: s.replayEvent } : {}) }), ...s.manual };
       set({ t, readings, history: [...s.history, point(readings)].slice(-HISTORY_LEN), ...apply(readings, s.journal, t, s.providedMhiScore) });
     },
 
     triggerScenario: (id) => {
       const scenario = scenarioById(id);
       if (!scenario) return;
-      set((s) => ({ incidentReports: {}, readings: { ...s.readings, reportedConcerns: {}, sepEvent: id === "sep" ? undefined : s.readings.sepEvent }, providedMhiScore: null, scenarioId: id, scenarioStart: s.t, replayEvent: id === "sep" ? null : s.replayEvent }));
+      const s = get();
+      // Every scenario starts from the clean crew baseline: no earlier readings, journal score, alert timers, replay or manual values carry over.
+      const fresh = initial(s.selectedCrewId);
+      const start = scenario.targets(0);
+      const readings = clampReadings({ ...fresh.readings, ...start, cumulativeDose: Math.max(fresh.readings.cumulativeDose, start.cumulativeDose ?? 0), absorbedDoseGy: Math.max(fresh.readings.absorbedDoseGy, start.absorbedDoseGy ?? 0) });
+      const cleared = reconcile([], s.alerts, {}, s.t, s.logSeq);
+      set({ ...fresh, readings, history: [point(readings)], providedMhiScore: null, scenarioId: id, scenarioStart: s.t, t: s.t, alerts: [], openedAt: {}, log: [...cleared.entries, ...s.log].slice(0, LOG_LEN), logSeq: cleared.seq });
       if (scenario.journalText) get().submitJournal(scenario.journalText);
       get().tick();
+    },
+
+    setManualVital: (key, value) => {
+      const s = get();
+      const manual = { ...s.manual, [key]: value };
+      const readings = { ...s.readings, ...manual };
+      set({ manual, readings, ...apply(readings, s.journal, s.t, s.providedMhiScore) });
     },
 
     replaySep: (event) => {

@@ -106,7 +106,7 @@ export default function Dashboard() {
         <AlertHud onOpen={() => openPanel("alerts")} />
         <JournalComposer demoText={demo.sampleText} />
         <ScenarioDock
-          onScenarioSelect={(id) => { if (id === "evaHandInjury" || id === "cabinCold") openPanel("assistance"); }}
+          onScenarioSelect={() => openPanel("assistance")}
           onOpenPanels={() => { setMenuOpen(!menuOpen); setPanel(null); }}
           panelMenu={menuOpen && !demo.active ? (
             <div className="hud-glass hud-menu" id="dashboard-panel-menu" role="menu" aria-label="Dashboard panels">
@@ -129,9 +129,9 @@ export default function Dashboard() {
 
         <dialog ref={referenceDialog} className="reference-dialog" aria-label="Reference">
           <div className="flex max-h-[calc(100dvh-48px)] flex-col gap-3 overflow-auto p-4">
-            <div className="flex justify-end gap-2">
+            <div className="flex items-center justify-end gap-2">
               <Button variant="outline" onClick={() => { referenceDialog.current?.close(); setPanel(null); setMenuOpen(false); demo.start(); }}>Replay demo</Button>
-              <Button variant="outline" onClick={() => referenceDialog.current?.close()}>Close reference</Button>
+              <button className="hud-popup-close reference-close" onClick={() => referenceDialog.current?.close()} aria-label="Close reference"><X size={18} strokeWidth={1.5} /></button>
             </div>
             <ReferencePanel />
             <p className="px-1 text-[11px] text-ink-3">

@@ -1,22 +1,22 @@
 "use client";
 
-import { PanelsTopLeft, RotateCcw } from "lucide-react";
+import { CloudFog, Hand, Moon, PanelsTopLeft, Radiation, RotateCcw, Smile, Snowflake, Sun, Thermometer, ThermometerSun, Wind, type LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { SCENARIOS } from "@aura/core/lib/scenarios";
 import { useAuraStore } from "@/store/useAuraStore";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
-const SHORT_LABEL: Record<string, string> = {
-  sep: "Solar event",
-  acuteDose: "Acute dose",
-  coLeak: "CO leak",
-  co2Buildup: "CO₂ buildup",
-  cabinOverheat: "Overheat",
-  cabinCold: "Cabin cold",
-  fever: "Fever",
-  sleepDeprivation: "Sleep loss",
-  evaHandInjury: "Hand injury",
-  imFine: "I'm fine",
+const CONDITION: Record<string, { label: string; Icon: LucideIcon }> = {
+  sep: { label: "Solar event", Icon: Sun },
+  acuteDose: { label: "Acute dose", Icon: Radiation },
+  coLeak: { label: "CO leak", Icon: Wind },
+  co2Buildup: { label: "CO₂ buildup", Icon: CloudFog },
+  cabinOverheat: { label: "Overheat", Icon: ThermometerSun },
+  cabinCold: { label: "Cabin cold", Icon: Snowflake },
+  fever: { label: "Fever", Icon: Thermometer },
+  sleepDeprivation: { label: "Sleep loss", Icon: Moon },
+  evaHandInjury: { label: "Hand injury", Icon: Hand },
+  imFine: { label: "How I feel", Icon: Smile },
 };
 
 export default function ScenarioDock({ onOpenPanels, onScenarioSelect, panelMenu }: { onOpenPanels: () => void; onScenarioSelect: (id: string) => void; panelMenu: ReactNode }) {
@@ -25,14 +25,17 @@ export default function ScenarioDock({ onOpenPanels, onScenarioSelect, panelMenu
   const reset = useAuraStore((s) => s.reset);
 
   return (
-    <nav className="hud-glass hud-dock" aria-label="Demo scenarios and dashboard panels">
-      <div className="hud-dock-scenarios" role="group" aria-label="Demo scenarios">
+    <nav className="hud-glass hud-dock" aria-label="Conditions and dashboard panels">
+      <span className="hud-dock-label" id="conditions-label">Conditions</span>
+      <div className="hud-dock-scenarios" role="group" aria-labelledby="conditions-label">
         {SCENARIOS.map((scenario) => {
+          const { label, Icon } = CONDITION[scenario.id];
           return (
             <Tooltip key={scenario.id}>
               <TooltipTrigger asChild>
                 <button className="hud-dock-button" aria-pressed={scenarioId === scenario.id} onClick={() => { trigger(scenario.id); onScenarioSelect(scenario.id); }}>
-                  {SHORT_LABEL[scenario.id]}
+                  <Icon size={15} strokeWidth={1.5} aria-hidden />
+                  {label}
                 </button>
               </TooltipTrigger>
               <TooltipContent side="top">{scenario.description}</TooltipContent>
@@ -41,9 +44,9 @@ export default function ScenarioDock({ onOpenPanels, onScenarioSelect, panelMenu
         })}
       </div>
       <div className="hud-dock-actions">
-        <button className="hud-dock-icon" onClick={reset} aria-label="Reset scenario" title="Reset scenario"><RotateCcw size={17} strokeWidth={1.5} /></button>
+        <button className="hud-dock-icon hud-dock-labeled" onClick={reset} aria-label="Reset condition" title="Reset to the crew baseline"><RotateCcw size={16} strokeWidth={1.5} aria-hidden /><span>Reset</span></button>
         <div className="hud-panels-anchor">
-          <button className="hud-dock-icon" onClick={onOpenPanels} aria-label="Open dashboard panels" title="Dashboard panels" aria-haspopup="menu" aria-expanded={!!panelMenu} aria-controls="dashboard-panel-menu"><PanelsTopLeft size={17} strokeWidth={1.5} /></button>
+          <button className="hud-dock-icon hud-dock-labeled" onClick={onOpenPanels} aria-label="Open dashboard panels" title="Alerts, telemetry, mental health, space weather, next steps" aria-haspopup="menu" aria-expanded={!!panelMenu} aria-controls="dashboard-panel-menu"><PanelsTopLeft size={16} strokeWidth={1.5} aria-hidden /><span>Panels</span></button>
           {panelMenu}
         </div>
       </div>
