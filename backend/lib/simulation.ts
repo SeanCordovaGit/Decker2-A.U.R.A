@@ -80,8 +80,8 @@ export function tickReadings(
   // Heart rate follows resting HR plus activity
   next.heartRate = next.restingHeartRate + next.activityLevel * 70 + ((rand() - 0.5) * 2);
 
-  // Demo integration adds 0.02 days of exposure at the simulated daily dose rate per tick.
-  next.cumulativeDose = Math.max(prev.cumulativeDose, targets.cumulativeDose ?? prev.cumulativeDose + next.doseRate * 0.02);
+  // Demo integration adds 0.02 days of exposure per tick, only during an SEP event; an idle nominal baseline must not drift past the 150 mSv warning.
+  next.cumulativeDose = Math.max(prev.cumulativeDose, targets.cumulativeDose ?? prev.cumulativeDose + (targets.sepActive ? next.doseRate * 0.02 : 0));
 
   next.pvtLapses = Math.round(goal.pvtLapses);
   next.absorbedDoseGy = Math.max(prev.absorbedDoseGy, targets.absorbedDoseGy ?? prev.absorbedDoseGy);
